@@ -1,0 +1,32 @@
+{
+  "name": "odysey_sistema_de_preventas",
+  "version": "1.0.0",
+  "description": "Proyecto de sistema de preventas para PPG",
+  "keywords": [
+    "Preventa",
+    "Producto",
+    "PPG"
+  ],
+  "homepage": "https://github.com/J24RM/Odysey_sistema_de_preventas#readme",
+  "bugs": {
+    "url": "https://github.com/J24RM/Odysey_sistema_de_preventas/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/J24RM/Odysey_sistema_de_preventas.git"
+  },
+  "license": "MIT",
+  "author": "Odysey_Team",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "start": "node --watch app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0"
+  }
+}
