@@ -1,5 +1,10 @@
 # Odysey_Lab
 
+
+Para iniciar el proyecto con nmp init
+
+Para ejecutarlo con npm start
+
 - Ver todas las ramas que estan en remoto: git branch -r
 - Clonar el repositorio "git clone link"
 - Crear una nueva rama "git checkout -b (nombre de la rama)"
