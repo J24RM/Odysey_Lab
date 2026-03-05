@@ -37,7 +37,9 @@ app.use(estadisticasRoutes);
 const adminHistOrdenesRoutes = require('./routes/admin_hist_ordenes.routes');
 app.use(adminHistOrdenesRoutes);
 
-// Ruta a panel del cliente
+//Ruta a panel de clientes
+const adminClientesRoutes = require('./routes/admin_clientes.routes');
+app.use(adminClientesRoutes);
 
 //Error 404 (La ruta no existe)
 app.use((request, response, next) => {
