@@ -16,6 +16,10 @@ exports.postLogin = (request, response) => {
         request.session.usuario = usuario;
         return response.redirect('/admin_home');
     }
+    else if (usuario === "c" ) {
+        request.session.usuario = usuario;
+        return response.redirect('/cliente_home');
+    }
 
     response.render('login', { mensaje: "Credenciales incorrectas" });
 };
@@ -31,10 +35,25 @@ exports.getHome = (request, response) => {
     response.render('admin_home', { usuario: request.session.usuario });
 };
 
+exports.getHomeCliente = (request, response) => {
+    if (!request.session.usuario) {
+        return response.redirect('/login');
+    }
+
+    response.render('navbar', { usuario: request.session.usuario });
+};
 
 //Se accede al dar clic en "Cerrar sesion"
 exports.logout = (request, response) => {
     request.session.destroy(() => {
         response.redirect('/login');
     });
+};
+
+exports.getMiPerfil = (request, response) => {
+    if (!request.session.usuario) {
+        return response.redirect('/login');
+    }
+
+    response.render('', { usuario: request.session.usuario });
 };
