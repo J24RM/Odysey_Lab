@@ -1,4 +1,4 @@
-//Accede al panel de estadísticas
+//Accede al panel de estadisticas
 exports.getEstadisticas = (request, response) => {
     if (!request.session.usuario) {
         return response.redirect('/login');
