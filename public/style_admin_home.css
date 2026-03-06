@@ -1,90 +1,465 @@
-body {
-    font-family: Arial, sans-serif;
-    background: #f4f6f9;
+/* Hoja de estilos para el Panel de Administrador PPG */
+
+
+/* RESET BÁSICO Elimina márgenes y paddings por defecto del navegador  */
+
+*, *::before, *::after {
+    box-sizing: border-box;
     margin: 0;
-}
-
-header {
-    background: rgba(0, 120, 169, 0.1);
-    color: rgb(5, 0, 0);
-    padding: 15px 25px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.logo-header {
-    width: 45px;
-    height: auto;
-    margin-right: 15px;
-}
-
-header h1 {
-    margin: 0;
-}
-
-header a {
-    color: rgb(0, 0, 0);
-    text-decoration: none;
-    font-weight: bold;
-    background: rgba(17, 72, 143, 0.2);
-    padding: 8px 12px;
-    border-radius: 6px;
-}
-
-.contenido {
-    padding: 40px;
-}
-
-.card {
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    width: 350px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.sidebar {
-    width: 220px;
-    height: calc(100vh - 70px);
-    background-color: #252f3d;
-    padding: 20px 0;
-    position: fixed;
-    top: 70px;
-    left: 0;
-}
-
-.contenido {
-    margin-left: 240px;
-    padding: 30px;
-}
-
-.logo {
-    color: white;
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 22px;
-}
-
-.menu {
-    list-style: none;
     padding: 0;
 }
 
-.menu li {
-    margin: 20px 0;
+  /* VARIABLES GLOBALES */
+:root {
+    --font-sans:     "Aptos", "Segoe UI Variable", "Segoe UI", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    --font-display:  "Aptos Display", "Segoe UI Variable Display", "Segoe UI", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+
+    /* Colores principales */
+    --navy:          #252f3d;   /* Sidebar oscuro */
+    --navy-light:    #263447;   /* Hover en sidebar */
+    --ppg-blue:      #005bab;   /* Azul corporativo PPG */
+    --ppg-blue-light:#0078A91A;   /* Azul muy claro (fondos) */
+
+    /* Botones de acción */
+    --green-btn:     #4cdb87;   /* Fondo botón Agregar */
+    --red-btn:       #f87171;   /* Fondo botón Eliminar */
+
+    /* Textos */
+    --text-dark:     #1a1a2e;   /* Texto principal */
+    --text-muted:    #6b7a90;   /* Texto secundario / labels */
+
+    /* Fondos */
+    --bg:            #f0f4f9;   /* Fondo general de la página */
+    --card-bg:       #ffffff;   /* Fondo de tarjetas */
+
+    /* Dimensiones de layout */
+    --sidebar-w:     220px;     /* Ancho del sidebar */
+    --header-h:      70px;      /* Alto del header */
 }
 
 
-.menu a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-    padding: 10px 20px;
+  /* BODY  */
+
+body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+
+  /* HEADER — barra superior fija */
+
+header {
+    position:0;          
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-h);
+    background: var(--ppg-blue-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    z-index: 100;             /* Por encima del resto del contenido */
+    border-bottom: 1px solid #c9ddf5;
+    box-shadow: 0 2px 8px rgba(0, 91, 171, 0.08);
+}
+
+  /* Área del logo  */
+.logo-area img {
+    height: 44px;
     display: block;
+    
 }
 
-.menu a:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
+
+  /* Barra de búsqueda global  */
+.search-bar {
+    flex: 1;
+    max-width: 520px;
+    margin: 0 32px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px 20px;
+    border: 1.5px solid #b8cfe8;
+    border-radius: 50px;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    background: #fff;
+    color: var(--text-dark);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-bar input:focus {
+    border-color: var(--ppg-blue); /* Resalta al enfocar */
+}
+
+  /* Ícono / avatar de usuario ─────────────────────────────── */
+.user-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(null);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.user-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-icon svg {
+    width: 22px;
+    height: 22px;
+    fill: #fff;
+}
+
+
+  /* LAYOUT — contenedor sidebar + main */
+
+.layout {
+    display: flex;
+    margin-top: var(--header-h);           /* Deja espacio para el header */
+    min-height: calc(100vh - var(--header-h));
+}
+
+
+/* SIDEBAR — navegación lateral fija*/
+aside {
+    width: var(--sidebar-w);
+    background: var(--navy);
+    padding: 36px 0;
+    position: absolute;
+    top: var(--header-h);
+    left: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+  /* Links de navegación ───────────────────────────────────── */
+aside nav a {
+    display: block;
+    padding: 16px 32px;
+    color: #a8bdd4;                        /* Color texto inactivo */
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    border-left: 3px solid transparent;   /* Borde indicador activo */
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+  /* Estado hover y activo */
+aside nav a:hover,
+aside nav a.active {
+    background: var(--navy-light);
+    color: #ffffff;
+    border-left-color: var(--ppg-blue);   /* Línea azul al lado izquierdo */
+}
+
+
+  /*  MAIN — área de contenido principal */
+main {
+    margin-left: var(--sidebar-w);         
+    padding: 36px 40px;
+    flex: 1;
+}
+
+  /* Subtítulo de sección */
+.panel-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+  /* ═ BANNER — Preventa Mundial 2026  */
+.banner {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 28px 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    box-shadow: 0 2px 16px rgba(0, 91, 171, 0.07);
+    margin-bottom: 28px;
+    overflow: hidden;
+    position: relative;
+}
+
+  /* Decoración de fondo del banner */
+.banner::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, #e8f1fb 60%, transparent 100%);
+    pointer-events: none;
+}
+
+  /* Título del banner ─────────────────────────────────────── */
+.banner-text h2 {
+    font-family: var(--font-display);
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--ppg-blue);
+    text-decoration: underline;
+    text-decoration-color: #f97316;        /* Subrayado naranja */
+    text-underline-offset: 4px;
+    max-width: 380px;
+}
+
+  /* Contenedor derecho (imagen + contador) ────────────────── */
+.banner-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-shrink: 0;
+}
+
+  /* Imagen de ilustración del mundial */
+.banner-illustration {
+    height: 130px;
+    width: auto;
+    object-fit: contain;
+}
+
+  /* Placeholder visible si no hay imagen de ilustración aún */
+.banner-illustration-placeholder {
+    height: 130px;
+    width: 130px;
+    background: linear-gradient(135deg, #fde68a, #f97316);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+}
+
+  /* Bloque de cuenta regresiva ────────────────────────────── */
+.countdown-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+  /* Texto "del 1 de Mayo al 2 de Julio" con ícono reloj */
+.countdown-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ppg-blue);
+}
+
+.countdown-date svg {
+    width: 18px;
+    height: 18px;
+}
+
+  /* Fila de tiles del contador */
+.countdown-tiles {
+    display: flex;
+    gap: 6px;
+}
+
+  /* Cada tile individual (Días / Horas / Min / Seg) */
+.tile {
+    background: var(--ppg-blue);
+    color: #fff;
+    border-radius: 8px;
+    padding: 8px 10px;
+    text-align: center;
+    min-width: 52px;
+}
+
+.tile .num {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.tile .lbl {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    opacity: 0.85;
+    margin-top: 2px;
+}
+
+  /* ACCIONES RÁPIDAS — Agregar / Eliminar producto */
+.actions-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 28px 36px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    box-shadow: 0 2px 16px rgba(0, 91, 171, 0.07);
+    margin-bottom: 28px;
+}
+
+  /* Estilo base compartido por ambos botones */
+.btn-action {
+    flex: 1;
+    padding: 20px;
+    border: none;
+    border-radius: 12px;
+    font-family: var(--font-sans);
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.3px;
+}
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+  /* Botón verde — Agregar */
+.btn-add {
+    background: var(--green-btn);
+    color: #0a4a28;
+}
+
+  /* Botón rojo — Eliminar */
+.btn-del {
+    background: var(--red-btn);
+    color: #7f1d1d;
+}
+
+/* CATÁLOGO DE PRODUCTOS */
+.catalog-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 28px 36px;
+    box-shadow: 0 2px 16px rgba(0, 91, 171, 0.07);
+}
+
+  /* Encabezado: título + buscador ─────────────────────────── */
+.catalog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 16px;
+}
+
+.catalog-header h3 {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text-dark);
+}
+
+  /* Input de búsqueda dentro del catálogo */
+.search-catalog {
+    padding: 9px 18px;
+    border: 1.5px solid #d0dce8;
+    border-radius: 50px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    width: 260px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-catalog:focus {
+    border-color: var(--ppg-blue);
+}
+
+  /*  GRID DE PRODUCTOS  */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+  /* Tarjeta individual de producto */
+.product-card {
+    border: 1.5px solid #e2ecf5;
+    border-radius: 12px;
+    padding: 20px 16px 16px;
+    text-align: center;
+    transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+}
+
+.product-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 91, 171, 0.1);
+    border-color: var(--ppg-blue);
+    transform: translateY(-3px);
+}
+
+  /* Área de la imagen del producto */
+.product-img-wrap {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+
+.product-img-wrap img {
+    max-height: 110px;
+    max-width: 100%;
+    object-fit: contain;
+    /* Ajusta el max-height si las imágenes necesitan otro tamaño */
+}
+
+  /* Placeholder visible si no hay imagen del producto aún */
+.product-img-placeholder {
+    width: 90px;
+    height: 90px;
+    background: var(--ppg-blue-light);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+}
+
+  /* Nombre del producto */
+.product-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1.4;
+    text-align: left;
+}
+
+  /* Etiqueta de categoría (ej: "Sellador") */
+.product-tag {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--ppg-blue-light);
+    color: var(--ppg-blue);
+    border-radius: 50px;
+    padding: 3px 10px;
 }
