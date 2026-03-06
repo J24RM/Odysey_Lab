@@ -8,11 +8,11 @@ exports.getLogin = (request, response) => {
 //Ingresa credenciales
 //Para iniciar sesion de prueba:
 //Usuario: admin
-//Contraseña: nos3quep0ner
+//Contraseña: a
 exports.postLogin = (request, response) => {
     const { usuario, password } = request.body;
 
-    if (usuario === "admin" && password === "nos3quep0ner") {
+    if (usuario === "admin" && password === "a") {
         request.session.usuario = usuario;
         return response.redirect('/admin_home');
     }

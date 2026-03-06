@@ -9,14 +9,28 @@
 
 <body>
 
-<header>
+<div class="top-bar">
     <img src="/img/ppg-logo.svg" alt="Logo" class="logo-header">
-    <h1>Historial de ordenes</h1>
-    <a href="/logout">Cerrar sesión</a>
-</header>
+
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Buscar Orden">
+    </div>
+
+    <div class="right-section">
+        <div class="user-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+                <path d="M4 20C4 16.6863 6.68629 14 10 14H14C17.3137 14 20 16.6863 20 20"
+                stroke="currentColor" stroke-width="2"/>
+            </svg>
+        </div>
+
+        <a href="/logout" class="logout-btn">Cerrar sesión</a>
+    </div>
+</div>
+
 
 <div class="sidebar">
-
     <ul class="menu">
         <li><a href="/admin_home">Inicio</a></li>
         <li><a href="/admin_estadisticas">Estadísticas</a></li>
@@ -24,6 +38,7 @@
         <li><a href="/admin_clientes">Clientes</a></li>
     </ul>
 </div>
+
 
 <div class="contenido">
     <div class="card">
