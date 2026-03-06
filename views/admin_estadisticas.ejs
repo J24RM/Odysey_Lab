@@ -1,44 +1,157 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Estadísticas</title>
-    <link rel="stylesheet" href="/style_admin_estadisticas.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title class="title">Estadísticas Generales</title>
+  <link rel="stylesheet" href="/style_admin_estadisticas.css" />
 </head>
-
 <body>
 
-<header>
+  <!-- TOP NAV -->
+  <header class="topnav">
     <img src="/img/ppg-logo.svg" alt="Logo" class="logo-header">
-    <h1>Estadísticas</h1>
-    <a href="/logout">Cerrar sesión</a>
-</header>
-
-<div class="sidebar">
-
-    <ul class="menu">
-        <li><a href="/admin_home">Inicio</a></li>
-        <li><a href="/admin_estadisticas">Estadísticas</a></li>
-        <li><a href="/admin_historial">Historial de órdenes</a></li>
-        <li><a href="/admin_clientes">Clientes</a></li>
-    </ul>
-</div>
-
-<div class="contenido">
-    <div class="card">
-        <h2>Panel de Estadísticas</h2>
-        <p>Aquí se colocarán estadísticas acerca de:
-            <ul>
-                <li>Usuario con más ordenes realizadas</li>
-                <li>Región con más ordenes realizadas</li>
-                <li>Producto mas reservado</li>
-                <li>Cantidad de reservas al día y su comparación con el día anterior</li>
-                <li>Horario con mayor interacción del sistema con los usuarios</li>
-            </ul>
-        </p>
+    <div class="topnav__logo">
+      <div class="logo-box">
+      </div>
     </div>
-</div>
+    
+    <!-- BUSCADOR-->
+    <div class="topnav__search">
+      <input type="text" placeholder="Buscar Producto" />
+      <span class="search-icon">&#9906;</span>
+    </div>
+
+    <!-- ACCIONES-->
+    <div class="topnav__actions">
+      <button class="icon-btn" title="Carrito">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      </button>
+      <button class="icon-btn avatar-btn" title="Perfil">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+    </div>
+  </header>
+
+    <div class="sidebar">
+
+        <ul class="menu">
+            <li><a href="/admin_home">Inicio</a></li>
+            <li><a href="/admin_estadisticas">Estadísticas</a></li>
+            <li><a href="/admin_historial">Historial de órdenes</a></li>
+            <li><a href="/admin_clientes">Clientes</a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <h1 class="page-title">ESTADÍSTICAS GENERALES</h1>
+
+      <!-- Filter pill -->
+      <div class="filter-bar">
+        <button class="pill pill--active">Productos reservados</button>
+      </div>
+
+      <!-- TOP ROW: Best seller + Donut -->
+      <div class="grid grid--top">
+
+        <!-- Best seller card -->
+        <div class="card card--bestseller">
+          <p class="card__label">PRODUCTO MÁS VENDIDO</p>
+          <div class="bestseller__body">
+            <div class="bestseller__img">
+              <img src="https://www.ppgpaints.com/content/dam/ppg/ppgpaints/products/sealers/sellador-comex-5x1-clasico-preparacion-superficies/COMEX_SELLO5X1.png"
+                   alt="Sellador Comex 5×1" onerror="this.style.display='none'"/>
+              <div class="img-placeholder">🎨</div>
+            </div>
+            <div class="bestseller__info">
+              <h3>Sellador Comex 5×1 Clásico</h3>
+              <p>Preparación de Superficies</p>
+              <p>PPG Silicona o Poliuretano</p>
+              <p>4000 ml Sellador</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Donut chart card -->
+        <div class="card card--donut">
+          <p class="card__label">CANTIDAD REFERENTE A VENTAS TOTALES</p>
+          <div class="donut-wrapper">
+            <svg viewBox="0 0 100 100" class="donut-svg">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#e8e4f0" stroke-width="12"/>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#7c5cbf" stroke-width="12"
+                stroke-dasharray="75 164" stroke-dashoffset="-41" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-center">
+              <span class="donut-pct">76%</span>
+              <span class="donut-sub">de las ventas<br/>totales</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MIDDLE ROW: Monthly + Weekly -->
+      <div class="grid grid--mid">
+
+        <div class="card">
+          <p class="card__label">TOTAL DE VENTAS EN EL MES</p>
+          <p class="card__desc">Se realizaron un total de:</p>
+          <p class="stat-highlight">156 Pedidos entre todas las sucursales</p>
+          <p class="card__desc">Se ordenaron:</p>
+          <p class="stat-highlight">1432 Productos entre todas las sucursales</p>
+        </div>
+
+        <div class="card">
+          <p class="card__label">TOTAL DE VENTAS SEMANALES</p>
+          <p class="card__desc">Se realizaron un total de:</p>
+          <p class="stat-highlight">44 Pedidos entre todas las sucursales</p>
+          <p class="card__desc">Se ordenaron:</p>
+          <p class="stat-highlight">328 Productos entre todas las sucursales</p>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW: Branches + Donut -->
+      <div class="grid grid--bottom">
+
+        <!-- Branches table -->
+        <div class="card card--branches">
+          <p class="card__label">SUCURSALES CON MÁS PEDIDOS REGISTRADOS</p>
+          <table class="branch-table">
+            <tbody>
+              <tr>
+                <td class="branch-name">Sucursal Bernardo Quintana #2402</td>
+                <td><span class="badge badge--high">8 Pedidos en la última semana</span></td>
+              </tr>
+              <tr>
+                <td class="branch-name">Sucursal Av. de la Luz #1707</td>
+                <td><span class="badge badge--high">8 Pedidos en la última semana</span></td>
+              </tr>
+              <tr>
+                <td class="branch-name">Sucursal Av. Revolución #99</td>
+                <td><span class="badge badge--med">6 Pedidos en la última semana</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mini donut -->
+        <div class="card card--donut-sm">
+          <div class="donut-wrapper">
+            <svg viewBox="0 0 100 100" class="donut-svg donut-svg--sm">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#e8e4f0" stroke-width="12"/>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#7c5cbf" stroke-width="12"
+                stroke-dasharray="50 164" stroke-dashoffset="-41" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-center">
+              <span class="donut-pct donut-pct--sm">50%</span>
+              <span class="donut-sub donut-sub--sm">Representando el<br/>50% de los pedidos<br/>reales caídos<br/>en la semana</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
 
 </body>
 </html>
