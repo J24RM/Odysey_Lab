@@ -1,0 +1,89 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    margin: 0;
+}
+
+header {
+    background: rgba(0, 120, 169, 0.1);
+    color: rgb(5, 0, 0);
+    padding: 15px 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo-header {
+    width: 45px;
+    height: auto;
+    margin-right: 15px;
+}
+
+header h1 {
+    margin: 0;
+}
+
+header a {
+    color: rgb(0, 0, 0);
+    text-decoration: none;
+    font-weight: bold;
+    background: rgba(17, 72, 143, 0.2);
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+.contenido {
+    padding: 40px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 350px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.sidebar {
+    width: 220px;
+    height: calc(100vh - 70px);
+    background-color: #252f3d;
+    padding: 20px 0;
+    position: fixed;
+    top: 70px;
+    left: 0;
+}
+
+.contenido {
+    margin-left: 240px;
+    padding: 30px;
+}
+
+.logo {
+    color: white;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 22px;
+}
+
+.menu {
+    list-style: none;
+    padding: 0;
+}
+
+.menu li {
+    margin: 20px 0;
+}
+
+.menu a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    padding: 10px 20px;
+    display: block;
+}
+
+.menu a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+}

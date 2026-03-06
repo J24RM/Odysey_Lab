@@ -3,8 +3,11 @@ const app = express();
 const PORT = 3000;
 const bodyParser = require('body-parser');
 const session = require('express-session');
-
 const path = require("path");
+
+//Archivos de rutas
+const authRoutes = require('./routes/auth.routes')
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.set('view engine', 'ejs');
@@ -18,6 +21,27 @@ app.use(session({
 
 app.use(bodyParser.urlencoded({extended: false}));
 
+//Uso de rutas
+app.use (authRoutes);
+
+// Ruta raíz opcional
+app.get('/', (req, res) => {
+    res.redirect('/login');
+});
+
+//Ruta a panel de estadisticas
+const estadisticasRoutes = require('./routes/admin_estadisticas.routes');
+app.use(estadisticasRoutes);
+
+//Ruta al historial de ordenes
+const adminHistOrdenesRoutes = require('./routes/admin_hist_ordenes.routes');
+app.use(adminHistOrdenesRoutes);
+
+//Ruta a panel de clientes
+const adminClientesRoutes = require('./routes/admin_clientes.routes');
+app.use(adminClientesRoutes);
+
+//Error 404 (La ruta no existe)
 app.use((request, response, next) => {
     response.status(404).send("La ruta no existe");
 })
