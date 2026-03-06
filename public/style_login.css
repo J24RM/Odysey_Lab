@@ -1,12 +1,12 @@
 
 /* RESET BÁSICO */
-   *, *::before, *::after {
+*, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-  /* VARIABLES GLOBALES  */
+/* VARIABLES GLOBALES  */
 :root {
     --ppg-blue:       #2d7dd2;   /* Azul principal PPG */
     --ppg-blue-dark:  #1f5fa6;   /* Azul oscuro (hover botón) */
@@ -16,9 +16,8 @@
     --text-dark:      #1a1a2e;
     --error:          #e74c3c;
 }
-/* BOBY Divide la pantalla en dos mitades  */
 
-
+/* Body Divide la pantalla en dos mitades  */
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
     height: 100vh;
@@ -79,7 +78,7 @@ body::after {
     position: relative;
     z-index: 2;
     background: var(--card-bg);
-    border-radius: 16px;
+    border-radius: 5px;
     padding: 56px 52px;
     width: 100%;
     max-width: 420px;
@@ -91,8 +90,6 @@ body::after {
     flex-direction: column;
     align-items: center;
     gap: 20px;
-
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
   /* Título "Iniciar sesión" / "Bienvenido" */
