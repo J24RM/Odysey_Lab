@@ -40,14 +40,37 @@ body::before {
     position: absolute;
     top: 0;
     left: 0;
-    width: 57%;
+    width: 56%;
     height: 100%;
-    background-color: #ffffff;
-    background-image: url('img/ppg-logo.svg');
+    border-right: 10px solid #fff;
+    background-image: linear-gradient(
+    rgba(255,255,255,0.60),
+    rgba(255,255,255,0.60)
+    ),
+    url('/img/fondoLogin.jpg');
     background-size: cover;
     background-position: center;
-    display: flex;              /* No aplica a pseudo-elementos, */
-    z-index: 0;                 /* pero dejamos z-index para capas */
+    
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+
+/* Logo por delante del fondo izquierdo */
+body::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 56%;
+    height: 100%;
+    background-image: url('/img/ppg-logo.svg');
+    background-repeat: no-repeat;
+    background-size: 450px auto;
+    background-position: center;
+    z-index: 1;
+    pointer-events: none;
 }
 
 /* .card — tarjeta blanca de login (columna derecha) */
