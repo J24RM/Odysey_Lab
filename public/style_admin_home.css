@@ -125,6 +125,33 @@ header {
     fill: #fff;
 }
 
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid #b8cfe8;
+    background: #ffffff;
+    color: var(--ppg-blue);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.btn-logout:hover {
+    background: var(--ppg-blue);
+    color: #ffffff;
+    border-color: var(--ppg-blue);
+}
+
 
   /* LAYOUT — contenedor sidebar + main */
 
