@@ -5,27 +5,33 @@ body {
 }
 
 /* TOP BAR */
+
 header {
-    position:0;          
-    top: 0;
-    left: 0;
-    right: 0;
+    position: static;
     height: 70px;
     background: #0078A91A;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 28px;
-    z-index: 100;            
+    z-index: 100;             /* Por encima del resto del contenido */
     border-bottom: 1px solid #c9ddf5;
     box-shadow: 0 2px 8px rgba(0, 91, 171, 0.08);
 }
 
-/* Área del logo  */
+  /* Área del logo  */
 .logo-area img {
     height: 44px;
     display: block;
     
+}
+
+
+  /* Barra de búsqueda global  */
+.search-bar {
+    flex: 1;
+    max-width: 520px;
+    margin: 0 32px;
 }
 
 .search-bar input {
@@ -34,7 +40,7 @@ header {
     border: 1.5px solid #b8cfe8;
     border-radius: 50px;
     font-family: "Aptos", "Segoe UI Variable", "Segoe UI", "SF Pro Text", 
-    -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+                -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
     font-size: 15px;
     background: #fff;
     color: #1a1a2e;
@@ -46,6 +52,7 @@ header {
     border-color: #005bab; /* Resalta al enfocar */
 }
 
+  /* Ícono / avatar de usuario ─────────────────────────────── */
 .user-icon {
     width: 42px;
     height: 42px;
@@ -97,7 +104,6 @@ header {
     border-color: #005bab;
 }
 
-
 /* SIDEBAR */
 
 .sidebar {
@@ -137,13 +143,116 @@ header {
 .contenido {
     margin-left: 240px;
     padding: 30px;
-    margin-top: 90px;
+    margin-top: 15px;
 }
 
 .card {
     background: white;
     padding: 25px;
     border-radius: 10px;
-    width: 350px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* CARD DE CONTROLES (EXPANDIDA) */
+.controles-historial {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* TÍTULO */
+.titulo-historial {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+/* FILA DE BOTONES */
+.controles-row {
+    display: flex;
+    justify-content: space-between;   /* Dropdown izquierda, Exportar derecha */
+    align-items: center;
+    width: 100%;
+}
+
+/* BOTÓN EXPORTAR */
+.btn-exportar {
+    background: #005bab;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-exportar:hover {
+    background: #004a8f;
+}
+
+/* DROPDOWN */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-btn {
+    background: #ffffff;
+    border: 1.5px solid #b8cfe8;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.dropdown-btn:hover {
+    background: #f1f6fc;
+}
+
+.arrow {
+    font-size: 12px;
+}
+
+/* CONTENIDO DEL DROPDOWN */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 45px;
+    left: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 180px;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 10px 14px;
+    text-decoration: none;
+    color: #1a1a2e;
+    font-size: 14px;
+}
+
+.dropdown-content a:hover {
+    background: #e8f1fb;
+}
+
+/* MOSTRAR DROPDOWN */
+.dropdown:hover .dropdown-content {
+    display: block;
 }
