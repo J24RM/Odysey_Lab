@@ -4,45 +4,101 @@ body {
     margin: 0;
 }
 
+/* TOP BAR */
 header {
-    background: rgba(0, 120, 169, 0.1);
-    color: rgb(5, 0, 0);
-    padding: 15px 25px;
+    position:0;          
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background: #0078A91A;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0 28px;
+    z-index: 100;            
+    border-bottom: 1px solid #c9ddf5;
+    box-shadow: 0 2px 8px rgba(0, 91, 171, 0.08);
 }
 
-.logo-header {
-    width: 45px;
-    height: auto;
-    margin-right: 15px;
+/* Área del logo  */
+.logo-area img {
+    height: 44px;
+    display: block;
+    
 }
 
-header h1 {
-    margin: 0;
+.search-bar input {
+    width: 100%;
+    padding: 10px 20px;
+    border: 1.5px solid #b8cfe8;
+    border-radius: 50px;
+    font-family: "Aptos", "Segoe UI Variable", "Segoe UI", "SF Pro Text", 
+    -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    background: #fff;
+    color: #1a1a2e;
+    outline: none;
+    transition: border-color 0.2s;
 }
 
-header a {
-    color: rgb(0, 0, 0);
+.search-bar input:focus {
+    border-color: #005bab; /* Resalta al enfocar */
+}
+
+.user-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(null);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.user-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-icon svg {
+    width: 22px;
+    height: 22px;
+    fill: #fff;
+}
+
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid #b8cfe8;
+    background: #ffffff;
+    color: #005bab;
+    font-size: 14px;
+    font-weight: 700;
     text-decoration: none;
-    font-weight: bold;
-    background: rgba(17, 72, 143, 0.2);
-    padding: 8px 12px;
-    border-radius: 6px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
-.contenido {
-    padding: 40px;
+.btn-logout:hover {
+    background: #005bab;
+    color: #ffffff;
+    border-color: #005bab;
 }
 
-.card {
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    width: 350px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
+
+/* SIDEBAR */
 
 .sidebar {
     width: 220px;
@@ -52,18 +108,6 @@ header a {
     position: fixed;
     top: 70px;
     left: 0;
-}
-
-.contenido {
-    margin-left: 240px;
-    padding: 30px;
-}
-
-.logo {
-    color: white;
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 22px;
 }
 
 .menu {
@@ -86,4 +130,20 @@ header a {
 .menu a:hover {
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 6px;
+}
+
+/* CONTENIDO */
+
+.contenido {
+    margin-left: 240px;
+    padding: 30px;
+    margin-top: 90px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 350px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }

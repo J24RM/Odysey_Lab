@@ -9,25 +9,22 @@
 
 <body>
 
-<div class="top-bar">
-    <img src="/img/ppg-logo.svg" alt="Logo" class="logo-header">
-
-    <div class="search-container">
-        <input type="text" class="search-input" placeholder="Buscar Orden">
+<header>
+    <div class="logo-area">
+        <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
     </div>
 
-    <div class="right-section">
+    <div class="search-bar">
+        <input type="text" placeholder="Buscar Orden" />
+    </div>
+
+    <div class="header-user">
+        <a href="/logout" class="btn-logout">Cerrar sesión</a>
         <div class="user-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
-                <path d="M4 20C4 16.6863 6.68629 14 10 14H14C17.3137 14 20 16.6863 20 20"
-                stroke="currentColor" stroke-width="2"/>
-            </svg>
+            <img src="/img/iconoPerfil.png" alt="Usuario">
         </div>
-
-        <a href="/logout" class="logout-btn">Cerrar sesión</a>
     </div>
-</div>
+</header>
 
 
 <div class="sidebar">
