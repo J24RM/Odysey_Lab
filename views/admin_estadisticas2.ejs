@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Estadísticas de Pedidos</title>
+  <link rel="stylesheet" href="/style_admin_estadisticas2.css" />
+</head>
+
+<body>
+
+  <!-- TOP NAV -->
+  <header>
+    <img src="/img/ppg-logo.svg" alt="Logo" class="logo-header">
+    <div></div>
+
+    <!-- BUSCADOR -->
+    <div class="search-bar">
+      <select onchange="window.location.href = this.value">
+        <option value="/admin_estadisticas">Estadísticas generales</option>
+        <option value="/admin_estadisticas2" selected>Estadísticas de pedidos</option>
+      </select>
+    </div>
+
+    <!-- CERRAR SESIÓN -->
+    <div class="header-user">
+      <a href="/logout" class="btn-logout">Cerrar sesión</a>
+      <div class="user-icon">
+        <img src="/img/iconoPerfil.png" alt="Usuario">
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <ul class="menu">
+      <li><a href="/admin_home">Inicio</a></li>
+      <li><a href="/admin_estadisticas">Estadísticas</a></li>
+      <li><a href="/admin_historial">Historial de Pedidos</a></li>
+      <li><a href="/admin_clientes">Clientes</a></li>
+    </ul>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <h1 class="page-title">ESTADÍSTICAS DE PEDIDOS</h1>
+
+    <!-- FILTER ROW -->
+    <div class="filter-row">
+      <select class="filter-select">
+        <option>Estadísticas de pedidos</option>
+      </select>
+      <select class="filter-select">
+        <option>Semanales</option>
+        <option>Mensuales</option>
+      </select>
+    </div>
+
+    <!-- ====== WEEKLY ORDERS CARD ====== -->
+    <div class="card">
+      <p class="card__label">ORDENES SEMANALES:</p>
+      <div class="orders-chart">
+        <!-- Bar Chart -->
+        <div class="chart-area">
+          <div class="bar-group">
+            <div class="bar" style="height: 160px;"></div>
+            <span class="bar-label">Lunes</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 90px;"></div>
+            <span class="bar-label">Martes</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 130px;"></div>
+            <span class="bar-label">Miércoles</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 150px;"></div>
+            <span class="bar-label">Jueves</span>
+          </div>
+          <div class="bar-group">
+            <div class="bar" style="height: 20px;"></div>
+            <span class="bar-label">Viernes</span>
+          </div>
+        </div>
+
+        <!-- Data Table -->
+        <table class="data-table">
+          <tbody>
+            <tr>
+              <td>LUNES</td>
+              <td>7 pedidos</td>
+            </tr>
+            <tr>
+              <td>MARTES</td>
+              <td>3 pedidos</td>
+            </tr>
+            <tr>
+              <td>MIÉRCOLES</td>
+              <td>5 pedidos</td>
+            </tr>
+            <tr>
+              <td>JUEVES</td>
+              <td>6 pedidos</td>
+            </tr>
+            <tr>
+              <td>VIERNES</td>
+              <td>1 pedido</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== PRODUCTS MOST ORDERED ====== -->
+    <div class="card">
+      <p class="card__label">PRODUCTOS MÁS PEDIDOS SEMANALMENTE:</p>
+
+      <!-- Product 1 -->
+      <div class="product-row">
+        <div class="product-img">
+          <img
+            src="https://www.ppgpaints.com/content/dam/ppg/ppgpaints/products/sealers/sellador-comex-5x1-clasico-preparacion-superficies/COMEX_SELLO5X1.png"
+            alt="Sellador Comex 5×1" />
+        </div>
+        <div class="product-info">
+          <h4>Sellador Comex 5×1 Clásico &nbsp;Preparación de Superficies PPG Silicona o Poliuretano</h4>
+          <p>4000 ml Sellador</p>
+        </div>
+        <div class="product-price">
+          <p class="price-main">$ 1,600</p>
+          <p class="price-unit">($ 800/ unidad)</p>
+        </div>
+      </div>
+
+      <!-- Product 2 -->
+      <div class="product-row">
+        <div class="product-img">
+          <img
+            src="https://www.ppgpaints.com/content/dam/ppg/ppgpaints/products/sealers/sellador-comex-5x1-clasico-preparacion-superficies/COMEX_SELLO5X1.png"
+            alt="Sellador Comex 5×1" />
+        </div>
+        <div class="product-info">
+          <h4>Sellador Comex 5×1 Clásico &nbsp;Preparación de Superficies PPG Silicona o Poliuretano</h4>
+          <p>4000 ml Sellador</p>
+        </div>
+        <div class="product-price">
+          <p class="price-main">$ 1,600</p>
+          <p class="price-unit">($ 800/ unidad)</p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+</body>
+
+</html>
