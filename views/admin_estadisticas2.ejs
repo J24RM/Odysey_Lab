@@ -7,42 +7,55 @@
   <link rel="stylesheet" href="/style_admin_estadisticas2.css" />
 </head>
 
-<body>
+<body class="font-sans bg-bgmain m-0 flex flex-col min-h-screen" style="background-color: #f4f6f9;">
 
-  <!-- TOP NAV -->
-  <header>
-    <img src="/img/ppg-logo.svg" alt="Logo" class="logo-header">
-    <div></div>
+  <!-- HEADER -->
+  <header
+    class="fixed top-0 left-0 right-0 h-[70px] bg-ppgbluelight flex items-center justify-between px-7 z-[100] border-b border-[#c9ddf5] shadow-[0_2px_8px_rgba(0,91,171,0.08)] bg-white">
+    <div class="logo-area">
+      <img src="/img/ppg-logo.svg" alt="Logo PPG" class="h-[44px] block">
+    </div>
 
     <!-- BUSCADOR -->
-    <div class="search-bar">
-      <select onchange="window.location.href = this.value">
+    <div class="flex-1 max-w-[520px] mx-8 search-bar">
+      <select onchange="window.location.href = this.value"
+        class="w-full py-[10px] px-5 border-[1.5px] border-[#b8cfe8] rounded-[50px] font-sans text-[15px] bg-white text-textdark outline-none transition-colors duration-200 focus:border-[#005bab]">
         <option value="/admin_estadisticas">Estadísticas generales</option>
         <option value="/admin_estadisticas2" selected>Estadísticas de pedidos</option>
       </select>
     </div>
 
     <!-- CERRAR SESIÓN -->
-    <div class="header-user">
-      <a href="/logout" class="btn-logout">Cerrar sesión</a>
-      <div class="user-icon">
-        <img src="/img/iconoPerfil.png" alt="Usuario">
+    <div class="flex items-center gap-[10px]">
+      <a href="/logout"
+        class="inline-flex items-center justify-center py-2 px-[14px] rounded-full border border-[#b8cfe8] bg-white text-[#005bab] text-[14px] font-bold no-underline transition-all hover:bg-[#005bab] hover:text-white hover:border-[#005bab]">Cerrar
+        sesión</a>
+      <div class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer overflow-hidden">
+        <img src="/img/iconoPerfil.png" alt="Usuario" class="w-full h-full object-cover">
       </div>
     </div>
   </header>
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
-    <ul class="menu">
-      <li><a href="/admin_home">Inicio</a></li>
-      <li><a href="/admin_estadisticas">Estadísticas</a></li>
-      <li><a href="/admin_historial">Historial de Pedidos</a></li>
-      <li><a href="/admin_clientes">Clientes</a></li>
+  <div class="w-[220px] h-[calc(100vh-70px)] bg-[#252f3d] py-5 fixed top-[70px] left-0">
+    <ul class="list-none p-0 m-0">
+      <li class="my-5"><a href="/admin_home"
+          class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Inicio</a>
+      </li>
+      <li class="my-5"><a href="/admin_estadisticas"
+          class="text-white no-underline text-lg block py-[10px] px-5 bg-white/20 rounded-md transition-colors">Estadísticas</a>
+      </li>
+      <li class="my-5"><a href="/admin_historial"
+          class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Historial
+          de órdenes</a></li>
+      <li class="my-5"><a href="/admin_clientes"
+          class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Clientes</a>
+      </li>
     </ul>
   </div>
 
   <!-- MAIN CONTENT -->
-  <main class="main">
+  <main class="main ml-[240px] pt-[90px] px-[30px] pb-5">
 
     <h1 class="page-title">ESTADÍSTICAS DE PEDIDOS</h1>
 
