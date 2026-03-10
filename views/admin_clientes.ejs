@@ -4,44 +4,79 @@
 <head>
     <meta charset="UTF-8">
     <title>Clientes</title>
-    <link rel="stylesheet" href="/style_admin_clientes.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#252f3d',
+                        ppgblue: '#005bab',
+                        ppgbluelight: '#0078A91A',
+                        textdark: '#1a1a2e',
+                        bgmain: '#f4f6f9',
+                    },
+                    fontFamily: {
+                        sans: ['"Aptos"', '"Segoe UI Variable"', '"Segoe UI"', '"SF Pro Text"', '-apple-system', 'BlinkMacSystemFont', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 
-<body>
+<body class="font-sans bg-bgmain m-0 flex flex-col min-h-screen">
 
-<header>
-    <div class="logo-area">
-        <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
+    <!-- HEADER -->
+    <header
+        class="fixed top-0 left-0 right-0 h-[70px] bg-ppgbluelight flex items-center justify-between px-7 z-[100] border-b border-[#c9ddf5] shadow-[0_2px_8px_rgba(0,91,171,0.08)]">
+        <div class="logo-area">
+            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="h-[44px] block">
+        </div>
+
+        <div class="flex-1 max-w-[520px] mx-8">
+            <input
+                class="w-full py-[10px] px-5 border-[1.5px] border-[#b8cfe8] rounded-[50px] font-sans text-[15px] bg-white text-textdark outline-none transition-colors duration-200 focus:border-ppgblue"
+                type="text" placeholder="Buscar Cuenta" />
+        </div>
+
+        <div class="flex items-center gap-[10px]">
+            <a href="/logout"
+                class="inline-flex items-center justify-center py-2 px-[14px] rounded-full border border-[#b8cfe8] bg-white text-ppgblue text-[14px] font-bold no-underline transition-all hover:bg-ppgblue hover:text-white hover:border-ppgblue">Cerrar
+                sesión</a>
+            <div class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer overflow-hidden">
+                <img src="/img/iconoPerfil.png" alt="Usuario" class="w-full h-full object-cover">
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <div class="w-[220px] h-[calc(100vh-70px)] bg-navy py-5 fixed top-[70px] left-0">
+        <ul class="list-none p-0 m-0">
+            <li class="my-5"><a href="/admin_home"
+                    class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Inicio</a>
+            </li>
+            <li class="my-5"><a href="/admin_estadisticas"
+                    class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Estadísticas</a>
+            </li>
+            <li class="my-5"><a href="/admin_historial"
+                    class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Historial
+                    de órdenes</a></li>
+            <li class="my-5"><a href="/admin_clientes"
+                    class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Clientes</a>
+            </li>
+        </ul>
     </div>
 
-    <div class="search-bar">
-        <input type="text" placeholder="Buscar Cuenta" />
-    </div>
-
-    <div class="header-user">
-        <a href="/logout" class="btn-logout">Cerrar sesión</a>
-        <div class="user-icon">
-            <img src="/img/iconoPerfil.png" alt="Usuario">
+    <!-- MAIN CONTENT -->
+    <div class="ml-[240px] p-[30px] mt-[90px]">
+        <div class="bg-white p-[25px] rounded-[10px] w-[350px] shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+            <h2 class="mt-0 font-bold mb-2 text-2xl">Clientes</h2>
+            <p class="m-0 text-gray-700">Aquí se muestra la información de los usuarios</p>
         </div>
     </div>
-</header>
-
-<div class="sidebar">
-
-    <ul class="menu">
-        <li><a href="/admin_home">Inicio</a></li>
-        <li><a href="/admin_estadisticas">Estadísticas</a></li>
-        <li><a href="/admin_historial">Historial de órdenes</a></li>
-        <li><a href="/admin_clientes">Clientes</a></li>
-    </ul>
-</div>
-
-<div class="contenido">
-    <div class="card">
-        <h2>Clientes</h2>
-        <p>Aquí se muestra la información de los usuarios</p>
-    </div>
-</div>
 
 </body>
+
 </html>

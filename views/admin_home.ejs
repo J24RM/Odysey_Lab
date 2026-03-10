@@ -4,147 +4,203 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Home</title>
-    <link rel="stylesheet" href="/style_admin_home.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#252f3d',
+                        navylight: '#263447',
+                        ppgblue: '#005bab',
+                        ppgbluelight: '#0078A91A',
+                        greenbtn: '#4cdb87',
+                        redbtn: '#f87171',
+                        textdark: '#1a1a2e',
+                        textmuted: '#6b7a90',
+                        bgmain: '#f0f4f9',
+                        cardbg: '#ffffff'
+                    },
+                    fontFamily: {
+                        sans: ['"Aptos"', '"Segoe UI Variable"', '"Segoe UI"', '"SF Pro Text"', '-apple-system', 'BlinkMacSystemFont', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+                        display: ['"Aptos Display"', '"Segoe UI Variable Display"', '"Segoe UI"', '"SF Pro Display"', '-apple-system', 'BlinkMacSystemFont', '"Helvetica Neue"', 'Arial', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 
-<body>
+<body class="font-sans bg-bgmain text-textdark min-h-screen flex flex-col m-0 p-0">
 
-    <header>
+    <!-- HEADER -->
+    <header
+        class="fixed top-0 left-0 right-0 h-[70px] bg-ppgbluelight flex items-center justify-between px-7 z-[100] border-b border-[#c9ddf5] shadow-[0_2px_8px_rgba(0,91,171,0.08)] bg-white">
         <div class="logo-area">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
+            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="h-[44px] block">
         </div>
 
-        <div class="search-bar">
-            <input type="text" placeholder="Buscar Producto" />
+        <div class="flex-1 max-w-[520px] mx-8">
+            <input
+                class="w-full py-[10px] px-5 border-[1.5px] border-[#b8cfe8] rounded-[50px] font-sans text-[15px] bg-white text-textdark outline-none transition-colors duration-200 focus:border-ppgblue"
+                type="text" placeholder="Buscar Producto" />
         </div>
 
-        <div class="header-user">
-            <a href="/logout" class="btn-logout">Cerrar sesión</a>
-            <div class="user-icon">
-                <img src="/img/iconoPerfil.png" alt="Usuario">
+        <div class="flex items-center gap-[10px]">
+            <a href="/logout"
+                class="inline-flex items-center justify-center py-2 px-[14px] rounded-full border border-[#b8cfe8] bg-white text-ppgblue text-[14px] font-bold no-underline transition-all hover:bg-ppgblue hover:text-white hover:border-ppgblue">Cerrar
+                sesión</a>
+            <div class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer overflow-hidden">
+                <img src="/img/iconoPerfil.png" alt="Usuario" class="w-full h-full object-cover">
             </div>
         </div>
     </header>
 
-    
+    <!-- SIDEBAR -->
+    <div class="w-[220px] h-[calc(100vh-70px)] bg-navy py-5 fixed top-[70px] left-0">
+        <ul class="list-none p-0 m-0">
+            <li class="my-5"><a href="/admin_home"
+                    class="text-white no-underline text-lg block py-[10px] px-5 bg-white/20 rounded-md transition-colors">Inicio</a>
+            </li>
+            <li class="my-5"><a href="/admin_estadisticas"
+                    class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Estadísticas</a>
+            </li>
+            <li class="my-5"><a href="/admin_historial"
+                    class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Historial
+                    de órdenes</a></li>
+            <li class="my-5"><a href="/admin_clientes"
+                    class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Clientes</a>
+            </li>
+        </ul>
+    </div>
 
-    <div class="layout">
-        <aside>
-            <nav class="menu">
-                <a href="/admin_home" class="active">Inicio</a>
-                <a href="/admin_estadisticas">Estadísticas</a>
-                <a href="/admin_historial">Historial de órdenes</a>
-                <a href="/admin_clientes">Clientes</a>
-            </nav>
-        </aside>
+    <!-- MAIN CONTENT -->
+    <div class="ml-[240px] pt-[90px] px-10 pb-9 flex-1">
+        <div
+            class="bg-gradient-to-r from-white to-[#f7fbff] border border-[#d8e7f6] border-l-[6px] border-l-ppgblue rounded-[14px] py-4 px-5 mb-[22px] shadow-[0_2px_12px_rgba(0,91,171,0.08)]">
+            <h2 class="m-0 font-display text-[28px] font-extrabold text-ppgblue leading-[1.15]">Bienvenido
+                administrador</h2>
+        </div>
 
-
-        <main>
-            <div class="bienvenida">
-                <h2>Bienvenido administrador</h2>
+        <section
+            class="bg-cardbg rounded-2xl py-7 px-9 flex items-center justify-between gap-6 shadow-[0_2px_16px_rgba(0,91,171,0.07)] mb-7 overflow-hidden relative">
+            <div
+                class="absolute -top-10 -right-10 w-[220px] h-[220px] bg-[radial-gradient(circle,#e8f1fb_60%,transparent_100%)] pointer-events-none">
+            </div>
+            <div class="z-10 relative">
+                <h2
+                    class="font-display text-[38px] font-extrabold leading-[1.1] text-ppgblue underline decoration-[#f97316] underline-offset-4 max-w-[380px]">
+                    Preventa Activa: Productos Exclusivos Mundial 2026</h2>
             </div>
 
-            <section class="banner">
-                <div class="banner-text">
-                    <h2>Preventa Activa: Productos Exclusivos Mundial 2026</h2>
+            <div class="flex items-center gap-6 shrink-0 z-10 relative">
+                <img src="/img/niñoMundial.png" alt="Mundial 2026" class="h-[130px] w-auto object-contain">
+            </div>
+        </section>
+
+        <section
+            class="bg-cardbg rounded-2xl py-7 px-9 flex gap-6 items-center shadow-[0_2px_16px_rgba(0,91,171,0.07)] mb-7">
+            <button
+                class="flex-1 p-5 border-none rounded-xl font-sans text-lg font-extrabold cursor-pointer transition-all tracking-[0.3px] bg-greenbtn text-[#0a4a28] hover:-translate-y-[2px] hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)]">Agregar
+                Producto</button>
+            <button
+                class="flex-1 p-5 border-none rounded-xl font-sans text-lg font-extrabold cursor-pointer transition-all tracking-[0.3px] bg-redbtn text-[#7f1d1d] hover:-translate-y-[2px] hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)]">Eliminar
+                Producto</button>
+        </section>
+
+        <section class="bg-cardbg rounded-2xl py-7 px-9 shadow-[0_2px_16px_rgba(0,91,171,0.07)]">
+            <div class="flex items-center justify-between mb-6 gap-4">
+                <h3 class="font-display text-[26px] font-extrabold text-textdark">Catalogo de Productos</h3>
+                <input
+                    class="py-[9px] px-[18px] border-[1.5px] border-[#d0dce8] rounded-full font-sans text-sm w-[260px] outline-none transition-colors focus:border-ppgblue"
+                    type="text" placeholder="Buscar Productos" />
+            </div>
+
+            <div class="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-5">
+                <!-- product cards -->
+                <div
+                    class="border-[1.5px] border-[#e2ecf5] rounded-xl pt-5 px-4 pb-4 text-center transition-all cursor-pointer hover:shadow-[0_6px_20px_rgba(0,91,171,0.1)] hover:border-ppgblue hover:-translate-y-[3px]">
+                    <div class="h-[120px] flex items-center justify-center mb-[14px]">
+                        <img src="/img/botePintura.png" alt="Sellador Comex"
+                            class="max-h-[110px] max-w-full object-contain">
+                    </div>
+                    <div class="text-[13px] font-bold text-textdark leading-[1.4] text-left">
+                        Sellador Comex 5×1 Clásico Preparación de Superfícies PPG Silicona o Poliuretano 4000 ml
+                    </div>
+                    <span
+                        class="inline-block mt-2 text-[11px] font-bold bg-ppgbluelight text-ppgblue rounded-full py-[3px] px-[10px]">Sellador</span>
                 </div>
 
-                <div class="banner-right">
-                    <img src="/img/niñoMundial.png"
-                        alt="Mundial 2026"
-                        class="banner-illustration">
-                </div>
-            </section>
-
-            <section class="actions-card">
-                <button class="btn-action btn-add">Agregar Producto</button>
-                <button class="btn-action btn-del">Eliminar Producto</button>
-            </section>
-
-            <section class="catalog-card">
-                <div class="catalog-header">
-                    <h3>Catalogo de Productos</h3>
-                    <input class="search-catalog"
-                        type="text"
-                        placeholder="Buscar Productos" />
+                <div
+                    class="border-[1.5px] border-[#e2ecf5] rounded-xl pt-5 px-4 pb-4 text-center transition-all cursor-pointer hover:shadow-[0_6px_20px_rgba(0,91,171,0.1)] hover:border-ppgblue hover:-translate-y-[3px]">
+                    <div class="h-[120px] flex items-center justify-center mb-[14px]">
+                        <img src="/img/botePintura.png" alt="Sellador Comex"
+                            class="max-h-[110px] max-w-full object-contain">
+                    </div>
+                    <div class="text-[13px] font-bold text-textdark leading-[1.4] text-left">
+                        Sellador Comex 5×1 Clásico Preparación de Superfícies PPG Silicona o Poliuretano 4000 ml
+                    </div>
+                    <span
+                        class="inline-block mt-2 text-[11px] font-bold bg-ppgbluelight text-ppgblue rounded-full py-[3px] px-[10px]">Sellador</span>
                 </div>
 
-                <div class="product-grid">
-                    <div class="product-card">
-                        <div class="product-img-wrap">
-                            <img src="/img/botePintura.png"
-                                alt="Sellador Comex">
-                        </div>
-                        <div class="product-name">
-                            Sellador Comex 5×1 Clásico Preparación de
-                            Superfícies PPG Silicona o Poliuretano 4000 ml
-                        </div>
-                        <span class="product-tag">Sellador</span>
+                <div
+                    class="border-[1.5px] border-[#e2ecf5] rounded-xl pt-5 px-4 pb-4 text-center transition-all cursor-pointer hover:shadow-[0_6px_20px_rgba(0,91,171,0.1)] hover:border-ppgblue hover:-translate-y-[3px]">
+                    <div class="h-[120px] flex items-center justify-center mb-[14px]">
+                        <img src="/img/botePintura.png" alt="Sellador Comex"
+                            class="max-h-[110px] max-w-full object-contain">
                     </div>
-
-                    <div class="product-card">
-                        <div class="product-img-wrap">
-                            <img src="/img/botePintura.png"
-                                alt="Sellador Comex">
-                        </div>
-                        <div class="product-name">
-                            Sellador Comex 5×1 Clásico Preparación de
-                            Superfícies PPG Silicona o Poliuretano 4000 ml
-                        </div>
-                        <span class="product-tag">Sellador</span>
+                    <div class="text-[13px] font-bold text-textdark leading-[1.4] text-left">
+                        Sellador Comex 5×1 Clásico Preparación de Superfícies PPG Silicona o Poliuretano 4000 ml
                     </div>
-
-                    <div class="product-card">
-                        <div class="product-img-wrap">
-                            <img src="/img/botePintura.png"
-                                alt="Sellador Comex">
-                        </div>
-                        <div class="product-name">
-                            Sellador Comex 5×1 Clásico Preparación de
-                            Superfícies PPG Silicona o Poliuretano 4000 ml
-                        </div>
-                        <span class="product-tag">Sellador</span>
-                    </div>
-
-                    <div class="product-card">
-                        <div class="product-img-wrap">
-                            <img src="/img/botePintura.png"
-                                alt="Sellador Comex">
-                        </div>
-                        <div class="product-name">
-                            Sellador Comex 5×1 Clásico Preparación de
-                            Superfícies PPG Silicona o Poliuretano 4000 ml
-                        </div>
-                        <span class="product-tag">Sellador</span>
-                    </div>
-
-                    <div class="product-card">
-                        <div class="product-img-wrap">
-                            <img src="/img/botePintura.png"
-                                alt="Sellador Comex">
-                        </div>
-                        <div class="product-name">
-                            Sellador Comex 5×1 Clásico Preparación de
-                            Superfícies PPG Silicona o Poliuretano 4000 ml
-                        </div>
-                        <span class="product-tag">Sellador</span>
-                    </div>
-
-                    <div class="product-card">
-                        <div class="product-img-wrap">
-                            <img src="/img/botePintura.png"
-                                alt="Sellador Comex">
-                        </div>
-                        <div class="product-name">
-                            Sellador Comex 5×1 Clásico Preparación de
-                            Superfícies PPG Silicona o Poliuretano 4000 ml
-                        </div>
-                        <span class="product-tag">Sellador</span>
-                    </div>
+                    <span
+                        class="inline-block mt-2 text-[11px] font-bold bg-ppgbluelight text-ppgblue rounded-full py-[3px] px-[10px]">Sellador</span>
                 </div>
-            </section>
-        </main>
+
+                <div
+                    class="border-[1.5px] border-[#e2ecf5] rounded-xl pt-5 px-4 pb-4 text-center transition-all cursor-pointer hover:shadow-[0_6px_20px_rgba(0,91,171,0.1)] hover:border-ppgblue hover:-translate-y-[3px]">
+                    <div class="h-[120px] flex items-center justify-center mb-[14px]">
+                        <img src="/img/botePintura.png" alt="Sellador Comex"
+                            class="max-h-[110px] max-w-full object-contain">
+                    </div>
+                    <div class="text-[13px] font-bold text-textdark leading-[1.4] text-left">
+                        Sellador Comex 5×1 Clásico Preparación de Superfícies PPG Silicona o Poliuretano 4000 ml
+                    </div>
+                    <span
+                        class="inline-block mt-2 text-[11px] font-bold bg-ppgbluelight text-ppgblue rounded-full py-[3px] px-[10px]">Sellador</span>
+                </div>
+
+                <div
+                    class="border-[1.5px] border-[#e2ecf5] rounded-xl pt-5 px-4 pb-4 text-center transition-all cursor-pointer hover:shadow-[0_6px_20px_rgba(0,91,171,0.1)] hover:border-ppgblue hover:-translate-y-[3px]">
+                    <div class="h-[120px] flex items-center justify-center mb-[14px]">
+                        <img src="/img/botePintura.png" alt="Sellador Comex"
+                            class="max-h-[110px] max-w-full object-contain">
+                    </div>
+                    <div class="text-[13px] font-bold text-textdark leading-[1.4] text-left">
+                        Sellador Comex 5×1 Clásico Preparación de Superfícies PPG Silicona o Poliuretano 4000 ml
+                    </div>
+                    <span
+                        class="inline-block mt-2 text-[11px] font-bold bg-ppgbluelight text-ppgblue rounded-full py-[3px] px-[10px]">Sellador</span>
+                </div>
+
+                <div
+                    class="border-[1.5px] border-[#e2ecf5] rounded-xl pt-5 px-4 pb-4 text-center transition-all cursor-pointer hover:shadow-[0_6px_20px_rgba(0,91,171,0.1)] hover:border-ppgblue hover:-translate-y-[3px]">
+                    <div class="h-[120px] flex items-center justify-center mb-[14px]">
+                        <img src="/img/botePintura.png" alt="Sellador Comex"
+                            class="max-h-[110px] max-w-full object-contain">
+                    </div>
+                    <div class="text-[13px] font-bold text-textdark leading-[1.4] text-left">
+                        Sellador Comex 5×1 Clásico Preparación de Superfícies PPG Silicona o Poliuretano 4000 ml
+                    </div>
+                    <span
+                        class="inline-block mt-2 text-[11px] font-bold bg-ppgbluelight text-ppgblue rounded-full py-[3px] px-[10px]">Sellador</span>
+                </div>
+
+            </div>
+        </section>
     </div>
 
 </body>
+
 </html>
