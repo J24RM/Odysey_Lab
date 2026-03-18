@@ -42,6 +42,26 @@ app.use(adminHistOrdenesRoutes);
 const producto = require('./routes/producto.routes');
 app.use(producto);
 
+//Ruta de ordenes
+const orden = require('./routes/orden.routes');
+app.use(orden);
+
+//Rutas del cliente
+const cliente = require('./routes/cliente.routes');
+app.use(cliente);
+
+//Rutas del Carrito
+const carrito = require('./routes/carrito.routes');
+app.use(carrito);
+
+//Rutas del Cuenta
+const cuenta = require('./routes/cuenta.routes');
+app.use(cuenta);
+
+//Rutas del Sucursal
+const sucursal = require('./routes/sucursal.routes');
+app.use(sucursal);
+
 //Error 404 (La ruta no existe)
 app.use((request, response, next) => {
     response.status(404).send("La ruta no existe");

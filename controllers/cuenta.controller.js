@@ -1,0 +1,5 @@
+exports.getCuentasDeMiUsuario = (request, response) => {
+
+};
+
+
