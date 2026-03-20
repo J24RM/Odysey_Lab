@@ -1,0 +1,35 @@
+@startuml Modificar Producto del Carrito
+Title "Modificar Producto del Carrito"
+
+actor Navegador as nav
+boundary "carrito.routes.js" as ruta
+boundary "carrito.ejs" as UI
+control "carrito.controller.js" as ctrl
+entity "detalle_orden.model.js" as model
+database "Postgres (Supabase)" as DB
+
+activate nav
+nav -> ruta: POST /carrito/items/id_producto 
+deactivate nav
+
+activate ruta
+ruta -> ctrl:  actualizarItem(request, response)
+deactivate ruta
+activate ctrl
+
+alt request.body.cantidad = 0
+    ctrl -> model: eliminarProducto(id_producto)
+    activate DB
+    model -> DB: DELETE detalle_orden Where id_producto
+    DB --> model: Producto Eliminado
+    deactivate DB
+    
+else request.body.cantidad != 0
+    ctrl -> model: eliminarProducto(id_producto, cantidad_ingresada)
+    activate DB
+    model -> DB: UPDATE cantidad = cantidad_ingresada
+    DB --> model: Cantidad Actualizada
+    deactivate DB
+
+end
+@enduml

@@ -21,7 +21,7 @@ app.use(session({
     resave: false, // La sesión no se guardará en cada petición, sino sólo se guardará si algo cambió
     saveUninitialized: false, // Asegura que no se guarde una sesión para una petición que no lo necesita
 }));
-
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 //Rutas publicas (sin autenticacion)
@@ -31,6 +31,22 @@ app.use(authRoutes);
 app.get('/', (request, response) => {
     response.redirect('/login');
 });
+
+//Ruta a panel de estadisticas
+const estadisticasRoutes = require('./routes/admin_estadisticas.routes');
+app.use(estadisticasRoutes);
+
+//Ruta al historial de ordenes
+const adminHistOrdenesRoutes = require('./routes/admin_hist_ordenes.routes');
+app.use(adminHistOrdenesRoutes);
+
+
+
+
+//Rutas del Carrito
+const carrito = require('./routes/carrito.routes');
+app.use("/carrito", carrito);
+
 
 //Middleware global de autenticacion
 app.use((request, response, next) => {

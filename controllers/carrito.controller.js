@@ -1,19 +1,32 @@
-//Ver carrito
-exports.getCarrito = (request, response) => {
-    response.render('cliente/cart', { usuario: request.session.usuario });
+const ordenModel = require('../models/orden.model')
+const detalle_ordenModel = require('../models/detalle_orden.model');
+const { compile } = require('ejs');
+
+exports.getCarrito = async (request, response, next) => {
+
+
+
 };
 
-//Agregar producto al carrito
-exports.agregarItem = (request, response) => {
-    response.render('cliente/cart', { usuario: request.session.usuario });
+exports.agregarItem = async (request, response, next) => {
+    try {
+        // Obtener o crear carrito
+        const orden = await ordenModel.obtenerOrdenEnEstadoCarrito(request.body.id_usuario);
+
+        // Agregar producto
+        await detalle_ordenModel.agregarProductoAlCarrito(
+            orden.id_orden,
+            request.body.id_producto,
+            request.body.cantidad_ingresada
+        );
+
+        response.json({ message: "Producto agregado" });
+
+    } catch (err) {
+        next(err);
+    }
 };
 
-//Modificar cantidad
-exports.actulizarItem = (request, response) => {
-    response.render('cliente/cart', { usuario: request.session.usuario });
-};
+exports.actualizarItem = (request, response) => {
 
-//Eliminar producto
-exports.eliminarItem = (request, response) => {
-    response.render('cliente/cart', { usuario: request.session.usuario });
 };
