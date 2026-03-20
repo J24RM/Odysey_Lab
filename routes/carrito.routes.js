@@ -10,9 +10,7 @@ router.get('/', carritoController.getCarrito);
 router.post('/items', carritoController.agregarItem);
 
 // Modificar cantidad
-router.put('/items/:producto_id', carritoController.actulizarItem);
+router.post('/items/:id_producto', carritoController.actualizarItem);
 
-// Eliminar producto
-router.delete('/items/:producto_id', carritoController.eliminarItem);
 
 module.exports = router;
