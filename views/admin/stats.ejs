@@ -2,225 +2,225 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8" />
-  <title>Estadísticas Generales</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
+<meta charset="UTF-8" />
+<title>Estadísticas Generales</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
     tailwind.config = {
-      theme: {
+    theme: {
         extend: {
-          colors: {
+            colors: {
             'ppg-blue': '#0078a9',
             'ppg-dark': '#252f3d',
             'text-dark': '#1a1a2e',
             'text-muted': '#6b7280',
-          },
-          fontFamily: {
+            },
+        fontFamily: {
             sans: ['Inter', 'Arial', 'sans-serif'],
-          },
+        },
         }
-      }
     }
-  </script>
-  <style>
+    }
+</script>
+<style>
     /* Donut chart rotation — not possible with pure Tailwind */
     .donut-svg {
-      transform: rotate(-90deg);
+    transform: rotate(-90deg);
     }
-  </style>
+</style>
 </head>
 
 <body class="font-sans bg-[#f4f6f9] m-0">
 
-  <!-- TOP NAV -->
-  <header
+<!-- TOP NAV -->
+<header
     class="bg-[#0078A91A] text-[rgb(5,0,0)] px-7 flex items-center justify-between h-[70px] z-[100] border-b border-[#c9ddf5] shadow-[0_2px_8px_rgba(0,91,171,0.08)]">
     <img src="/img/ppg-logo.svg" alt="Logo" class="w-[45px] h-auto mr-4">
     <div>
-      <div></div>
+    <div></div>
     </div>
 
     <!-- BUSCADOR DE ESTADÍSTICAS -->
     <div class="flex-1 max-w-[520px] mx-8">
-      <select onchange="window.location.href = this.value"
+        <select onchange="window.location.href = this.value"
         class="w-full py-2.5 px-5 border-[1.5px] border-[#b8cfe8] rounded-full font-sans text-[15px] bg-white text-text-dark outline-none transition-colors duration-200 cursor-pointer focus:border-ppg-blue">
-        <option value="/admin_estadisticas">Estadísticas generales</option>
-        <option value="/admin_estadisticas2">Estadísticas de pedidos</option>
-      </select>
+        <option value="/admin/stats">Estadísticas generales</option>
+        <option value="/admin/stats">Estadísticas de pedidos</option>
+        </select>
     </div>
 
     <!-- CERRAR SESIÓN -->
     <div class="flex items-center gap-2.5">
-      <a href="/logout"
+        <a href="/logout"
         class="inline-flex items-center justify-center py-2 px-3.5 rounded-full border border-[#b8cfe8] bg-white text-[#005bab] text-sm font-bold no-underline transition-all duration-200 hover:bg-[#005bab] hover:text-white hover:border-[#005bab]">
         Cerrar sesión
-      </a>
-      <div class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer overflow-hidden">
+        </a>
+        <div class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer overflow-hidden">
         <img src="/img/iconoPerfil.png" alt="Usuario" class="w-full h-full object-cover">
-      </div>
+        </div>
     </div>
 
-  </header>
+</header>
 
-  <!-- SIDEBAR -->
-  <div class="w-[220px] h-[calc(100vh-70px)] bg-ppg-dark py-5 fixed top-[70px] left-0 max-[900px]:w-[60px]">
+<!-- SIDEBAR -->
+<div class="w-[220px] h-[calc(100vh-70px)] bg-ppg-dark py-5 fixed top-[70px] left-0 max-[900px]:w-[60px]">
     <ul class="list-none p-0">
-      <li class="my-5"><a href="/admin_home"
-          class="text-white no-underline text-lg py-2.5 px-5 block hover:bg-white/20 hover:rounded-md max-[900px]:text-[0px] max-[900px]:p-3.5 max-[900px]:text-center">Inicio</a>
-      </li>
-      <li class="my-5"><a href="/admin_estadisticas"
-          class="text-white no-underline text-lg py-2.5 px-5 block hover:bg-white/20 hover:rounded-md max-[900px]:text-[0px] max-[900px]:p-3.5 max-[900px]:text-center">Estadísticas</a>
-      </li>
-      <li class="my-5"><a href="/admin_historial"
-          class="text-white no-underline text-lg py-2.5 px-5 block hover:bg-white/20 hover:rounded-md max-[900px]:text-[0px] max-[900px]:p-3.5 max-[900px]:text-center">Historial
-          de órdenes</a></li>
-      <li class="my-5"><a href="/admin_clientes"
-          class="text-white no-underline text-lg py-2.5 px-5 block hover:bg-white/20 hover:rounded-md max-[900px]:text-[0px] max-[900px]:p-3.5 max-[900px]:text-center">Clientes</a>
-      </li>
+        <li class="my-5"><a href="/admin/home"
+            class="text-white no-underline text-lg py-2.5 px-5 block hover:bg-white/20 hover:rounded-md max-[900px]:text-[0px] max-[900px]:p-3.5 max-[900px]:text-center">Inicio</a>
+        </li>
+        <li class="my-5"><a href="/admin/stats"
+            class="text-white no-underline text-lg py-2.5 px-5 block hover:bg-white/20 hover:rounded-md max-[900px]:text-[0px] max-[900px]:p-3.5 max-[900px]:text-center">Estadísticas</a>
+        </li>
+        <li class="my-5"><a href="/admin/orders"
+            class="text-white no-underline text-lg py-2.5 px-5 block hover:bg-white/20 hover:rounded-md max-[900px]:text-[0px] max-[900px]:p-3.5 max-[900px]:text-center">Historial
+            de órdenes</a></li>
+        <li class="my-5"><a href="/admin/clients"
+            class="text-white no-underline text-lg py-2.5 px-5 block hover:bg-white/20 hover:rounded-md max-[900px]:text-[0px] max-[900px]:p-3.5 max-[900px]:text-center">Clientes</a>
+        </li>
     </ul>
-  </div>
+</div>
 
-  <!-- MAIN CONTENT -->
-  <main
+<!-- MAIN CONTENT -->
+<main
     class="ml-[240px] px-9 py-[30px] mt-5 min-h-[calc(100vh-70px)] max-[900px]:ml-[60px] max-[900px]:px-4 max-[900px]:py-5">
 
     <% if (!dbConnected) { %>
-      <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
         <p class="font-bold">Aviso</p>
         <p>No se ha conectado Supabase. Mostrando datos de prueba. Configura tu `.env` para ver datos reales.</p>
-      </div>
-      <% } %>
+    </div>
+    <% } %>
 
         <!-- TOP ROW: Best seller + Donut -->
         <div class="grid grid-cols-2 gap-6 mb-6 max-[900px]:grid-cols-1">
 
-          <!-- Best seller card -->
-          <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+        <!-- Best seller card -->
+        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
             <p class="text-[13px] font-bold text-text-muted tracking-wide mb-4 uppercase">PRODUCTO MÁS VENDIDO
-              SEMANALMENTE</p>
+            SEMANALMENTE</p>
             <div class="flex items-center gap-5">
-              <div
+            <div
                 class="w-[120px] h-[120px] shrink-0 flex items-center justify-center bg-[#f8f6fc] rounded-xl overflow-hidden p-2">
                 <% if (productoMasVendido && productoMasVendido.img) { %>
-                  <img src="<%= productoMasVendido.img %>" alt="Producto" onerror="this.style.display='none'"
+                <img src="<%= productoMasVendido.img %>" alt="Producto" onerror="this.style.display='none'"
                     class="max-w-full max-h-full object-contain" />
-                  <% } else { %>
+                <% } else { %>
                     <div class="text-5xl">📦</div>
                     <% } %>
-              </div>
-              <div>
+            </div>
+            <div>
                 <h3 class="text-lg m-0 mb-1.5 text-text-dark">
-                  <%= productoMasVendido ? productoMasVendido.nombre : 'Aún no hay ventas' %>
+                    <%= productoMasVendido ? productoMasVendido.nombre : 'Aún no hay ventas' %>
                 </h3>
                 <p class="text-[13px] text-text-muted my-0.5">
-                  <%= productoMasVendido ? productoMasVendido.desc : 'Sin pedidos recientes' %>
+                    <%= productoMasVendido ? productoMasVendido.desc : 'Sin pedidos recientes' %>
                 </p>
-              </div>
             </div>
-          </div>
+            </div>
+        </div>
 
-          <!-- Donut chart card -->
-          <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)] flex flex-col items-center">
+        <!-- Donut chart card -->
+        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)] flex flex-col items-center">
             <p class="text-[13px] font-bold text-text-muted tracking-wide mb-4 uppercase">CANTIDAD REFERENTE A VENTAS DE
-              LA SEMANA</p>
+                LA SEMANA</p>
             <div class="relative w-[200px] h-[200px] flex items-center justify-center">
-              <svg viewBox="0 0 100 100" class="donut-svg w-full h-full">
+            <svg viewBox="0 0 100 100" class="donut-svg w-full h-full">
                 <circle cx="50" cy="50" r="38" fill="none" stroke="#e8e4f0" stroke-width="12" />
                 <!-- stroke-dasharray formula: (percent/100) * 239, 239 -->
                 <% const dash1=Math.round((porcentajeProducto/100) * 239); %>
-                  <circle cx="50" cy="50" r="38" fill="none" stroke="#7c5cbf" stroke-width="12"
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#7c5cbf" stroke-width="12"
                     stroke-dasharray="<%= dash1 %> 239" stroke-dashoffset="0" stroke-linecap="round" />
-              </svg>
-              <div class="absolute text-center">
+            </svg>
+            <div class="absolute text-center">
                 <span class="block text-[32px] font-extrabold text-[#7c5cbf]">
-                  <%= porcentajeProducto %>%
+                    <%= porcentajeProducto %>%
                 </span>
                 <span class="block text-[11px] text-text-muted leading-tight mt-0.5">de productos<br />de la
-                  semana</span>
-              </div>
+                    semana</span>
             </div>
-          </div>
+            </div>
+        </div>
         </div>
 
         <!-- MIDDLE ROW: Monthly + Weekly -->
         <div class="grid grid-cols-2 gap-6 mb-6 max-[900px]:grid-cols-1">
 
-          <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
             <p class="text-[13px] font-bold text-text-muted tracking-wide mb-4 uppercase">TOTAL DE VENTAS EN EL MES</p>
             <p class="text-sm text-text-muted my-1.5">Se realizaron un total de:</p>
             <p class="text-base font-bold text-ppg-blue my-1 mb-3">
-              <%= totalMensual %> Pedidos entre todas las sucursales
+                <%= totalMensual %> Pedidos entre todas las sucursales
             </p>
-          </div>
+            </div>
 
-          <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
             <p class="text-[13px] font-bold text-text-muted tracking-wide mb-4 uppercase">TOTAL DE VENTAS SEMANALES</p>
             <p class="text-sm text-text-muted my-1.5">Se realizaron un total de:</p>
             <p class="text-base font-bold text-ppg-blue my-1 mb-3">
-              <%= totalSemanal %> Pedidos entre todas las sucursales
+                <%= totalSemanal %> Pedidos entre todas las sucursales
             </p>
             <p class="text-sm text-text-muted my-1.5">Se ordenaron:</p>
             <p class="text-base font-bold text-ppg-blue my-1 mb-3">
-              <%= productosSemanal %> Productos entre todas las sucursales
+                <%= productosSemanal %> Productos entre todas las sucursales
             </p>
-          </div>
+        </div>
         </div>
 
         <!-- BOTTOM ROW: Branches + Donut -->
         <div class="grid grid-cols-[2fr_1fr] gap-6 mb-6 max-[900px]:grid-cols-1">
 
-          <!-- Branches table -->
-          <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+        <!-- Branches table -->
+        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
             <p class="text-[13px] font-bold text-text-muted tracking-wide mb-4 uppercase">SUCURSALES CON MÁS PEDIDOS EN
-              LA SEMANA</p>
+                LA SEMANA</p>
             <table class="w-full border-collapse">
-              <tbody>
+            <tbody>
                 <% if (topSucursales && topSucursales.length> 0) { %>
-                  <% topSucursales.forEach((sucursal, index)=> { %>
+                <% topSucursales.forEach((sucursal, index)=> { %>
                     <tr class="border-b border-[#f0f0f0]">
-                      <td class="py-3 px-2 align-middle text-sm font-semibold text-text-dark">
+                    <td class="py-3 px-2 align-middle text-sm font-semibold text-text-dark">
                         <%= sucursal.nombre %>
-                      </td>
-                      <td class="py-3 px-2 align-middle">
+                    </td>
+                    <td class="py-3 px-2 align-middle">
                         <span
-                          class="inline-block text-xs font-semibold py-1.5 px-3 rounded-full <%= index === 0 ? 'bg-ppg-blue/[0.12] text-ppg-blue' : 'bg-[#7c5cbf]/[0.12] text-[#7c5cbf]' %>">
-                          <%= sucursal.cantidad %> Pedidos en la última semana
+                        class="inline-block text-xs font-semibold py-1.5 px-3 rounded-full <%= index === 0 ? 'bg-ppg-blue/[0.12] text-ppg-blue' : 'bg-[#7c5cbf]/[0.12] text-[#7c5cbf]' %>">
+                        <%= sucursal.cantidad %> Pedidos en la última semana
                         </span>
-                      </td>
+                    </td>
                     </tr>
                     <% }); %>
-                      <% } else { %>
+                        <% } else { %>
                         <tr>
-                          <td class="py-3 px-2 text-sm text-text-muted">Aún no hay pedidos registrados esta semana.</td>
+                            <td class="py-3 px-2 text-sm text-text-muted">Aún no hay pedidos registrados esta semana.</td>
                         </tr>
                         <% } %>
-              </tbody>
+                </tbody>
             </table>
-          </div>
+        </div>
 
-          <!-- Mini donut -->
-          <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)] flex flex-col items-center">
+        <!-- Mini donut -->
+        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)] flex flex-col items-center">
             <div class="relative w-[160px] h-[160px] flex items-center justify-center">
-              <svg viewBox="0 0 100 100" class="donut-svg w-[160px] h-[160px]">
+                <svg viewBox="0 0 100 100" class="donut-svg w-[160px] h-[160px]">
                 <circle cx="50" cy="50" r="38" fill="none" stroke="#e8e4f0" stroke-width="12" />
                 <!-- stroke-dasharray formula: (percent/100) * 239, 239 -->
                 <% const dash2=Math.round((porcentajeSucursales/100) * 239); %>
-                  <circle cx="50" cy="50" r="38" fill="none" stroke="#7c5cbf" stroke-width="12"
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#7c5cbf" stroke-width="12"
                     stroke-dasharray="<%= dash2 %> 239" stroke-dashoffset="0" stroke-linecap="round" />
-              </svg>
-              <div class="absolute text-center">
+            </svg>
+            <div class="absolute text-center">
                 <span class="block text-[26px] font-extrabold text-[#7c5cbf]">
-                  <%= porcentajeSucursales %>%
+                <%= porcentajeSucursales %>%
                 </span>
                 <span class="block text-[10px] text-text-muted leading-tight mt-0.5">Representado por las<br />top
-                  sucursales<br />en la semana</span>
-              </div>
+                sucursales<br />en la semana</span>
             </div>
-          </div>
+            </div>
+        </div>
 
         </div>
-  </main>
+</main>
 
 </body>
 

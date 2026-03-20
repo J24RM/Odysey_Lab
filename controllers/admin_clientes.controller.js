@@ -1,8 +1,4 @@
 //Accede al panel de clientes
-exports.getClientes = (request, response) => {
-    if (!request.session.usuario) {
-        return response.redirect('/login');
-    }
-
-    response.render('admin_clientes', { usuario: request.session.usuario });
+exports.getAdminClientes = (request, response) => {
+    response.render('admin/clients', { usuario: request.session.usuario });
 };

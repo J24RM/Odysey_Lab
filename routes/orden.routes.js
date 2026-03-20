@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const ordenController = require("../controllers/orden.controller.js")
+const ordenesController = require("../controllers/orden.controller.js")
 
 router.get("/", ordenesController.getOrdenes);
 router.get("/:id_orden", ordenesController.getOrdenes);

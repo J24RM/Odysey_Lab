@@ -6,8 +6,10 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require("path");
 
-//Archivos de rutas
-const authRoutes = require('./routes/auth.routes')
+// Archivos de rutas
+const authRoutes = require('./routes/auth.routes');
+const adminRoutes = require('./routes/admin.routes');
+const clienteRoutes = require('./routes/cliente.routes');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -16,18 +18,18 @@ app.set('views', 'views');
 
 app.use(session({
     secret: 'mi string secreto que debe ser un string aleatorio muy largo, no como éste',
-    resave: false, //La sesión no se guardará en cada petición, sino sólo se guardará si algo cambió 
-    saveUninitialized: false, //Asegura que no se guarde una sesión para una petición que no lo necesita
+    resave: false, // La sesión no se guardará en cada petición, sino sólo se guardará si algo cambió
+    saveUninitialized: false, // Asegura que no se guarde una sesión para una petición que no lo necesita
 }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-//Uso de rutas
+//Rutas publicas (sin autenticacion)
 app.use(authRoutes);
 
-// Ruta raíz opcional
-app.get('/', (req, res) => {
-    res.redirect('/login');
+//Ruta raiz opcional
+app.get('/', (request, response) => {
+    response.redirect('/login');
 });
 
 //Ruta a panel de estadisticas
@@ -46,11 +48,39 @@ const carrito = require('./routes/carrito.routes');
 app.use("/carrito", carrito);
 
 
+//Middleware global de autenticacion
+app.use((request, response, next) => {
+    if (!request.session.usuario) {
+        return response.redirect('/login');
+    }
+    next();
+});
 
-//Error 404 (La ruta no existe)
+//Middleware de autorizacion para rutas admin
+const requireAdmin = (request, response, next) => {
+    if (request.session.rol !== 'admin') {
+        return response.status(403).send('Acceso denegado. Solo administradores pueden acceder aquí.');
+    }
+    next();
+};
+
+//Middleware de autorizacion para rutas cliente
+const requireCliente = (request, response, next) => {
+    if (request.session.rol !== 'cliente') {
+        return response.status(403).send('Acceso denegado. Solo clientes pueden acceder aquí.');
+    }
+    next();
+};
+
+//Rutas para admin 
+app.use('/admin', requireAdmin, adminRoutes);
+
+//Rutas para cliente
+app.use(requireCliente, clienteRoutes);
+
 app.use((request, response, next) => {
     response.status(404).send("La ruta no existe");
-})
+});
 
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);

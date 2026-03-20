@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de Producto</title>
+    <link rel="stylesheet" href="/style_admin_home.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo-area">
+            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
+        </div>
+
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar Producto" />
+        </div>
+
+        <div class="header-user">
+            <a href="/logout" class="btn-logout">Cerrar sesión</a>
+            <div class="user-icon">
+                <img src="/img/iconoPerfil.png" alt="Usuario">
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside>
+            <nav class="menu">
+                <a href="/admin/home">Inicio</a>
+                <a href="/admin/stats">Estadísticas</a>
+                <a href="/admin/orders">Historial de órdenes</a>
+                <a href="/admin/clients">Clientes</a>
+            </nav>
+        </aside>
+
+        <main>
+            <div class="bienvenida">
+                <h2>Detalle de Producto</h2>
+            </div>
+
+            <section class="catalog-card">
+                <div class="product-detail">
+                    <p>Producto ID: <%= productoId %></p>
+                    <p>Aquí va la información del producto seleccionado</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+</body>
+</html>
