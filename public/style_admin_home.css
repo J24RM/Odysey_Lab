@@ -157,6 +157,7 @@ header {
     display: flex;
     margin-top: 0;
     min-height: calc(100vh - var(--header-h));
+    flex: 1;
 }
 
 
@@ -513,4 +514,37 @@ main {
     color: var(--ppg-blue);
     border-radius: 50px;
     padding: 3px 10px;
+}
+
+.admin-footer {
+    background: var(--navy);
+    padding: 8px 20px;
+}
+
+.admin-footer-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.admin-footer-inner img {
+    width: 86px;
+    height: auto;
+    flex-shrink: 0;
+}
+
+.admin-footer-inner p {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+@media (max-width: 720px) {
+    .admin-footer-inner {
+        align-items: flex-start;
+        flex-direction: column;
+    }
 }
