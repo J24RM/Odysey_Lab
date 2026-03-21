@@ -17,19 +17,32 @@ ruta -> ctrl:  actualizarItem(request, response)
 deactivate ruta
 activate ctrl
 
-alt request.body.cantidad = 0
-    ctrl -> model: eliminarProducto(id_producto)
+alt request.body.cantidad_ingresada = 0
+    ctrl ->> model: eliminarProducto(id_producto)
+    activate model
+    model ->> DB: .from('detalle_orden') .delete() .eq('id_producto', id_producto)
     activate DB
-    model -> DB: DELETE detalle_orden Where id_producto
-    DB --> model: Producto Eliminado
+    DB -->> model
     deactivate DB
+    model -->> ctrl
+    deactivate model
     
 else request.body.cantidad != 0
-    ctrl -> model: eliminarProducto(id_producto, cantidad_ingresada)
+    ctrl ->> model: modificarCantidad(id_producto, cantidad_ingresada)
+    activate model
+    model ->> DB: UPDATE cantidad = cantidad_ingresada
     activate DB
-    model -> DB: UPDATE cantidad = cantidad_ingresada
-    DB --> model: Cantidad Actualizada
+    DB -->> model
     deactivate DB
+    model -->> ctrl
 
+    deactivate model
 end
+
+ctrl --> ruta: JSON (resultado)
+deactivate ctrl
+activate ruta
+ruta --> nav: JSON
+deactivate ruta
+activate nav
 @enduml

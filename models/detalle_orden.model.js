@@ -46,4 +46,27 @@ module.exports = class Orden {
 
         return;
     }
+
+
+    static async eliminarProducto(id_orden, id_producto,){
+        const {error} = await supabase
+            .from('detalle_orden')
+            .delete()
+            .eq('id_producto', id_producto)
+            .eq('id_orden', id_orden);
+
+        if (error) throw error;
+        return id_producto;
+    }
+
+    static async modificarCantidad(id_orden, id_producto, cantidad_ingresada){
+        const {error} = await supabase
+            .from('detalle_orden')
+            .update({cantidad: cantidad_ingresada})
+            .eq('id_producto', id_producto)
+            .eq('id_orden', id_orden);
+
+        if (error) throw error;
+        return;
+    }
 }

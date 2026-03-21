@@ -33,8 +33,9 @@ app.get('/', (request, response) => {
 });
 
 //Ruta a panel de estadisticas
-const estadisticasRoutes = require('./routes/admin_estadisticas.routes');
-app.use(estadisticasRoutes);
+// const estadisticasRoutes = require('./routes/admin_estadisticas.routes');
+// app.use(estadisticasRoutes);
+// ESAS LINEAS DAN FALLO
 
 //Ruta al historial de ordenes
 const adminHistOrdenesRoutes = require('./routes/admin_hist_ordenes.routes');

@@ -12,6 +12,7 @@ exports.agregarItem = async (request, response, next) => {
     try {
         // Obtener o crear carrito
         const orden = await ordenModel.obtenerOrdenEnEstadoCarrito(request.body.id_usuario);
+        request.session.id_orden = orden.id;
 
         // Agregar producto
         await detalle_ordenModel.agregarProductoAlCarrito(
@@ -27,6 +28,28 @@ exports.agregarItem = async (request, response, next) => {
     }
 };
 
-exports.actualizarItem = (request, response) => {
+exports.actualizarItem = async (request, response, next) => {
+    const { id_producto } = request.params;
+    const { cantidad_ingresada } = request.body;
+    const id_orden =  3 ; // req.session.id_orden;
 
+    try {
+        if (cantidad_ingresada == 0) {
+            await detalle_ordenModel.eliminarProducto(id_orden, id_producto);
+            return response.json({ eliminado: true });
+        } else {
+            await detalle_ordenModel.modificarCantidad(
+                id_orden,
+                id_producto,
+                cantidad_ingresada
+            );
+
+            return response.json({
+                eliminado: false,
+                nuevaCantidad: cantidad_ingresada
+            });
+        }
+    } catch (error) {
+        return response.status(500).json({ error: error.message });
+    }
 };

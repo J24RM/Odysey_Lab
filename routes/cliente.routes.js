@@ -19,13 +19,10 @@ router.get('/product/:id', productoController.getProductoCliente);
 router.get('/cart', carritoController.getCarrito);
 
 //Ruta post para gregar producto al carrito
-router.post('/cart/items', carritoController.agregarItem);
+router.post('/carrito/items', carritoController.agregarItem);
 
-//Ruta put para modificar cantidad
-router.put('/cart/items/:producto_id', carritoController.actulizarItem);
-
-//Ruta delete para eliminar producto
-router.delete('/cart/items/:producto_id', carritoController.eliminarItem);
+//Ruta post para modificar cantidad y eleminar producto
+router.post('/items/:id_producto', carritoController.actualizarItem);
 
 //Ruta get para ver el perfil
 router.get('/profile', cuentaController.getProfile);
