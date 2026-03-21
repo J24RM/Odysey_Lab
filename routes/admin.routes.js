@@ -15,6 +15,9 @@ router.get('/home', authController.getAdminHome);
 //Ruta /admin/home_agregarProducto
 router.get('/home_agregarProducto', authController.getAdminAgregarProducto);
 
+//Ruta /admin/home_eliminarProducto
+router.get('/home_eliminarProducto', authController.getAdminEliminarProducto);
+
 //Ruta /admin/stats
 router.get('/stats', adminEstadisticasController.getEstadisticas);
 
