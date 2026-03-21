@@ -431,6 +431,8 @@ main {
 .admin-footer {
     background: var(--navy);
     padding: 8px 20px;
+    position: relative;
+    z-index: 20;
 }
 
 .admin-footer-inner {
