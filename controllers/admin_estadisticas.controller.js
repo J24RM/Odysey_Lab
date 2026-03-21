@@ -26,3 +26,7 @@ exports.getEstadisticas = async (request, response) => {
 
     response.render('admin/stats', pageData);
 };
+
+exports.getEstadisticas2 = (request, response) => {
+    response.render('admin_estadisticas2', { usuario: request.session.usuario });
+};

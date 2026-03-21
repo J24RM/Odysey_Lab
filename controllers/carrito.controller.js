@@ -30,3 +30,7 @@ exports.agregarItem = async (request, response, next) => {
 exports.actualizarItem = (request, response) => {
 
 };
+
+exports.eliminarItem = (request, response) => {
+
+};

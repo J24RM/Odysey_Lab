@@ -12,6 +12,9 @@ const productoController = require('../controllers/producto.controller');
 //Ruta /adminhome
 router.get('/home', authController.getAdminHome);
 
+//Ruta /admin/home_agregarProducto
+router.get('/home_agregarProducto', authController.getAdminAgregarProducto);
+
 //Ruta /admin/stats
 router.get('/stats', adminEstadisticasController.getEstadisticas);
 

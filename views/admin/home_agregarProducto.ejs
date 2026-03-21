@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Producto</title>
+    <link rel="stylesheet" href="/style_admin_agregarProducto.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo-area">
+            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
+        </div>
+
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar Producto" />
+        </div>
+
+        <div class="header-user">
+            <a href="/logout" class="btn-logout">Cerrar sesión</a>
+            <div class="user-icon">
+                <img src="/img/iconoPerfil.png" alt="Usuario">
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside>
+            <nav class="menu">
+                <a href="/admin/home" class="active">Inicio</a>
+                <a href="/admin/stats">Estadísticas</a>
+                <a href="/admin/orders">Historial de órdenes</a>
+                <a href="/admin/clients">Clientes</a>
+            </nav>
+        </aside>
+
+        <main>
+            <div class="page-shell" aria-hidden="true">
+                <section class="banner">
+                    <div class="banner-text">
+                        <h2>Preventa Activa: Productos Exclusivos Mundial 2026</h2>
+                    </div>
+                    <div class="banner-right">
+                        <img src="/img/niñoMundial.png" alt="Mundial 2026" class="banner-illustration">
+                    </div>
+                </section>
+
+                <section class="actions-card">
+                    <a class="btn-action btn-add btn-action-link" href="/admin/home_agregarProducto">Agregar Producto</a>
+                    <button class="btn-action btn-del" type="button">Eliminar Producto</button>
+                </section>
+
+                <section class="catalog-card">
+                    <div class="catalog-header">
+                        <h3>Catalogo de Productos</h3>
+                        <input class="search-catalog" type="text" placeholder="Buscar Productos" />
+                    </div>
+
+                    <div class="product-grid">
+                        <div class="product-card"></div>
+                        <div class="product-card"></div>
+                        <div class="product-card"></div>
+                        <div class="product-card"></div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="product-modal-overlay">
+                <section class="product-modal" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
+                    <a class="product-modal-close" href="/admin/home" aria-label="Cerrar vista">
+                        &times;
+                    </a>
+
+                    <h2 class="product-modal-title" id="productModalTitle">Agregar Producto</h2>
+
+                    <div class="product-modal-tabs" role="tablist" aria-label="Opciones de carga">
+                        <button
+                            class="product-modal-tab active"
+                            type="button"
+                            role="tab"
+                            aria-selected="true"
+                            data-product-tab="manual">
+                            Agregar producto manualmente
+                        </button>
+                        <button
+                            class="product-modal-tab"
+                            type="button"
+                            role="tab"
+                            aria-selected="false"
+                            data-product-tab="bulk">
+                            Carga masiva de productos
+                        </button>
+                    </div>
+
+                    <div class="product-modal-panel active" data-product-panel="manual">
+                        <form class="product-modal-form">
+                            <div class="product-field product-field-full">
+                                <label for="productName">Nombre del producto:</label>
+                                <input id="productName" type="text" placeholder="Ingresa el nombre del producto">
+                            </div>
+
+                            <div class="product-field product-field-full">
+                                <label for="productDescription">Descripción:</label>
+                                <input id="productDescription" type="text" placeholder="Ingresa la descripcion completa del producto">
+                            </div>
+
+                            <div class="product-form-grid product-form-grid-top">
+                                <div class="product-field">
+                                    <label for="productKey">Clave del producto:</label>
+                                    <input id="productKey" type="text" placeholder="Ingresa la clave del producto">
+                                </div>
+
+                                <div class="product-field">
+                                    <label for="saleUnit">Unidad de venta:</label>
+                                    <div class="product-select-wrap">
+                                        <select id="saleUnit">
+                                            <option selected disabled>Selecciona la unidad de venta</option>
+                                            <option>Pieza</option>
+                                            <option>Caja</option>
+                                            <option>Paquete</option>
+                                            <option>Litro</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="product-field">
+                                    <label for="measureUnit">Unidad de medida:</label>
+                                    <div class="product-select-wrap">
+                                        <select id="measureUnit">
+                                            <option selected disabled>Selecciona la unidad de medida</option>
+                                            <option>Mililitros</option>
+                                            <option>Litros</option>
+                                            <option>Kilogramos</option>
+                                            <option>Gramos</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="product-form-grid product-form-grid-bottom">
+                                <div class="product-field">
+                                    <label for="productImage">Imagen:</label>
+                                    <label class="product-upload-box" for="productImage">
+                                        <span>Haz clic aquí o Arrastra la imagen</span>
+                                    </label>
+                                    <input id="productImage" type="file" accept="image/*" hidden>
+                                </div>
+
+                                <div class="product-form-stack">
+                                    <div class="product-field">
+                                        <label for="productVolume">Volumen:</label>
+                                        <input id="productVolume" type="text" placeholder="Ingresa el volumen">
+                                    </div>
+
+                                    <div class="product-availability">
+                                        <span class="product-availability-label">Marcar producto activo:</span>
+                                        <div class="product-switch-row">
+                                            <span>No</span>
+                                            <label class="product-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="product-switch-slider"></span>
+                                            </label>
+                                            <span>Si</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="product-form-stack product-form-stack-right">
+                                    <div class="product-field">
+                                        <label for="productWeight">Peso:</label>
+                                        <input id="productWeight" type="text" placeholder="Ingresa el peso en kilogramos">
+                                    </div>
+
+                                    <div class="product-submit-wrap">
+                                        <button class="product-submit-btn" type="submit">Agregar</button>
+                                        <p>Antes de agregar llena correctamente todos los campos</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="product-modal-panel" data-product-panel="bulk">
+                        <div class="bulk-upload-card">
+                            <h3>Carga masiva de productos</h3>
+                            <p>Sube un archivo con el listado de productos para registrar varios elementos al mismo tiempo.</p>
+                            <label class="bulk-upload-dropzone" for="bulkFile">
+                                <span>Haz clic aquí o arrastra tu archivo CSV o Excel</span>
+                            </label>
+                            <input id="bulkFile" type="file" accept=".csv,.xlsx,.xls" hidden>
+                            <button class="product-submit-btn bulk-upload-btn" type="button">Subir archivo</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const productTabs = document.querySelectorAll('[data-product-tab]');
+        const productPanels = document.querySelectorAll('[data-product-panel]');
+
+        productTabs.forEach((tab) => {
+            tab.addEventListener('click', () => {
+                const targetPanel = tab.dataset.productTab;
+
+                productTabs.forEach((item) => {
+                    item.classList.toggle('active', item === tab);
+                    item.setAttribute('aria-selected', item === tab ? 'true' : 'false');
+                });
+
+                productPanels.forEach((panel) => {
+                    panel.classList.toggle('active', panel.dataset.productPanel === targetPanel);
+                });
+            });
+        });
+    </script>
+
+</body>
+</html> 
+

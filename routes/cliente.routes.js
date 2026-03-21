@@ -22,7 +22,7 @@ router.get('/cart', carritoController.getCarrito);
 router.post('/cart/items', carritoController.agregarItem);
 
 //Ruta put para modificar cantidad
-router.put('/cart/items/:producto_id', carritoController.actulizarItem);
+router.put('/cart/items/:producto_id', carritoController.actualizarItem);
 
 //Ruta delete para eliminar producto
 router.delete('/cart/items/:producto_id', carritoController.eliminarItem);

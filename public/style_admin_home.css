@@ -379,6 +379,13 @@ main {
     letter-spacing: 0.3px;
 }
 
+.btn-action-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
 .btn-action:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
