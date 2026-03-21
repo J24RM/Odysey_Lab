@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@source "../../views/**/*.ejs";
+@source "../../public/**/*.js";
+
+@theme {
+  --color-ppg-blue: #005bab;
+  --color-ppg-blue-soft: #eaf4ff;
+  --color-ppg-navy: #252f3d;
+  --color-ppg-navy-light: #263447;
+  --color-ppg-bg: #f0f4f9;
+  --color-ppg-border: #d8e7f6;
+  --color-ppg-muted: #6b7a90;
+  --font-sans: "Aptos", "Segoe UI Variable", "Segoe UI", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Aptos Display", "Segoe UI Variable Display", "Segoe UI", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+}

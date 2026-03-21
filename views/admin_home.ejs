@@ -7,144 +7,394 @@
     <link rel="stylesheet" href="/style_admin_home.css">
 </head>
 
-<body>
+<body class="min-h-screen bg-ppg-bg font-sans text-slate-900">
 
-    <header>
-        <div class="logo-area">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
+    <header class="flex h-[70px] items-center justify-between border-b border-[#c9ddf5] bg-ppg-blue-soft px-7 shadow-[0_2px_8px_rgba(0,91,171,0.08)]">
+        <div>
+            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="block h-11">
         </div>
 
-        <div class="search-bar">
-            <input type="text" placeholder="Buscar" />
+        <div class="mx-8 flex-1 max-w-[520px]">
+            <input
+                type="text"
+                placeholder="Buscar"
+                class="w-full rounded-full border border-[#b8cfe8] bg-white px-5 py-2.5 text-[15px] outline-none transition focus:border-ppg-blue">
         </div>
 
-        <div class="header-user">
-            <a href="/logout" class="btn-logout">Cerrar sesión</a>
-            <div class="user-icon">
-                <img src="/img/iconoPerfil.png" alt="Usuario">
+        <div class="flex items-center gap-3">
+            <a
+                href="/logout"
+                class="inline-flex items-center justify-center rounded-full border border-[#b8cfe8] bg-white px-4 py-2 text-sm font-bold text-ppg-blue transition hover:border-ppg-blue hover:bg-ppg-blue hover:text-white">
+                Cerrar sesión
+            </a>
+            <div class="flex h-[42px] w-[42px] items-center justify-center overflow-hidden rounded-full">
+                <img src="/img/iconoPerfil.png" alt="Usuario" class="h-full w-full object-cover">
             </div>
         </div>
     </header>
 
-    
-
-    <div class="layout">
-        <aside>
-            <nav class="menu">
-                <a href="/admin_home" class="active">Inicio</a>
-                <a href="/admin_estadisticas">Estadísticas</a>
-                <a href="/admin_historial">Historial de órdenes</a>
-                <a href="/admin_clientes">Clientes</a>
+    <div class="relative flex min-h-[calc(100vh-70px)]">
+        <aside class="absolute inset-y-0 left-0 flex w-[220px] flex-col gap-1 bg-ppg-navy py-9">
+            <nav>
+                <a href="/admin_home" class="block border-l-3 border-ppg-blue bg-ppg-navy-light px-8 py-4 text-base font-semibold tracking-[0.3px] text-white">Inicio</a>
+                <a href="/admin_estadisticas" class="block border-l-3 border-transparent px-8 py-4 text-base font-semibold tracking-[0.3px] text-[#a8bdd4] transition hover:bg-ppg-navy-light hover:text-white">Estadísticas</a>
+                <a href="/admin_historial" class="block border-l-3 border-transparent px-8 py-4 text-base font-semibold tracking-[0.3px] text-[#a8bdd4] transition hover:bg-ppg-navy-light hover:text-white">Historial de órdenes</a>
+                <a href="/admin_clientes" class="block border-l-3 border-transparent px-8 py-4 text-base font-semibold tracking-[0.3px] text-[#a8bdd4] transition hover:bg-ppg-navy-light hover:text-white">Clientes</a>
             </nav>
         </aside>
 
 
-        <main>
-            <div class="bienvenida">
-                <h2>Bienvenido administrador</h2>
+        <main class="ml-[220px] flex-1 px-10 pb-9 pt-2">
+            <div class="mb-6 rounded-2xl border border-ppg-border border-l-[6px] border-l-ppg-blue bg-linear-to-r from-white to-[#f7fbff] px-5 py-4 shadow-[0_2px_12px_rgba(0,91,171,0.08)]">
+                <h2 class="font-display text-[28px] leading-[1.15] font-extrabold text-ppg-blue">Bienvenido administrador</h2>
             </div>
 
-            <section class="banner">
-                <div class="banner-text">
-                    <h2>Preventa Activa: Productos Exclusivos Mundial 2026</h2>
+            <section class="relative mb-7 flex items-center justify-between gap-6 overflow-hidden rounded-2xl bg-white px-9 py-7 shadow-[0_2px_16px_rgba(0,91,171,0.07)]">
+                <div class="pointer-events-none absolute -top-10 -right-10 h-[220px] w-[220px] rounded-full bg-radial from-[#e8f1fb] from-60% to-transparent"></div>
+                <div class="relative">
+                    <h2 class="max-w-[380px] font-display text-[38px] leading-[1.1] font-extrabold text-ppg-blue underline decoration-[#f97316] decoration-[3px] underline-offset-4">
+                        Preventa Activa: Productos Exclusivos Mundial 2026
+                    </h2>
                 </div>
 
-                <div class="banner-right">
+                <div class="relative flex shrink-0 items-center gap-6">
                     <img src="/img/niñoMundial.png"
                         alt="Mundial 2026"
-                        class="banner-illustration">
+                        class="h-[130px] w-auto object-contain">
                 </div>
             </section>
 
-            <section class="actions-card">
-                <button class="btn-action btn-add">Agregar Producto</button>
-                <button class="btn-action btn-del">Eliminar Producto</button>
+            <section class="mb-7 flex items-center gap-6 rounded-2xl bg-white px-9 py-7 shadow-[0_2px_16px_rgba(0,91,171,0.07)]">
+                <button
+                    id="open-add-product-modal"
+                    type="button"
+                    class="flex flex-1 items-center justify-center gap-3 rounded-xl bg-linear-to-r from-[#4f72da] to-[#3558c8] px-5 py-5 text-lg font-extrabold tracking-[0.3px] text-white shadow-[0_10px_24px_rgba(56,89,197,0.22)] transition hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(56,89,197,0.3)]">
+                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                        <path d="M12 5v14" />
+                        <path d="M5 12h14" />
+                    </svg>
+                    Agregar Producto
+                </button>
+                <button class="flex-1 rounded-xl bg-[#f87171] px-5 py-5 text-lg font-extrabold tracking-[0.3px] text-[#7f1d1d] transition hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.12)]">
+                    Eliminar Producto
+                </button>
             </section>
 
-            <section class="catalog-card">
-                <div class="catalog-header">
-                    <h3>Catalogo de Productos</h3>
-                    <input class="search-catalog"
-                        type="text"
-                        placeholder="Buscar Productos" />
+            <section class="rounded-2xl bg-white px-9 py-7 shadow-[0_2px_16px_rgba(0,91,171,0.07)]">
+                <div class="mb-6 flex items-center justify-between gap-4">
+                    <h3 class="font-display text-[26px] font-extrabold text-slate-900">Catalogo de Productos</h3>
+                    <input type="text"
+                        placeholder="Buscar Productos"
+                        class="w-[260px] rounded-full border border-[#d0dce8] px-[18px] py-[9px] text-sm outline-none transition focus:border-ppg-blue" />
                 </div>
 
-                <div class="product-grid">
-                    <div class="product-card">
-                        <div class="product-img-wrap">
+                <div id="products-grid" class="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-5">
+                    <div class="cursor-pointer rounded-xl border border-[#e2ecf5] px-4 pt-5 pb-4 text-center transition hover:-translate-y-[3px] hover:border-ppg-blue hover:shadow-[0_6px_20px_rgba(0,91,171,0.1)]">
+                        <div class="mb-[14px] flex h-[120px] items-center justify-center">
                             <img src="/img/botePintura.png"
-                                alt="Sellador Comex">
+                                alt="Sellador Comex"
+                                class="max-h-[110px] max-w-full object-contain">
                         </div>
-                        <div class="product-name">
+                        <div class="text-left text-[13px] leading-5 font-bold text-slate-900">
                             Sellador Comex 5×1 Clásico Preparación de
                             Superfícies PPG Silicona o Poliuretano 4000 ml
                         </div>
-                        <span class="product-tag">Sellador</span>
+                        <span class="mt-2 inline-block rounded-full bg-ppg-blue-soft px-2.5 py-[3px] text-[11px] font-bold text-ppg-blue">Sellador</span>
                     </div>
 
-                    <div class="product-card">
-                        <div class="product-img-wrap">
+                    <div class="cursor-pointer rounded-xl border border-[#e2ecf5] px-4 pt-5 pb-4 text-center transition hover:-translate-y-[3px] hover:border-ppg-blue hover:shadow-[0_6px_20px_rgba(0,91,171,0.1)]">
+                        <div class="mb-[14px] flex h-[120px] items-center justify-center">
                             <img src="/img/botePintura.png"
-                                alt="Sellador Comex">
+                                alt="Sellador Comex"
+                                class="max-h-[110px] max-w-full object-contain">
                         </div>
-                        <div class="product-name">
+                        <div class="text-left text-[13px] leading-5 font-bold text-slate-900">
                             Sellador Comex 5×1 Clásico Preparación de
                             Superfícies PPG Silicona o Poliuretano 4000 ml
                         </div>
-                        <span class="product-tag">Sellador</span>
+                        <span class="mt-2 inline-block rounded-full bg-ppg-blue-soft px-2.5 py-[3px] text-[11px] font-bold text-ppg-blue">Sellador</span>
                     </div>
 
-                    <div class="product-card">
-                        <div class="product-img-wrap">
+                    <div class="cursor-pointer rounded-xl border border-[#e2ecf5] px-4 pt-5 pb-4 text-center transition hover:-translate-y-[3px] hover:border-ppg-blue hover:shadow-[0_6px_20px_rgba(0,91,171,0.1)]">
+                        <div class="mb-[14px] flex h-[120px] items-center justify-center">
                             <img src="/img/botePintura.png"
-                                alt="Sellador Comex">
+                                alt="Sellador Comex"
+                                class="max-h-[110px] max-w-full object-contain">
                         </div>
-                        <div class="product-name">
+                        <div class="text-left text-[13px] leading-5 font-bold text-slate-900">
                             Sellador Comex 5×1 Clásico Preparación de
                             Superfícies PPG Silicona o Poliuretano 4000 ml
                         </div>
-                        <span class="product-tag">Sellador</span>
+                        <span class="mt-2 inline-block rounded-full bg-ppg-blue-soft px-2.5 py-[3px] text-[11px] font-bold text-ppg-blue">Sellador</span>
                     </div>
 
-                    <div class="product-card">
-                        <div class="product-img-wrap">
+                    <div class="cursor-pointer rounded-xl border border-[#e2ecf5] px-4 pt-5 pb-4 text-center transition hover:-translate-y-[3px] hover:border-ppg-blue hover:shadow-[0_6px_20px_rgba(0,91,171,0.1)]">
+                        <div class="mb-[14px] flex h-[120px] items-center justify-center">
                             <img src="/img/botePintura.png"
-                                alt="Sellador Comex">
+                                alt="Sellador Comex"
+                                class="max-h-[110px] max-w-full object-contain">
                         </div>
-                        <div class="product-name">
+                        <div class="text-left text-[13px] leading-5 font-bold text-slate-900">
                             Sellador Comex 5×1 Clásico Preparación de
                             Superfícies PPG Silicona o Poliuretano 4000 ml
                         </div>
-                        <span class="product-tag">Sellador</span>
+                        <span class="mt-2 inline-block rounded-full bg-ppg-blue-soft px-2.5 py-[3px] text-[11px] font-bold text-ppg-blue">Sellador</span>
                     </div>
 
-                    <div class="product-card">
-                        <div class="product-img-wrap">
+                    <div class="cursor-pointer rounded-xl border border-[#e2ecf5] px-4 pt-5 pb-4 text-center transition hover:-translate-y-[3px] hover:border-ppg-blue hover:shadow-[0_6px_20px_rgba(0,91,171,0.1)]">
+                        <div class="mb-[14px] flex h-[120px] items-center justify-center">
                             <img src="/img/botePintura.png"
-                                alt="Sellador Comex">
+                                alt="Sellador Comex"
+                                class="max-h-[110px] max-w-full object-contain">
                         </div>
-                        <div class="product-name">
+                        <div class="text-left text-[13px] leading-5 font-bold text-slate-900">
                             Sellador Comex 5×1 Clásico Preparación de
                             Superfícies PPG Silicona o Poliuretano 4000 ml
                         </div>
-                        <span class="product-tag">Sellador</span>
+                        <span class="mt-2 inline-block rounded-full bg-ppg-blue-soft px-2.5 py-[3px] text-[11px] font-bold text-ppg-blue">Sellador</span>
                     </div>
 
-                    <div class="product-card">
-                        <div class="product-img-wrap">
+                    <div class="cursor-pointer rounded-xl border border-[#e2ecf5] px-4 pt-5 pb-4 text-center transition hover:-translate-y-[3px] hover:border-ppg-blue hover:shadow-[0_6px_20px_rgba(0,91,171,0.1)]">
+                        <div class="mb-[14px] flex h-[120px] items-center justify-center">
                             <img src="/img/botePintura.png"
-                                alt="Sellador Comex">
+                                alt="Sellador Comex"
+                                class="max-h-[110px] max-w-full object-contain">
                         </div>
-                        <div class="product-name">
+                        <div class="text-left text-[13px] leading-5 font-bold text-slate-900">
                             Sellador Comex 5×1 Clásico Preparación de
                             Superfícies PPG Silicona o Poliuretano 4000 ml
                         </div>
-                        <span class="product-tag">Sellador</span>
+                        <span class="mt-2 inline-block rounded-full bg-ppg-blue-soft px-2.5 py-[3px] text-[11px] font-bold text-ppg-blue">Sellador</span>
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
+    <div
+        id="add-product-modal"
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-[rgba(53,76,126,0.38)] px-4 py-6 backdrop-blur-[3px] sm:px-6">
+        <div class="absolute inset-0" data-close-modal></div>
+        <section class="relative flex max-h-[95vh] w-full max-w-5xl flex-col overflow-hidden rounded-[24px] border border-white/60 bg-[#f9fbff] shadow-[0_24px_80px_rgba(31,60,136,0.28)]">
+            <div class="flex shrink-0 items-center justify-between border-b border-[#d9e4f7] px-6 py-5 sm:px-7">
+                <div class="flex items-center gap-4">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-b from-[#9cd8ff] to-[#5f84ff] text-white shadow-[0_10px_20px_rgba(95,132,255,0.35)]">
+                        <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                            <path d="M12 5v14" />
+                            <path d="M5 12h14" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="font-display text-3xl font-extrabold text-[#53679f] sm:text-[38px]">Agregar Producto</h2>
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    class="flex h-11 w-11 items-center justify-center rounded-full text-[#5b6f9f] transition hover:bg-white/90 hover:text-[#324b8d]"
+                    aria-label="Cerrar modal"
+                    data-close-modal>
+                    <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                        <path d="M6 6l12 12" />
+                        <path d="M18 6 6 18" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="min-h-0 flex-1 overflow-y-auto px-6 py-5 sm:px-7 sm:py-6">
+                <div class="mb-5 flex flex-wrap gap-2">
+                    <button
+                        type="button"
+                        class="min-w-[240px] rounded-t-xl border border-[#5373d8] bg-[#4e6bd0] px-6 py-3 text-lg font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25)] transition hover:bg-[#4562c3]"
+                        data-tab-trigger="manual">
+                        Agregar Manualmente
+                    </button>
+                    <button
+                        type="button"
+                        class="min-w-[220px] rounded-t-xl border border-[#d9e4f7] bg-[#eef3ff] px-6 py-3 text-lg font-semibold text-[#566ea6] transition hover:bg-[#e5edff]"
+                        data-tab-trigger="csv">
+                        Agregar desde CSV
+                    </button>
+                </div>
+
+                <div
+                    data-tab-panel="manual"
+                    class="rounded-[20px] border border-[#dfe7f6] bg-white/90 p-5 shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)] sm:p-6">
+                    <form id="add-product-form" class="space-y-5">
+                        <div>
+                            <label for="product-name" class="mb-2 block text-[19px] font-bold text-[#445b95]">
+                                Nombre del Producto <span class="text-[#ff7f7f]">*</span>
+                            </label>
+                            <input
+                                id="product-name"
+                                name="productName"
+                                type="text"
+                                required
+                                class="w-full rounded-xl border border-[#d7e0f2] bg-[#fbfcff] px-4 py-3 text-lg text-[#445b95] outline-none transition focus:border-[#7e9cff] focus:ring-3 focus:ring-[#dfe8ff]"
+                                placeholder="Escribe el nombre del producto">
+                        </div>
+
+                        <div>
+                            <label for="product-description" class="mb-2 block text-[19px] font-bold text-[#445b95]">
+                                Descripción <span class="text-[#ff7f7f]">*</span>
+                            </label>
+                            <textarea
+                                id="product-description"
+                                name="description"
+                                rows="3"
+                                required
+                                class="w-full resize-none rounded-xl border border-[#d7e0f2] bg-[#fbfcff] px-4 py-3 text-lg text-[#445b95] outline-none transition focus:border-[#7e9cff] focus:ring-3 focus:ring-[#dfe8ff]"
+                                placeholder="Describe el producto"></textarea>
+                        </div>
+
+                        <div class="grid gap-5 md:grid-cols-2">
+                            <div>
+                                <label for="product-price" class="mb-2 block text-[19px] font-bold text-[#445b95]">
+                                    Precio MXN <span class="text-[#ff7f7f]">*</span>
+                                </label>
+                                <div class="flex overflow-hidden rounded-xl border border-[#d7e0f2] bg-[#fbfcff] focus-within:border-[#7e9cff] focus-within:ring-3 focus-within:ring-[#dfe8ff]">
+                                    <span class="flex items-center border-r border-[#d7e0f2] px-4 text-2xl font-bold text-[#5d73a8]">$</span>
+                                    <input
+                                        id="product-price"
+                                        name="price"
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        required
+                                        class="w-full bg-transparent px-4 py-3 text-lg text-[#445b95] outline-none"
+                                        placeholder="0.00">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="product-key" class="mb-2 block text-[19px] font-bold text-[#445b95]">
+                                    Clave del Producto <span class="text-[#ff7f7f]">*</span>
+                                </label>
+                                <select
+                                    id="product-key"
+                                    name="productKey"
+                                    required
+                                    class="w-full rounded-xl border border-[#d7e0f2] bg-[#fbfcff] px-4 py-3 text-lg text-[#6f81af] outline-none transition focus:border-[#7e9cff] focus:ring-3 focus:ring-[#dfe8ff]">
+                                    <option value="">Seleccionar</option>
+                                    <option value="sellador">Sellador</option>
+                                    <option value="esmalte">Esmalte</option>
+                                    <option value="vinilica">Pintura vinílica</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="sale-unit" class="mb-2 block text-[19px] font-bold text-[#445b95]">
+                                    Unidad de Venta <span class="text-[#ff7f7f]">*</span>
+                                </label>
+                                <select
+                                    id="sale-unit"
+                                    name="saleUnit"
+                                    required
+                                    class="w-full rounded-xl border border-[#d7e0f2] bg-[#fbfcff] px-4 py-3 text-lg text-[#6f81af] outline-none transition focus:border-[#7e9cff] focus:ring-3 focus:ring-[#dfe8ff]">
+                                    <option value="">Seleccionar</option>
+                                    <option value="pieza">Pieza</option>
+                                    <option value="caja">Caja</option>
+                                    <option value="paquete">Paquete</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="measure-unit" class="mb-2 block text-[19px] font-bold text-[#445b95]">
+                                    Unidad de Medida <span class="text-[#ff7f7f]">*</span>
+                                </label>
+                                <select
+                                    id="measure-unit"
+                                    name="measureUnit"
+                                    required
+                                    class="w-full rounded-xl border border-[#d7e0f2] bg-[#fbfcff] px-4 py-3 text-lg text-[#6f81af] outline-none transition focus:border-[#7e9cff] focus:ring-3 focus:ring-[#dfe8ff]">
+                                    <option value="">Seleccionar</option>
+                                    <option value="l">Litros</option>
+                                    <option value="ml">Mililitros</option>
+                                    <option value="kg">Kilogramos</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="mb-3 block text-[19px] font-bold text-[#445b95]">
+                                Imagen del Producto <span class="text-[#ff7f7f]">*</span>
+                            </label>
+                            <label
+                                for="product-image"
+                                id="drop-zone"
+                                class="flex min-h-[250px] cursor-pointer flex-col items-center justify-center rounded-[22px] border-2 border-dashed border-[#dde5f6] bg-linear-to-b from-[#fcfdff] to-[#f7faff] px-6 py-8 text-center transition hover:border-[#9db3ff] hover:bg-[#fbfdff]">
+                                <div
+                                    id="image-preview"
+                                    class="mb-5 hidden h-36 w-36 overflow-hidden rounded-2xl border border-[#d6e0f7] bg-white shadow-[0_12px_30px_rgba(101,125,190,0.12)]">
+                                    <img id="preview-image-tag" src="" alt="Vista previa del producto" class="h-full w-full object-cover">
+                                </div>
+                                <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#eef3ff] text-[#6d88d9] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+                                    <svg class="h-10 w-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M16 16l-2.6-3.1a1 1 0 0 0-1.5-.1L8 17" />
+                                        <path d="M9 10h.01" />
+                                        <path d="M20 14.5V8a2 2 0 0 0-2-2h-3.5" />
+                                        <path d="M4 14v4a2 2 0 0 0 2 2h12" />
+                                        <path d="M14 4H8a2 2 0 0 0-2 2v6" />
+                                        <path d="M12 7v8" />
+                                        <path d="M8 11h8" />
+                                    </svg>
+                                </div>
+                                <p class="mb-6 text-[20px] font-bold text-[#445b95]">Arrastra aquí una imagen</p>
+                                <span class="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-[#4f72da] to-[#385ed1] px-8 py-3 text-[19px] font-semibold text-white shadow-[0_10px_24px_rgba(55,91,201,0.28)]">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                        <path d="M7 17a4 4 0 0 1-.5-7.96A5.5 5.5 0 0 1 17 8.5" />
+                                        <path d="M12 12v8" />
+                                        <path d="M8.5 15.5 12 12l3.5 3.5" />
+                                    </svg>
+                                    Subir Imagen
+                                </span>
+                                <input id="product-image" name="image" type="file" accept="image/*" class="hidden">
+                            </label>
+                        </div>
+
+                        <div class="flex justify-end gap-3 border-t border-[#e2e8f5] pt-5">
+                            <button
+                                type="button"
+                                class="rounded-xl border border-[#d8e0f0] bg-white px-7 py-3 text-[18px] font-semibold text-[#5d71a6] transition hover:border-[#afbddf] hover:bg-[#f7faff]"
+                                data-close-modal>
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                class="rounded-xl bg-linear-to-r from-[#4f72da] to-[#3558c8] px-8 py-3 text-[18px] font-semibold text-white shadow-[0_10px_26px_rgba(56,89,197,0.3)] transition hover:brightness-105">
+                                Guardar Producto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div
+                    data-tab-panel="csv"
+                    class="hidden rounded-[20px] border border-[#dfe7f6] bg-white/90 p-6">
+                    <div class="flex min-h-[420px] flex-col items-center justify-center rounded-[18px] border-2 border-dashed border-[#d8e0f3] bg-linear-to-b from-[#fbfcff] to-[#f4f7ff] px-8 text-center">
+                        <div class="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-[#eef3ff] text-[#6d88d9]">
+                            <svg class="h-10 w-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <path d="M14 2v6h6" />
+                                <path d="M8 13h8" />
+                                <path d="M8 17h8" />
+                                <path d="M8 9h2" />
+                            </svg>
+                        </div>
+                        <h3 class="mb-3 font-display text-3xl font-extrabold text-[#53679f]">Carga masiva por CSV</h3>
+                        <p class="mb-7 max-w-xl text-lg leading-8 text-[#6f81af]">
+                            Prepara un archivo CSV con los campos del producto y súbelo aquí para registrar varios productos al mismo tiempo.
+                        </p>
+                        <button
+                            type="button"
+                            class="rounded-xl bg-linear-to-r from-[#4f72da] to-[#3558c8] px-8 py-3 text-[18px] font-semibold text-white shadow-[0_10px_26px_rgba(56,89,197,0.3)] transition hover:brightness-105">
+                            Seleccionar archivo CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/admin_home.js"></script>
 </body>
 </html>
