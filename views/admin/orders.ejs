@@ -41,7 +41,7 @@
             <nav class="menu">
                 <a href="/admin/home">Inicio</a>
                 <a href="/admin/stats">Estadísticas</a>
-                <a href="/admin/orders" class="active">Historial de Pedidos</a>
+                <a href="/admin/orders" class="active">Historial de órdenes</a>
                 <a href="/admin/clients">Clientes</a>
             </nav>
         </aside>
@@ -92,17 +92,19 @@
 
                     <div class="orders-table-body">
                         <% pedidos.forEach((pedido) => { %>
-                            <article class="orders-row">
-                                <span><%= pedido.orden %></span>
-                                <span><%= pedido.fecha %></span>
-                                <span><%= pedido.cliente %></span>
-                                <span><%= pedido.total %></span>
-                                <span class="status-cell">
-                                    <span class="status-pill <%= pedido.estatus === 'Pendiente' ? 'status-pending' : pedido.estatus === 'Cancelada' ? 'status-cancelled' : 'status-confirmed' %>">
-                                        <%= pedido.estatus %>
+                            <a class="orders-row-link" href="/admin/orders/<%= pedido.orden %>">
+                                <article class="orders-row">
+                                    <span><%= pedido.orden %></span>
+                                    <span><%= pedido.fecha %></span>
+                                    <span><%= pedido.cliente %></span>
+                                    <span><%= pedido.total %></span>
+                                    <span class="status-cell">
+                                        <span class="status-pill <%= pedido.estatus === 'Pendiente' ? 'status-pending' : pedido.estatus === 'Cancelada' ? 'status-cancelled' : 'status-confirmed' %>">
+                                            <%= pedido.estatus %>
+                                        </span>
                                     </span>
-                                </span>
-                            </article>
+                                </article>
+                            </a>
                         <% }); %>
                     </div>
                 </section>

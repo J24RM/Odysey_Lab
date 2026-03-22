@@ -23,6 +23,7 @@ router.get('/stats', adminEstadisticasController.getEstadisticas);
 
 //Ruta /admin/orders
 router.get('/orders', adminHistorialOrdenesController.getHistorialOrdenes);
+router.get('/orders/:id', adminHistorialOrdenesController.getDetalleOrden);
 
 //Ruta /admin/clients
 router.get('/clients', adminClientesController.getAdminClientes);

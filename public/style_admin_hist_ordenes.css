@@ -349,11 +349,24 @@ main {
     gap: 18px;
 }
 
+.orders-row-link {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+}
+
 .orders-row {
     background: #dff0fb;
     padding: 10px 14px;
     font-size: 16px;
     color: #101010;
+    transition: transform 0.16s, box-shadow 0.16s;
+    cursor: pointer;
+}
+
+.orders-row-link:hover .orders-row {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(0, 91, 171, 0.1);
 }
 
 .status-cell {
