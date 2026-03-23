@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="/style_cliente_home.css">
     <title>Cliente Home</title>
 </head>
 <body>
@@ -86,10 +87,84 @@ Menu Horizontal: rgba(0, 120, 169, 0.1)
 </div>
 
 <!-- Contenido principal aqui -->
-<div class="container mt-5">
-    <h1>Bienvenido <%= usuario %></h1>
-    <p>Aqui va el contenido del home de cliente</p>
-</div>
+<main class="client-main">
+    <section class="banner">
+        <div class="banner-text">
+            <h2>Preventa Activa: Productos Exclusivos <span>Mundial 2026</span></h2>
+        </div>
+        <div class="banner-right">
+            <div class="countdown-block">
+                <div class="countdown-date">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    del 1 de Mayo al 2 de Julio
+                </div>
+                <div class="countdown-tiles">
+                    <div class="tile">
+                        <div class="num">32</div>
+                        <div class="lbl">Días</div>
+                    </div>
+                    <div class="tile">
+                        <div class="num">12</div>
+                        <div class="lbl">Horas</div>
+                    </div>
+                    <div class="tile">
+                        <div class="num">45</div>
+                        <div class="lbl">Min</div>
+                    </div>
+                    <div class="tile">
+                        <div class="num">20</div>
+                        <div class="lbl">Seg</div>
+                    </div>
+                </div>
+            </div>
+            <img src="/img/niñoMundial.png" alt="Mundial 2026" class="banner-illustration" onerror="this.src='https://cdn-icons-png.flaticon.com/512/33/33736.png'">
+        </div>
+    </section>
+
+    <!-- Product Grid -->
+    <div class="product-grid">
+        <% for (let i = 0; i < 20; i++) { %>
+            <div class="product-card">
+                <div class="product-img-wrap">
+                    <img src="/img/cubeta_ejemplo.png" alt="Sellador Comex" onerror="this.src='/img/botePintura.png'">
+                </div>
+                <div class="product-name">
+                    Sellador Comex 5x1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador
+                </div>
+                <div class="product-rating">
+                    ★★★★★
+                </div>
+                <div class="product-price">
+                    $ 800
+                </div>
+                <button class="btn-add-cart">agregar al carrito</button>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="pagination-container">
+        <a href="#" class="page-link">&lt; Anterior</a>
+        <a href="#" class="page-link active">1</a>
+        <a href="#" class="page-link">2</a>
+        <a href="#" class="page-link">3</a>
+        <span style="color:var(--text-muted); font-size: 14px; margin: 0 4px;">...</span>
+        <a href="#" class="page-link">20</a>
+        <a href="#" class="page-link">Siguiente &gt;</a>
+    </div>
+    
+    <hr style="border: 0; height: 1.5px; background: #c0d1e1; margin: 40px 0;">
+</main>
+
+<!-- Footer -->
+<footer class="client-footer">
+    <div class="client-footer-inner">
+        <img src="/img/ppg-logo.svg" alt="Logo PPG">
+        <p>The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. &copy; 2026 PPG Industries, Inc.All Rights Reserved</p>
+    </div>
+</footer>
 
 <script src="/nav_bar.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
