@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="/style_cliente_pedidos.css">
+    <title>Historial de pedidos</title>
+</head>
+<body>
+
+<%
+const pedidos = [];
+for (let i = 1; i <= 20; i++) {
+    const paddedFolio = i.toString().padStart(4, '0');
+    pedidos.push({
+        orden: 'A' + paddedFolio,
+        fecha: '12 de Marzo de 2026',
+        cliente: 'Concesionario Jurica',
+        total: '$189.00',
+        estatus: i === 1 ? 'Pendiente' : (i % 8 === 0 ? 'Cancelada' : 'Confirmada')
+    });
+}
+%>
+
+<nav class="navbar navbar-expand-lg" style="background-color: rgba(0, 120, 169, 0.1);">
+    <div class="container-fluid align-items-center">
+
+    <!-- Logo -->
+    <a class="navbar-brand" href="/home">
+        <img src="/img/ppg-logo.svg" width="60">
+    </a>
+
+    <!-- Sucursal -->
+    <ul class="navbar-nav me-3">
+    <li class="nav-item">
+        <a class="btn btn-light" id="btnSucursal" data-bs-toggle="modal" data-bs-target="#modalSelector">
+            Sucursal: Jurica
+        </a>
+    </li>
+    </ul>
+
+    <!-- Buscador centrado -->
+    <form class="mx-auto search-bar" style="width: 45%;">
+        <div class="input-group">
+        <input
+            type="search"
+            class="form-control text-center"
+            placeholder="Buscar Producto"
+            aria-label="Buscar Producto"
+        >
+        </div>
+    </form>
+
+    <!-- Menu derecho -->
+    <ul class="navbar-nav ms-auto align-items-center">
+
+    <li class="nav-item me-3">
+        <a class="btn btn-light" href="/mis-pedidos">Mis Pedidos</a>
+    </li>
+
+    <li class="nav-item me-3">
+        <a href="/cart">
+            <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" width="35">
+        </a>
+    </li>
+
+    <li class="nav-item">
+        <a href="#" id="btnPerfil" data-bs-toggle="modal" data-bs-target="#modalSelector" style="display:block;">
+            <img src="/img/iconoPerfil.png" width="40" height="40" style="border-radius:50%; object-fit:cover;">
+        </a>
+    </li>
+
+    </ul>
+
+    </div>
+</nav>
+
+<!-- Card de informacion (modales) -->
+<div class="modal fade" id="modalSelector" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle"></h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="modalBody">
+        </div>
+    </div>
+    </div>
+</div>
+
+<!-- Modal Detalle de Orden -->
+<div class="modal fade" id="modalDetalleOrden" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content detalle-orden-modal">
+        <div class="modal-header border-0 pb-0">
+            <h4 class="modal-title mx-auto fw-bold">Detalle de orden</h4>
+            <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-3 px-4">
+            
+            <!-- Resumen de la orden (fondo celeste) -->
+            <div class="resumen-orden-box mb-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <p class="mb-1 fw-bold">Folio: <span class="fw-normal">A0001</span></p>
+                        <p class="mb-0 fw-bold">Fecha: <span class="fw-normal">18/02/26</span></p>
+                    </div>
+                    <div class="col-md-5">
+                        <p class="mb-1 fw-bold">Sucursal: <span class="fw-normal">Jurica</span></p>
+                        <p class="mb-0 fw-bold">Total de productos: <span class="fw-normal">10</span></p>
+                    </div>
+                    <div class="col-md-3 text-md-end">
+                        <p class="mb-1 fw-bold d-flex align-items-center justify-content-md-end gap-2">
+                            Estado de la orden: <span class="status-pill status-confirmed d-inline-block px-2 py-1" style="font-size:11px; min-width:auto;">Confirmada</span>
+                        </p>
+                        <p class="mb-0 fw-bold d-flex align-items-center justify-content-md-end gap-2">
+                            Subtotal: <span class="fw-normal">7,280.00</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Titulo y Exportar -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Desglose de orden:</h5>
+                <button class="btn btn-exportar-small shadow-sm">Exportar</button>
+            </div>
+
+            <!-- Lista de productos -->
+            <div class="productos-lista">
+                
+                <!-- Producto 1 -->
+                <div class="producto-item">
+                    <div class="img-box">
+                        <img src="/img/cubeta_ejemplo.png" alt="Producto" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1170/1170679.png'">
+                    </div>
+                    <div class="producto-info flex-grow-1">
+                        <h6 class="fw-normal mb-2" style="font-size: 14px; max-width: 90%;">Sellador Comex 5x1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</h6>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="cantidad-box">
+                                Unidades: 2
+                            </div>
+                        </div>
+                    </div>
+                    <div class="producto-precio text-end">
+                        <div class="fw-bold fs-5">$ 1,600</div>
+                        <div class="text-muted" style="font-size: 11px;">($ 800/ unidad)</div>
+                    </div>
+                </div>
+
+                <!-- Producto 2 -->
+                <div class="producto-item">
+                    <div class="img-box">
+                        <img src="/img/cubeta_ejemplo.png" alt="Producto" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1170/1170679.png'">
+                    </div>
+                    <div class="producto-info flex-grow-1">
+                        <h6 class="fw-normal mb-2" style="font-size: 14px; max-width: 90%;">Sellador Comex 5x1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</h6>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="cantidad-box">
+                                Unidades: 2
+                            </div>
+                        </div>
+                    </div>
+                    <div class="producto-precio text-end">
+                        <div class="fw-bold fs-5">$ 1,600</div>
+                        <div class="text-muted" style="font-size: 11px;">($ 800/ unidad)</div>
+                    </div>
+                </div>
+
+                <!-- Producto 3 -->
+                <div class="producto-item">
+                    <div class="img-box">
+                        <img src="/img/cubeta_ejemplo.png" alt="Producto" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1170/1170679.png'">
+                    </div>
+                    <div class="producto-info flex-grow-1">
+                        <h6 class="fw-normal mb-2" style="font-size: 14px; max-width: 90%;">Sellador Comex 5x1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</h6>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="cantidad-box">
+                                Unidades: 2
+                            </div>
+                        </div>
+                    </div>
+                    <div class="producto-precio text-end">
+                        <div class="fw-bold fs-5">$ 1,600</div>
+                        <div class="text-muted" style="font-size: 11px;">($ 800/ unidad)</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    </div>
+</div>
+
+<!-- Contenido principal -->
+<div class="pedidos-container">
+    <h1 class="pedidos-titulo">Ordenes</h1>
+
+    <!-- Barra de herramientas -->
+    <div class="pedidos-toolbar">
+        <div class="pedidos-search">
+            <input type="text" placeholder="Buscar historial de pedido">
+            <button type="button" class="btn-search" aria-label="Buscar pedido">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="pedidos-actions">
+            <button class="btn-exportar" type="button">Exportar todo el historial</button>
+
+            <div class="dropdown-filter">
+                <select class="select-filter">
+                    <option>30 días</option>
+                    <option>7 días</option>
+                    <option>90 días</option>
+                    <option>Último año</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen estadísticas -->
+    <div class="pedidos-stats">
+        <div class="stat-item">
+            <span class="stat-label">Hoy</span>
+            <span class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Ordenes Totales</span>
+            <span class="stat-value">32</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Ordenes confirmadas</span>
+            <span class="stat-value">32</span>
+        </div>
+    </div>
+
+    <!-- Tabla de pedidos -->
+    <div class="pedidos-table-card">
+        <div class="pedidos-table-head">
+            <span>Orden</span>
+            <span>Fecha</span>
+            <span>Cliente</span>
+            <span>Total</span>
+            <span class="text-center">Estatus de pedido</span>
+        </div>
+
+        <div class="pedidos-table-body">
+            <% pedidos.forEach((pedido) => { %>
+                <div class="pedidos-row" data-bs-toggle="modal" data-bs-target="#modalDetalleOrden" style="cursor:pointer;">
+                    <span><%= pedido.orden %></span>
+                    <span><%= pedido.fecha %></span>
+                    <span><%= pedido.cliente %></span>
+                    <span><%= pedido.total %></span>
+                    <span class="status-cell">
+                        <span class="status-pill <%= pedido.estatus === 'Pendiente' ? 'status-pending' : pedido.estatus === 'Cancelada' ? 'status-cancelled' : 'status-confirmed' %>">
+                            <%= pedido.estatus %>
+                        </span>
+                    </span>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="pedidos-footer">
+    <div class="pedidos-footer-inner">
+        <img src="/img/ppg-logo.svg" alt="Logo PPG">
+        <p>The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. &copy; 2026 PPG Industries, Inc.All Rights Reserved</p>
+    </div>
+</footer>
+
+<script src="/nav_bar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

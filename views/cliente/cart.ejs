@@ -16,54 +16,43 @@
         <img src="/img/ppg-logo.svg" width="60">
     </a>
 
-    <!-- Menu izquierdo -->
-    <ul class="navbar-nav me-">
+    <!-- Sucursal -->
+    <ul class="navbar-nav me-3">
     <li class="nav-item">
-        <a class="btn btn-light me-5" id="btnSucursal" data-bs-toggle="modal" data-bs-target="#modalSelector">
-            Sucursal
-        </a>
-    </li>
-
-    <li class="nav-item">
-        <a class="btn btn-light" id="btnCuenta" data-bs-toggle="modal" data-bs-target="#modalSelector">
-        Cambiar Cuenta
+        <a class="btn btn-light" id="btnSucursal" data-bs-toggle="modal" data-bs-target="#modalSelector">
+            Sucursal: Jurica
         </a>
     </li>
     </ul>
 
     <!-- Buscador centrado -->
-    <form class="mx-auto search-bar" style="width: 55%;">
+    <form class="mx-auto search-bar" style="width: 45%;">
         <div class="input-group">
-
         <input
-        type="search"
-        class="form-control text-center"
-        placeholder="Buscar Producto"
-        aria-label="Buscar Producto"
+            type="search"
+            class="form-control text-center"
+            placeholder="Buscar Producto"
+            aria-label="Buscar Producto"
         >
+        </div>
+    </form>
 
-        <button class="btn btn-light" type="submit">
-            🔍
-        </button>
-
-    </div>
-</form>
     <!-- Menu derecho -->
     <ul class="navbar-nav ms-auto align-items-center">
 
-    <li class="nav-item me-5">
-        <a class="btn btn-light" href="/profile">Mi Perfil</a>
+    <li class="nav-item me-3">
+        <a class="btn btn-light" href="/mis-pedidos">Mis Pedidos</a>
     </li>
 
-    <li class="nav-item me-5">
+    <li class="nav-item me-3">
         <a href="/cart">
-            <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" width="40">
+            <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" width="35">
         </a>
     </li>
 
     <li class="nav-item">
-        <a href="/logout">
-            <img src="https://cdn-icons-png.flaticon.com/512/6326/6326055.png" width="50">
+        <a href="#" id="btnPerfil" data-bs-toggle="modal" data-bs-target="#modalSelector" style="display:block;">
+            <img src="/img/iconoPerfil.png" width="40" height="40" style="border-radius:50%; object-fit:cover;">
         </a>
     </li>
 

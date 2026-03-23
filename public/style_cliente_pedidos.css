@@ -1,0 +1,387 @@
+/* ====== Mis Pedidos - Cliente ====== */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --font-sans: "Aptos", "Segoe UI Variable", "Segoe UI", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    --navy: #252f3d;
+    --ppg-blue: #005bab;
+    --bg: #f0f4f9;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: #1a1a2e;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ====== Contenido principal ====== */
+
+.pedidos-container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 24px;
+    flex: 1;
+}
+
+.pedidos-titulo {
+    font-size: 42px;
+    font-weight: 800;
+    color: #05070c;
+    margin-bottom: 24px;
+}
+
+/* ====== Toolbar ====== */
+
+.pedidos-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.pedidos-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    max-width: 500px;
+}
+
+.pedidos-search input {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1.5px solid #222;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    background: #fff;
+}
+
+.pedidos-search input:focus {
+    border-color: var(--ppg-blue);
+}
+
+.btn-search {
+    width: 44px;
+    height: 40px;
+    border: none;
+    border-radius: 6px;
+    background: #0d8de2; /* Blue matching mockup */
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pedidos-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+}
+
+.btn-exportar {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #0d8de2; /* Blue matching mockup */
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+}
+
+.btn-exportar:hover {
+    opacity: 0.9;
+}
+
+.select-filter {
+    padding: 8px 32px 8px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #0d8de2; /* Blue matching mockup */
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+/* ====== Stats Row ====== */
+
+.pedidos-stats {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 12px 0;
+}
+
+.stat-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: #dedede; /* Gray matching mockup */
+    padding: 8px 16px;
+    border-radius: 4px;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #333;
+    font-weight: 600;
+}
+
+.stat-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+}
+
+/* ====== Tabla de pedidos ====== */
+
+.pedidos-table-card {
+    background: #fff;
+    border-radius: 0;
+    overflow: hidden;
+}
+
+.pedidos-table-head,
+.pedidos-row {
+    display: grid;
+    grid-template-columns: 100px 1.2fr 1.2fr 100px 160px;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 24px;
+}
+
+.pedidos-table-head {
+    background: #a9a9a9; /* Darker gray for header */
+    font-weight: 600;
+    font-size: 14px;
+    color: #000;
+}
+
+.pedidos-table-body {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.pedidos-table-body::-webkit-scrollbar {
+    width: 6px;
+}
+.pedidos-table-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+.pedidos-table-body::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+.pedidos-table-body::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+.pedidos-row {
+    font-size: 13px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    transition: background 0.15s;
+}
+
+.pedidos-row:last-child {
+    border-bottom: none;
+}
+
+.pedidos-row:hover {
+    background: #f5faff;
+}
+
+/* ====== Status Pills ====== */
+
+.status-cell {
+    display: flex;
+    justify-content: center;
+}
+
+.status-pill {
+    display: inline-block;
+    padding: 6px 20px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    min-width: 110px;
+}
+
+.status-confirmed {
+    background: #4ade80;
+    color: #052e16;
+}
+
+.status-pending {
+    background: #facc15;
+    color: #422006;
+}
+
+.status-cancelled {
+    background: #f87171;
+    color: #450a0a;
+}
+
+/* ====== Modal Detalle Orden ====== */
+
+.detalle-orden-modal {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.resumen-orden-box {
+    background-color: #eaf6fd;
+    border-radius: 8px;
+    padding: 16px;
+    color: #333;
+    font-size: 14px;
+}
+
+.btn-exportar-small {
+    background-color: #0d8de2;
+    color: white;
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    transition: opacity 0.2s;
+}
+
+.btn-exportar-small:hover {
+    opacity: 0.9;
+    color: white;
+}
+
+.productos-lista {
+    border-top: 1px solid #eee;
+}
+
+.producto-item {
+    display: flex;
+    align-items: center;
+    padding: 16px 0;
+    gap: 16px;
+    border-bottom: 1px solid #eee;
+}
+
+.producto-item:last-child {
+    border-bottom: none;
+}
+
+.img-box {
+    width: 64px;
+    height: 64px;
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    flex-shrink: 0;
+}
+
+.img-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.cantidad-box {
+    background-color: #f1f3f5;
+    border: 1px solid #ced4da;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #333;
+}
+
+/* ====== Footer ====== */
+
+.pedidos-footer {
+    background: var(--navy);
+    padding: 12px 16px;
+    margin-top: auto;
+}
+
+.pedidos-footer-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pedidos-footer-inner img {
+    width: 44px;
+    height: auto;
+    flex-shrink: 0;
+}
+
+.pedidos-footer-inner p {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.15;
+    flex: 1;
+    text-align: center;
+}
+
+/* ====== Responsive ====== */
+
+@media (max-width: 768px) {
+    .pedidos-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pedidos-search {
+        max-width: 100%;
+    }
+
+    .pedidos-actions {
+        margin-left: 0;
+    }
+
+    .pedidos-stats {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .pedidos-table-head,
+    .pedidos-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        padding: 12px 16px;
+    }
+
+    .pedidos-table-head {
+        display: none;
+    }
+}

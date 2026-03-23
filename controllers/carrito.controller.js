@@ -53,3 +53,7 @@ exports.actualizarItem = async (request, response, next) => {
         return response.status(500).json({ error: error.message });
     }
 };
+
+exports.eliminarItem = (request, response) => {
+
+};

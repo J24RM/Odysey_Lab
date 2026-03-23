@@ -12,14 +12,22 @@ const productoController = require('../controllers/producto.controller');
 //Ruta /adminhome
 router.get('/home', authController.getAdminHome);
 
+//Ruta /admin/home_agregarProducto
+router.get('/home_agregarProducto', authController.getAdminAgregarProducto);
+
+//Ruta /admin/home_eliminarProducto
+router.get('/home_eliminarProducto', authController.getAdminEliminarProducto);
+
 //Ruta /admin/stats
 router.get('/stats', adminEstadisticasController.getEstadisticas);
 
 //Ruta /admin/orders
 router.get('/orders', adminHistorialOrdenesController.getHistorialOrdenes);
+router.get('/orders/:id', adminHistorialOrdenesController.getDetalleOrden);
 
 //Ruta /admin/clients
 router.get('/clients', adminClientesController.getAdminClientes);
+router.get('/clients/:id', adminClientesController.getDetalleCliente);
 
 //Ruta /admin/product/:id
 router.get('/product/:id', productoController.getProductoAdmin);

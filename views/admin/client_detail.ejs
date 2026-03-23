@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cliente</title>
+    <link rel="stylesheet" href="/style_admin_client_detail.css">
+</head>
+
+<body>
+    <header>
+        <div class="logo-area">
+            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
+        </div>
+
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar" />
+        </div>
+
+        <div class="header-user">
+            <a href="/logout" class="btn-logout">Cerrar sesión</a>
+            <div class="user-icon">
+                <img src="/img/iconoPerfil.png" alt="Usuario">
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside>
+            <nav class="menu">
+                <a href="/admin/home">Inicio</a>
+                <a href="/admin/stats">Estadísticas</a>
+                <a href="/admin/orders">Historial de<br>órdenes</a>
+                <a href="/admin/clients" class="active">Clientes</a>
+            </nav>
+        </aside>
+
+        <main>
+            <div class="client-detail-page-shell" aria-hidden="true">
+                <section class="clients-page">
+                    <h1 class="clients-title">Clientes</h1>
+                    <div class="clients-toolbar">
+                        <div class="clients-search">
+                            <input type="text" placeholder="Buscar Cliente">
+                            <button type="button" aria-label="Buscar cliente">
+                                <span class="search-icon"></span>
+                            </button>
+                        </div>
+                        <button class="btn-filter" type="button">Filtrar</button>
+                    </div>
+                    <section class="clients-table-card clients-table-card-placeholder"></section>
+                </section>
+            </div>
+
+            <div class="client-detail-modal-overlay">
+                <section class="client-detail-modal">
+                    <div class="client-detail-header">
+                        <h2>Cliente</h2>
+                        <a class="client-detail-close" href="/admin/clients" aria-label="Cerrar vista">&times;</a>
+                    </div>
+
+                    <div class="client-detail-body">
+                        <div class="client-detail-profile">
+                            <div class="client-detail-avatar">
+                                <img src="/img/iconoPerfil.png" alt="Perfil del cliente">
+                            </div>
+                        </div>
+
+                        <div class="client-detail-info">
+                            <p>Nombre: <span><%= cliente.nombre %></span></p>
+                            <p>Correo electronico: <span><%= cliente.correo %></span></p>
+                            <p>Telefono: <span><%= cliente.telefono %></span></p>
+                            <p>Ultima sesion: <span><%= cliente.ultimaSesion %></span></p>
+
+                            <div class="client-detail-branch-select">
+                                <select>
+                                    <% cliente.sucursales.forEach((sucursal) => { %>
+                                        <option><%= sucursal %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="client-detail-orders">
+                        <h3>Historial de Pedidos:</h3>
+                        <div class="client-detail-order-list">
+                            <% cliente.pedidos.forEach((pedido) => { %>
+                                <article class="client-detail-order-row">
+                                    <span><%= pedido.folio %></span>
+                                    <span><%= pedido.fecha %></span>
+                                    <span><%= pedido.sucursal %></span>
+                                    <span><%= pedido.total %></span>
+                                    <span class="client-detail-order-status <%= pedido.estado === 'Cancelada' ? 'client-detail-order-status-cancelled' : 'client-detail-order-status-confirmed' %>">
+                                        <%= pedido.estado %>
+                                    </span>
+                                </article>
+                            <% }); %>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <footer class="admin-footer">
+        <div class="admin-footer-inner">
+            <img src="/img/ppg-logo.svg" alt="Logo PPG">
+            <p>The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. © 2026 PPG Industries, Inc.All Rights Reserved</p>
+        </div>
+    </footer>
+</body>
+</html>
