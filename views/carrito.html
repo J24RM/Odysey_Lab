@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carrito PPG</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    * { font-family: 'Public Sans', sans-serif; }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ppg-blue':    '#0078A9',
+            'ppg-cyan':    '#1FB5DF',
+            'ppg-dark':    '#002736',
+          },
+          fontFamily: {
+            'public': ['Public Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+
+<body class="bg-gray-100 font-public">
+
+  <!-- ===== SECCIÓN PRINCIPAL DEL CARRITO ===== -->
+  <div class="max-w-7xl mx-auto px-6 py-10 flex gap-6 items-start">
+
+    <!-- Columna izquierda: lista de productos -->
+    <div class="flex-1 rounded-2xl p-8" style="background-color: rgba(0, 120, 169, 0.102);">
+
+      <!-- Encabezado -->
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-4xl font-black text-gray-900">Carrito</h1>
+        <span class="text-xl font-bold" style="color: #1FB5DF;">Sucursal: Jurica</span>
+      </div>
+
+      <hr class="border-gray-300 mb-0" />
+
+      <!-- Lista de productos -->
+      <div id="cart-items">
+
+        <!-- Producto 1 -->
+        <div class="product-row flex items-center gap-5 py-6 border-b border-gray-300">
+          <div class="w-28 h-28 flex-shrink-0 bg-white rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
+            <img src="../public/img/botePintura.png" alt="Sellador Comex Clásico" class="object-contain w-24 h-24" />
+          </div>
+          <div class="flex-1">
+            <p class="text-base font-semibold text-gray-900 leading-snug">
+              Sellador Comex 5×1 Clásico &nbsp;Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador
+            </p>
+            <div class="flex items-center gap-4 mt-4">
+              <!-- Stepper -->
+              <div class="flex items-center gap-2 border-2 rounded-full px-3 py-1" style="border-color: #1FB5DF;">
+                <button onclick="changeQty(this, -1)" class="text-gray-700 font-bold text-lg w-5 h-5 flex items-center justify-center hover:opacity-70 transition">−</button>
+                <span class="qty text-sm font-semibold text-gray-800 w-4 text-center">2</span>
+                <button onclick="changeQty(this, 1)" class="text-gray-700 font-bold text-lg w-5 h-5 flex items-center justify-center hover:opacity-70 transition">+</button>
+              </div>
+              <button onclick="removeProduct(this)" class="text-sm font-medium hover:underline" style="color: #1FB5DF;">Eliminar</button>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <p class="text-xl font-bold text-gray-900">$ 1,600</p>
+            <p class="text-xs text-gray-500 mt-1">($ 800/ unidad)</p>
+          </div>
+        </div>
+
+        <!-- Producto 2 -->
+        <div class="product-row flex items-center gap-5 py-6 border-b border-gray-300">
+          <div class="w-28 h-28 flex-shrink-0 bg-yellow-400 rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
+            <img src="https://placehold.co/100x100/facc15/555555?text=Comex" alt="Sellador Comex Reforzado" class="object-contain w-24 h-24" />
+          </div>
+          <div class="flex-1">
+            <p class="text-base font-semibold text-gray-900 leading-snug">
+              Sellador Comex 5×1 Clásico &nbsp;Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador
+            </p>
+            <div class="flex items-center gap-4 mt-4">
+              <div class="flex items-center gap-2 border-2 rounded-full px-3 py-1" style="border-color: #1FB5DF;">
+                <button onclick="changeQty(this, -1)" class="text-gray-700 font-bold text-lg w-5 h-5 flex items-center justify-center hover:opacity-70 transition">−</button>
+                <span class="qty text-sm font-semibold text-gray-800 w-4 text-center">2</span>
+                <button onclick="changeQty(this, 1)" class="text-gray-700 font-bold text-lg w-5 h-5 flex items-center justify-center hover:opacity-70 transition">+</button>
+              </div>
+              <button onclick="removeProduct(this)" class="text-sm font-medium hover:underline" style="color: #1FB5DF;">Eliminar</button>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <p class="text-xl font-bold text-gray-900">$ 1,600</p>
+            <p class="text-xs text-gray-500 mt-1">($ 800/ unidad)</p>
+          </div>
+        </div>
+
+        <!-- Producto 3 -->
+        <div class="product-row flex items-center gap-5 py-6 border-b border-gray-300">
+          <div class="w-28 h-28 flex-shrink-0 bg-white rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
+            <img src="https://placehold.co/100x100/ffffff/cccccc?text=Comex" alt="Sellador Comex Clásico" class="object-contain w-24 h-24" />
+          </div>
+          <div class="flex-1">
+            <p class="text-base font-semibold text-gray-900 leading-snug">
+              Sellador Comex 5×1 Clásico &nbsp;Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador
+            </p>
+            <div class="flex items-center gap-4 mt-4">
+              <div class="flex items-center gap-2 border-2 rounded-full px-3 py-1" style="border-color: #1FB5DF;">
+                <button onclick="changeQty(this, -1)" class="text-gray-700 font-bold text-lg w-5 h-5 flex items-center justify-center hover:opacity-70 transition">−</button>
+                <span class="qty text-sm font-semibold text-gray-800 w-4 text-center">2</span>
+                <button onclick="changeQty(this, 1)" class="text-gray-700 font-bold text-lg w-5 h-5 flex items-center justify-center hover:opacity-70 transition">+</button>
+              </div>
+              <button onclick="removeProduct(this)" class="text-sm font-medium hover:underline" style="color: #1FB5DF;">Eliminar</button>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <p class="text-xl font-bold text-gray-900">$ 1,600</p>
+            <p class="text-xs text-gray-500 mt-1">($ 800/ unidad)</p>
+          </div>
+        </div>
+
+        
+
+      </div><!-- /cart-items -->
+    </div>
+
+    <!-- Columna derecha: resumen de orden -->
+    <div class="w-72 flex-shrink-0 flex flex-col gap-4">
+
+      <!-- Subtotal card -->
+      <div class="bg-white rounded-2xl shadow-sm p-7">
+        <p class="text-2xl font-bold text-gray-900 leading-tight">Subtotal:</p>
+        <p class="text-5xl font-black text-gray-900 mt-1" id="subtotal-display">$ 6,800</p>
+        <p class="text-sm text-gray-500 mt-4 font-medium" id="qty-display">Cantidad de productos: 8</p>
+      </div>
+
+      <!-- Botón Realizar orden -->
+      <button
+        class="w-full text-white font-bold text-base py-4 rounded-2xl hover:opacity-90 active:scale-95 transition-all duration-150 shadow-md"
+        style="background-color: #002736;"
+      >
+        Realizar orden
+      </button>
+
+      <p class="text-xs text-gray-500 text-center leading-snug px-2">
+        <em>Revisa tu orden, solo tendrás 15 minutos para cancelarla una vez la realices</em>
+      </p>
+
+    </div>
+
+  </div><!-- /main -->
+
+  <script>
+    // Stepper: cambia cantidad
+    function changeQty(btn, delta) {
+      const row = btn.closest('.product-row');
+      const qtyEl = row.querySelector('.qty');
+      let qty = parseInt(qtyEl.textContent);
+      qty = Math.max(1, qty + delta);
+      qtyEl.textContent = qty;
+      recalculate();
+    }
+
+    // Eliminar producto
+    function removeProduct(btn) {
+      btn.closest('.product-row').remove();
+      recalculate();
+    }
+
+    // Recalcula subtotal y cantidad
+    function recalculate() {
+      const rows = document.querySelectorAll('.product-row');
+      let totalQty = 0;
+      let totalPrice = 0;
+      rows.forEach(row => {
+        const qty = parseInt(row.querySelector('.qty').textContent);
+        totalQty += qty;
+        totalPrice += qty * 800; // $800 por unidad
+      });
+      document.getElementById('subtotal-display').textContent = '$ ' + totalPrice.toLocaleString('es-MX');
+      document.getElementById('qty-display').textContent = `Cantidad de productos: ${totalQty}`;
+    }
+  </script>
+
+</body>
+</html>
