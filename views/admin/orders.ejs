@@ -8,6 +8,16 @@
 </head>
 
 <body>
+    <% const pedidos = [
+        { orden: 'A0001', fecha: '12 de Marzo de 2026', cliente: 'Concesionario Jurica', total: '$189.00', estatus: 'Pendiente' },
+        { orden: 'A0002', fecha: '12 de Marzo de 2026', cliente: 'Concesionario Jurica', total: '$189.00', estatus: 'Confirmada' },
+        { orden: 'A0003', fecha: '12 de Marzo de 2026', cliente: 'Concesionario Jurica', total: '$189.00', estatus: 'Confirmada' },
+        { orden: 'A0004', fecha: '12 de Marzo de 2026', cliente: 'Concesionario Jurica', total: '$189.00', estatus: 'Confirmada' },
+        { orden: 'A0005', fecha: '12 de Marzo de 2026', cliente: 'Concesionario Jurica', total: '$189.00', estatus: 'Confirmada' },
+        { orden: 'A0006', fecha: '12 de Marzo de 2026', cliente: 'Concesionario Jurica', total: '$189.00', estatus: 'Cancelada' },
+        { orden: 'A0007', fecha: '12 de Marzo de 2026', cliente: 'Concesionario Jurica', total: '$189.00', estatus: 'Confirmada' }
+    ]; %>
+
     <header>
         <div class="logo-area">
             <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
@@ -26,40 +36,88 @@
     </header>
 
 
-    <div class="sidebar">
-        <ul class="menu">
-            <li><a href="/admin/home">Inicio</a></li>
-            <li><a href="/admin/stats">Estadísticas</a></li>
-            <li><a href="/admin/orders">Historial de órdenes</a></li>
-            <li><a href="/admin/clients">Clientes</a></li>
-        </ul>
-    </div>
+    <div class="layout">
+        <aside>
+            <nav class="menu">
+                <a href="/admin/home">Inicio</a>
+                <a href="/admin/stats">Estadísticas</a>
+                <a href="/admin/orders" class="active">Historial de órdenes</a>
+                <a href="/admin/clients">Clientes</a>
+            </nav>
+        </aside>
 
+        <main>
+            <section class="orders-page">
+                <div class="orders-header">
+                    <h1 class="titulo-historial">Historial de Pedidos</h1>
 
+                    <div class="orders-actions">
+                        <button class="btn-exportar" type="button">Exportar todo el historial</button>
 
-    <div class="contenido">
-        <div class="card controles-historial">
-            <h2 class="titulo-historial">Historial de órdenes realizadas</h2>
+                        <div class="dropdown dropdown-filter">
+                            <button class="dropdown-btn dropdown-btn-large" type="button">
+                                30 dias
+                                <span class="arrow">⌄</span>
+                            </button>
 
-            <div class="controles-row">
-
-                <div class="dropdown">
-                    <button class="dropdown-btn">
-                        Pedidos más recientes
-                        <span class="arrow">▼</span>
-                    </button>
-
-                    <div class="dropdown-content">
-                        <a href="#">Últimas 12 horas</a>
-                        <a href="#">Últimas 24 horas</a>
-                        <a href="#">Última semana</a>
-                        <a href="#">Último mes</a>
+                            <div class="dropdown-content">
+                                <a href="#">7 dias</a>
+                                <a href="#">30 dias</a>
+                                <a href="#">90 dias</a>
+                                <a href="#">Ultimo año</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <button class="btn-exportar">Exportar historial</button>
-            </div>
-        </div>
+
+                <div class="orders-toolbar">
+                    <div class="orders-search">
+                        <input type="text" placeholder="Buscar historial de pedido">
+                        <button type="button" aria-label="Buscar pedido">
+                            <span class="search-icon"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <p class="orders-label">Pedidos más recientes:</p>
+
+                <section class="orders-table-card">
+                    <div class="orders-table-head">
+                        <span>Orden</span>
+                        <span>Fecha</span>
+                        <span>Cliente</span>
+                        <span>Total</span>
+                        <span>Estatus de pedido</span>
+                    </div>
+
+                    <div class="orders-table-body">
+                        <% pedidos.forEach((pedido) => { %>
+                            <a class="orders-row-link" href="/admin/orders/<%= pedido.orden %>">
+                                <article class="orders-row">
+                                    <span><%= pedido.orden %></span>
+                                    <span><%= pedido.fecha %></span>
+                                    <span><%= pedido.cliente %></span>
+                                    <span><%= pedido.total %></span>
+                                    <span class="status-cell">
+                                        <span class="status-pill <%= pedido.estatus === 'Pendiente' ? 'status-pending' : pedido.estatus === 'Cancelada' ? 'status-cancelled' : 'status-confirmed' %>">
+                                            <%= pedido.estatus %>
+                                        </span>
+                                    </span>
+                                </article>
+                            </a>
+                        <% }); %>
+                    </div>
+                </section>
+            </section>
+        </main>
     </div>
+
+    <footer class="admin-footer">
+        <div class="admin-footer-inner">
+            <img src="/img/ppg-logo.svg" alt="Logo PPG">
+            <p>The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. © 2026 PPG Industries, Inc.All Rights Reserved</p>
+        </div>
+    </footer>
 
 </body>
 </html>

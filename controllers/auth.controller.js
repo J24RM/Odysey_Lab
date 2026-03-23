@@ -32,6 +32,14 @@ exports.getAdminHome = (request, response) => {
     response.render('admin/home', { usuario: request.session.usuario });
 };
 
+exports.getAdminAgregarProducto = (request, response) => {
+    response.render('admin/home_agregarProducto', { usuario: request.session.usuario });
+};
+
+exports.getAdminEliminarProducto = (request, response) => {
+    response.render('admin/home_eliminarProducto', { usuario: request.session.usuario });
+};
+
 //Ruta protegida cliente
 exports.getClienteHome = (request, response) => {
     response.render('cliente/home', { usuario: request.session.usuario });
