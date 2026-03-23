@@ -33,20 +33,12 @@
 
 <body class="font-sans bg-[#f4f6f9] m-0">
 
-<<<<<<< HEAD:views/admin_estadisticas.ejs
-  <!-- HEADER -->
-  <header
-    class="fixed top-0 left-0 right-0 h-[70px] bg-ppgbluelight flex items-center justify-between px-7 z-[100] border-b border-[#c9ddf5] shadow-[0_2px_8px_rgba(0,91,171,0.08)] bg-white">
-    <div class="logo-area">
-      <img src="/img/ppg-logo.svg" alt="Logo PPG" class="h-[44px] block">
-=======
 <!-- TOP NAV -->
 <header
     class="bg-[#0078A91A] text-[rgb(5,0,0)] px-7 flex items-center justify-between h-[70px] z-[100] border-b border-[#c9ddf5] shadow-[0_2px_8px_rgba(0,91,171,0.08)]">
     <img src="/img/ppg-logo.svg" alt="Logo" class="w-[45px] h-auto mr-4">
     <div>
     <div></div>
->>>>>>> 563ec9f36ebaef56e4eb58432c8cef199ffd85be:views/admin/stats.ejs
     </div>
 
     <!-- BUSCADOR DE ESTADÍSTICAS -->
@@ -59,42 +51,15 @@
     </div>
 
     <!-- CERRAR SESIÓN -->
-<<<<<<< HEAD:views/admin_estadisticas.ejs
-    <div class="flex items-center gap-[10px]">
-      <a href="/logout"
-        class="inline-flex items-center justify-center py-2 px-[14px] rounded-full border border-[#b8cfe8] bg-white text-ppgblue text-[14px] font-bold no-underline transition-all hover:bg-ppgblue hover:text-white hover:border-ppgblue">Cerrar
-        sesión</a>
-      <div class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer overflow-hidden">
-=======
     <div class="flex items-center gap-2.5">
         <a href="/logout"
         class="inline-flex items-center justify-center py-2 px-3.5 rounded-full border border-[#b8cfe8] bg-white text-[#005bab] text-sm font-bold no-underline transition-all duration-200 hover:bg-[#005bab] hover:text-white hover:border-[#005bab]">
         Cerrar sesión
         </a>
         <div class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer overflow-hidden">
->>>>>>> 563ec9f36ebaef56e4eb58432c8cef199ffd85be:views/admin/stats.ejs
         <img src="/img/iconoPerfil.png" alt="Usuario" class="w-full h-full object-cover">
         </div>
     </div>
-<<<<<<< HEAD:views/admin_estadisticas.ejs
-  </header>
-
-  <!-- SIDEBAR -->
-  <div class="w-[220px] h-[calc(100vh-70px)] bg-[#252f3d] py-5 fixed top-[70px] left-0">
-    <ul class="list-none p-0 m-0">
-      <li class="my-5"><a href="/admin_home"
-          class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Inicio</a>
-      </li>
-      <li class="my-5"><a href="/admin_estadisticas"
-          class="text-white no-underline text-lg block py-[10px] px-5 bg-white/20 rounded-md transition-colors">Estadísticas</a>
-      </li>
-      <li class="my-5"><a href="/admin_historial"
-          class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Historial
-          de órdenes</a></li>
-      <li class="my-5"><a href="/admin_clientes"
-          class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Clientes</a>
-      </li>
-=======
 
 </header>
 
@@ -113,18 +78,12 @@
         <li class="my-5"><a href="/admin/clients"
             class="text-white no-underline text-lg py-2.5 px-5 block hover:bg-white/20 hover:rounded-md max-[900px]:text-[0px] max-[900px]:p-3.5 max-[900px]:text-center">Clientes</a>
         </li>
->>>>>>> 563ec9f36ebaef56e4eb58432c8cef199ffd85be:views/admin/stats.ejs
     </ul>
 </div>
 
-<<<<<<< HEAD:views/admin_estadisticas.ejs
-  <!-- MAIN CONTENT -->
-  <main class="ml-[240px] px-9 py-[30px] pt-[90px] min-h-[calc(100vh-70px)] max-[900px]:ml-[60px] max-[900px]:px-4">
-=======
 <!-- MAIN CONTENT -->
 <main
     class="ml-[240px] px-9 py-[30px] mt-5 min-h-[calc(100vh-70px)] max-[900px]:ml-[60px] max-[900px]:px-4 max-[900px]:py-5">
->>>>>>> 563ec9f36ebaef56e4eb58432c8cef199ffd85be:views/admin/stats.ejs
 
     <% if (!dbConnected) { %>
     <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
