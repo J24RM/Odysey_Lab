@@ -1,4 +1,4 @@
-/* Hoja de estilos para Clientes Admin */
+/* Detalle de cliente admin */
 
 *, *::before, *::after {
     box-sizing: border-box;
@@ -14,7 +14,6 @@
     --ppg-blue: #005bab;
     --ppg-blue-light: #0078A91A;
     --bg: #f0f4f9;
-    --card-bg: #ffffff;
     --sidebar-w: 220px;
     --header-h: 70px;
 }
@@ -26,10 +25,6 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-}
-
-body.modal-open {
-    overflow: hidden;
 }
 
 header {
@@ -66,11 +61,6 @@ header {
     background: #fff;
     color: #1a1a2e;
     outline: none;
-    transition: border-color 0.2s;
-}
-
-.search-bar input:focus {
-    border-color: var(--ppg-blue);
 }
 
 .header-user {
@@ -91,13 +81,6 @@ header {
     font-size: 14px;
     font-weight: 700;
     text-decoration: none;
-    transition: background 0.2s, color 0.2s, border-color 0.2s;
-}
-
-.btn-logout:hover {
-    background: var(--ppg-blue);
-    color: #ffffff;
-    border-color: var(--ppg-blue);
 }
 
 .user-icon {
@@ -128,9 +111,6 @@ aside {
     top: 0;
     left: 0;
     bottom: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
 }
 
 aside nav a {
@@ -154,8 +134,15 @@ aside nav a.active {
 
 main {
     margin-left: var(--sidebar-w);
-    padding: 14px 26px 36px;
     flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.client-detail-page-shell {
+    min-height: calc(100vh - var(--header-h));
+    padding: 14px 26px 36px;
+    opacity: 0.38;
 }
 
 .clients-page {
@@ -171,7 +158,6 @@ main {
     color: #05070c;
     line-height: 1.02;
     margin-bottom: 28px;
-    margin-left: 0;
 }
 
 .clients-toolbar {
@@ -200,12 +186,19 @@ main {
     outline: none;
 }
 
-.clients-search button {
-    width: 56px;
-    height: 36px;
+.clients-search button,
+.btn-filter {
+    min-height: 38px;
     border: 1.5px solid #17497b;
     border-radius: 10px;
     background: #2d89da;
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.clients-search button {
+    width: 56px;
     cursor: pointer;
     position: relative;
     flex-shrink: 0;
@@ -234,110 +227,23 @@ main {
     transform: rotate(45deg);
 }
 
-.btn-filter {
-    min-height: 38px;
-    border: 1.5px solid #17497b;
-    border-radius: 10px;
-    background: #2d89da;
-    color: #0f172a;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.clients-table-card {
+.clients-table-card-placeholder {
+    min-height: 520px;
     background: #dff0fb;
     border-radius: 14px;
-    margin-top: 10px;
-    padding: 24px 38px 12px;
-    width: 100%;
 }
 
-.clients-table-head,
-.client-row {
-    display: grid;
-    grid-template-columns: 100px 1.2fr 1.5fr 1fr;
-    gap: 24px;
-    align-items: center;
-}
-
-.clients-table-head {
-    padding: 10px 0 22px;
-    font-size: 24px;
-    color: #111111;
-}
-
-.clients-table-body {
-    display: flex;
-    flex-direction: column;
-}
-
-.client-row-button {
-    border: none;
-    background: transparent;
-    padding: 0;
-    cursor: pointer;
-    text-align: left;
-}
-
-.client-row {
-    padding: 24px 0 12px;
-    font-size: 24px;
-    color: #111111;
-    transition: transform 0.16s, opacity 0.16s;
-}
-
-.client-row-button:hover .client-row {
-    transform: translateY(-1px);
-    opacity: 0.92;
-}
-
-.client-divider {
-    border-top: 1.5px solid rgba(17, 17, 17, 0.6);
-}
-
-.client-divider-head {
-    margin-top: -4px;
-    margin-bottom: 6px;
-}
-
-.client-avatar-cell {
-    display: flex;
-    justify-content: center;
-}
-
-.client-avatar {
-    width: 88px;
-    height: 88px;
-    border-radius: 50%;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.client-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.client-modal-overlay {
-    position: fixed;
+.client-detail-modal-overlay {
+    position: absolute;
     inset: 0;
     background: rgba(76, 94, 112, 0.42);
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     padding: 24px;
-    z-index: 1200;
 }
 
-.client-modal-overlay.active {
-    display: flex;
-}
-
-.client-modal {
+.client-detail-modal {
     width: min(100%, 1170px);
     max-height: calc(100vh - 60px);
     overflow-y: auto;
@@ -346,33 +252,31 @@ main {
     box-shadow: 0 22px 60px rgba(34, 48, 68, 0.28);
 }
 
-.client-modal-header {
+.client-detail-header {
     position: relative;
     background: #e7f4fe;
     padding: 24px 34px 30px;
     text-align: center;
 }
 
-.client-modal-header h2 {
+.client-detail-header h2 {
     font-family: var(--font-display);
     font-size: clamp(44px, 5vw, 60px);
     font-weight: 800;
     color: #06090e;
 }
 
-.client-modal-close {
+.client-detail-close {
     position: absolute;
     top: 14px;
     right: 24px;
-    border: none;
-    background: transparent;
+    text-decoration: none;
+    color: #1b1b1b;
     font-size: 56px;
     line-height: 1;
-    cursor: pointer;
-    color: #1b1b1b;
 }
 
-.client-modal-body {
+.client-detail-body {
     display: grid;
     grid-template-columns: 280px 1fr;
     gap: 34px;
@@ -380,47 +284,47 @@ main {
     align-items: start;
 }
 
-.client-modal-profile {
+.client-detail-profile {
     display: flex;
     justify-content: center;
 }
 
-.client-modal-avatar {
+.client-detail-avatar {
     width: 250px;
     height: 250px;
     border-radius: 50%;
     overflow: hidden;
 }
 
-.client-modal-avatar img {
+.client-detail-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.client-modal-info {
+.client-detail-info {
     display: flex;
     flex-direction: column;
     gap: 18px;
     padding-top: 4px;
 }
 
-.client-modal-info p {
+.client-detail-info p {
     font-size: clamp(26px, 3vw, 34px);
     color: #111111;
 }
 
-.client-modal-info span {
+.client-detail-info span {
     font-weight: 500;
 }
 
-.client-branch-select {
+.client-detail-branch-select {
     width: min(100%, 400px);
     margin-top: 8px;
     position: relative;
 }
 
-.client-branch-select select {
+.client-detail-branch-select select {
     width: 100%;
     min-height: 62px;
     border: 1px solid #d6dde7;
@@ -434,7 +338,7 @@ main {
     outline: none;
 }
 
-.client-branch-select::after {
+.client-detail-branch-select::after {
     content: "⌄";
     position: absolute;
     right: 10px;
@@ -451,24 +355,24 @@ main {
     pointer-events: none;
 }
 
-.client-modal-orders {
+.client-detail-orders {
     padding: 0 28px 20px;
 }
 
-.client-modal-orders h3 {
+.client-detail-orders h3 {
     font-family: var(--font-display);
     font-size: 36px;
     font-weight: 500;
     margin-bottom: 18px;
 }
 
-.client-order-list {
+.client-detail-order-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.client-order-row {
+.client-detail-order-row {
     display: grid;
     grid-template-columns: 120px 210px 1fr 140px 170px;
     gap: 16px;
@@ -479,7 +383,7 @@ main {
     color: #111111;
 }
 
-.client-order-status {
+.client-detail-order-status {
     justify-self: end;
     min-width: 146px;
     padding: 8px 16px;
@@ -488,11 +392,11 @@ main {
     font-size: 16px;
 }
 
-.client-order-status-confirmed {
+.client-detail-order-status-confirmed {
     background: #45db4b;
 }
 
-.client-order-status-cancelled {
+.client-detail-order-status-cancelled {
     background: #ea4a43;
 }
 
@@ -525,82 +429,4 @@ main {
     line-height: 1.15;
     flex: 1;
     text-align: center;
-}
-
-@media (max-width: 1100px) {
-    .clients-toolbar {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-
-    .clients-table-head,
-    .client-row {
-        grid-template-columns: 90px 1fr 1.2fr 1fr;
-        gap: 18px;
-    }
-
-    .clients-table-head,
-    .client-row {
-        font-size: 20px;
-    }
-
-    .client-modal-body {
-        grid-template-columns: 1fr;
-    }
-
-    .client-modal-profile {
-        justify-content: flex-start;
-    }
-
-    .client-order-row {
-        grid-template-columns: 1fr;
-    }
-
-    .client-order-status {
-        justify-self: start;
-    }
-}
-
-@media (max-width: 720px) {
-    aside {
-        display: none;
-    }
-
-    main {
-        margin-left: 0;
-        padding: 14px 16px 28px;
-    }
-
-    .search-bar,
-    .btn-logout {
-        display: none;
-    }
-
-    .clients-table-card {
-        padding: 16px;
-    }
-
-    .clients-table-head {
-        display: none;
-    }
-
-    .client-row {
-        grid-template-columns: 1fr;
-        gap: 12px;
-        padding: 18px 0;
-        font-size: 18px;
-    }
-
-    .client-avatar-cell {
-        justify-content: flex-start;
-    }
-
-    .admin-footer-inner {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .admin-footer-inner p {
-        text-align: left;
-    }
 }

@@ -4,109 +4,142 @@
 <head>
     <meta charset="UTF-8">
     <title>Clientes</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        navy: '#252f3d',
-                        ppgblue: '#005bab',
-                        ppgbluelight: '#0078A91A',
-                        textdark: '#1a1a2e',
-                        bgmain: '#f4f6f9',
-                    },
-                    fontFamily: {
-                        sans: ['"Aptos"', '"Segoe UI Variable"', '"Segoe UI"', '"SF Pro Text"', '-apple-system', 'BlinkMacSystemFont', '"Helvetica Neue"', 'Arial', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <link rel="stylesheet" href="/style_admin_clientes.css">
 </head>
 
-<body class="font-sans bg-bgmain m-0 flex flex-col min-h-screen">
+<body>
+    <% const clientes = [
+        {
+            id: 'jose_nava',
+            nombre: 'Jose Nava',
+            correo: 'joseNava@gmail.com',
+            ultimaSesion: 'Hace 1 dia',
+            telefono: '442 891 2133',
+            sucursales: ['Concesionario Jurica', 'Concesionario Centro'],
+            pedidos: [
+                { folio: 'A0001', fecha: '12 de Marzo de 2026', sucursal: 'Concesionario Jurica', total: '$189.00', estado: 'Confirmada' },
+                { folio: 'A0002', fecha: '12 de Marzo de 2026', sucursal: 'Concesionario Jurica', total: '$189.00', estado: 'Cancelada' },
+                { folio: 'A0003', fecha: '12 de Marzo de 2026', sucursal: 'Concesionario Jurica', total: '$189.00', estado: 'Confirmada' }
+            ]
+        },
+        {
+            id: 'nicolas_bravo_miguel',
+            nombre: 'Nicolás Bravo Miguel',
+            correo: 'nicoBM@gmail.com',
+            ultimaSesion: 'Hace 10 horas',
+            telefono: '442 334 2298',
+            sucursales: ['Concesionario Norte'],
+            pedidos: [
+                { folio: 'A0004', fecha: '10 de Marzo de 2026', sucursal: 'Concesionario Norte', total: '$280.00', estado: 'Confirmada' }
+            ]
+        },
+        {
+            id: 'dante_hernandez',
+            nombre: 'Dante Hernandez',
+            correo: 'danteHer@gmail.com',
+            ultimaSesion: 'Hace 20 dias',
+            telefono: '442 100 1122',
+            sucursales: ['Concesionario Jurica', 'Concesionario Sur'],
+            pedidos: [
+                { folio: 'A0005', fecha: '03 de Marzo de 2026', sucursal: 'Concesionario Sur', total: '$450.00', estado: 'Confirmada' }
+            ]
+        },
+        {
+            id: 'jesus_rodriguez',
+            nombre: 'Jesus Rodriguez',
+            correo: 'chuyRo@gmail.com',
+            ultimaSesion: 'Hace 3 horas',
+            telefono: '442 555 0099',
+            sucursales: ['Concesionario Centro'],
+            pedidos: [
+                { folio: 'A0006', fecha: '20 de Marzo de 2026', sucursal: 'Concesionario Centro', total: '$129.00', estado: 'Confirmada' }
+            ]
+        }
+    ]; %>
 
-    <!-- HEADER -->
-    <header
-        class="fixed top-0 left-0 right-0 h-[70px] bg-ppgbluelight flex items-center justify-between px-7 z-[100] border-b border-[#c9ddf5] shadow-[0_2px_8px_rgba(0,91,171,0.08)]">
+    <header>
         <div class="logo-area">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="h-[44px] block">
+            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
         </div>
 
-        <div class="flex-1 max-w-[520px] mx-8">
-            <input
-                class="w-full py-[10px] px-5 border-[1.5px] border-[#b8cfe8] rounded-[50px] font-sans text-[15px] bg-white text-textdark outline-none transition-colors duration-200 focus:border-ppgblue"
-                type="text" placeholder="Buscar Cuenta" />
+        <div class="search-bar">
+            <input type="text" placeholder="Buscar" />
         </div>
 
-        <div class="flex items-center gap-[10px]">
-            <a href="/logout"
-                class="inline-flex items-center justify-center py-2 px-[14px] rounded-full border border-[#b8cfe8] bg-white text-ppgblue text-[14px] font-bold no-underline transition-all hover:bg-ppgblue hover:text-white hover:border-ppgblue">Cerrar
-                sesión</a>
-            <div class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer overflow-hidden">
-                <img src="/img/iconoPerfil.png" alt="Usuario" class="w-full h-full object-cover">
+        <div class="header-user">
+            <a href="/logout" class="btn-logout">Cerrar sesión</a>
+            <div class="user-icon">
+                <img src="/img/iconoPerfil.png" alt="Usuario">
             </div>
         </div>
     </header>
 
-    <!-- SIDEBAR -->
-    <div class="w-[220px] h-[calc(100vh-70px)] bg-navy py-5 fixed top-[70px] left-0">
-        <ul class="list-none p-0 m-0">
-            <li class="my-5"><a href="/admin_home"
-                    class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Inicio</a>
-            </li>
-            <li class="my-5"><a href="/admin_estadisticas"
-                    class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Estadísticas</a>
-            </li>
-            <li class="my-5"><a href="/admin_historial"
-                    class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Historial
-                    de órdenes</a></li>
-            <li class="my-5"><a href="/admin_clientes"
-                    class="text-white no-underline text-lg block py-[10px] px-5 hover:bg-white/20 hover:rounded-md transition-colors">Clientes</a>
-            </li>
-        </ul>
-    </div>
-<<<<<<< HEAD:views/admin_clientes.ejs
+    <div class="layout">
+        <aside>
+            <nav class="menu">
+                <a href="/admin/home">Inicio</a>
+                <a href="/admin/stats">Estadísticas</a>
+                <a href="/admin/orders">Historial de<br>órdenes</a>
+                <a href="/admin/clients" class="active">Clientes</a>
+            </nav>
+        </aside>
 
-    <!-- MAIN CONTENT -->
-    <div class="ml-[240px] p-[30px] mt-[90px]">
-        <div class="bg-white p-[25px] rounded-[10px] w-[350px] shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-            <h2 class="mt-0 font-bold mb-2 text-2xl">Clientes</h2>
-            <p class="m-0 text-gray-700">Aquí se muestra la información de los usuarios</p>
+        <main>
+            <section class="clients-page">
+                <h1 class="clients-title">Clientes</h1>
+
+                <div class="clients-toolbar">
+                    <div class="clients-search">
+                        <input type="text" placeholder="Buscar Cliente">
+                        <button type="button" aria-label="Buscar cliente">
+                            <span class="search-icon"></span>
+                        </button>
+                    </div>
+
+                    <button class="btn-filter" type="button">Filtrar</button>
+                </div>
+
+                <section class="clients-table-card">
+                    <div class="clients-table-head">
+                        <span>Perfil</span>
+                        <span>Nombre</span>
+                        <span>Correo Electronico</span>
+                        <span>Ultima sesion</span>
+                    </div>
+
+                    <div class="client-divider client-divider-head"></div>
+
+                    <div class="clients-table-body">
+                        <% clientes.forEach((cliente, index) => { %>
+                            <a class="client-row-button" href="/admin/clients/<%= cliente.id %>">
+                                <article class="client-row">
+                                    <div class="client-avatar-cell">
+                                        <div class="client-avatar">
+                                            <img src="/img/iconoPerfil.png" alt="Perfil de cliente">
+                                        </div>
+                                    </div>
+                                    <span class="client-name"><%= cliente.nombre %></span>
+                                    <span class="client-email"><%= cliente.correo %></span>
+                                    <span class="client-last-session"><%= cliente.ultimaSesion %></span>
+                                </article>
+                            </a>
+
+                            <% if (index !== clientes.length - 1) { %>
+                                <div class="client-divider"></div>
+                            <% } %>
+                        <% }); %>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+
+    <footer class="admin-footer">
+        <div class="admin-footer-inner">
+            <img src="/img/ppg-logo.svg" alt="Logo PPG">
+            <p>The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. © 2026 PPG Industries, Inc.All Rights Reserved</p>
         </div>
-=======
-</header>
-
-<div class="sidebar">
-
-    <ul class="menu">
-        <li><a href="/admin/home">Inicio</a></li>
-        <li><a href="/admin/stats">Estadísticas</a></li>
-        <li><a href="/admin/orders">Historial de órdenes</a></li>
-        <li><a href="/admin/clients">Clientes</a></li>
-    </ul>
-</div>
-
-<div class="contenido">
-    <div class="card">
-        <h2>Clientes</h2>
-        <p>Aquí se muestra la información de los usuarios</p>
->>>>>>> 563ec9f36ebaef56e4eb58432c8cef199ffd85be:views/admin/clients.ejs
-    </div>
-
-<footer class="admin-footer">
-    <div class="admin-footer-inner">
-        <img src="/img/ppg-logo.svg" alt="Logo PPG">
-        <p>The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. © 2026 PPG Industries, Inc.All Rights Reserved</p>
-    </div>
-</footer>
+    </footer>
 
 </body>
-<<<<<<< HEAD:views/admin_clientes.ejs
-
 </html>
-=======
-</html>
->>>>>>> 563ec9f36ebaef56e4eb58432c8cef199ffd85be:views/admin/clients.ejs
