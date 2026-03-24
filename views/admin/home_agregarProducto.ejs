@@ -4,206 +4,157 @@
 <head>
     <meta charset="UTF-8">
     <title>Agregar Producto</title>
-    <link rel="stylesheet" href="/style_admin_agregarProducto.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
 </head>
 
-<body>
+<body class="bg-gray-50">
 
-    <header>
-        <div class="logo-area">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
-        </div>
+    <%- include('partials/header.ejs') %>
 
-        <div class="search-bar">
-            <input type="text" placeholder="Buscar Producto" />
-        </div>
+    <div class="flex min-h-screen flex-col">
+        <%- include('partials/sidebar.ejs') %>
 
-        <div class="header-user">
-            <a href="/logout" class="btn-logout">Cerrar sesión</a>
-            <div class="user-icon">
-                <img src="/img/iconoPerfil.png" alt="Usuario">
-            </div>
-        </div>
-    </header>
+        <!-- Main Content -->
+        <main class="ml-48 pt-2 px-10 pb-9 flex-1 max-w-6xl">
+            <!-- Back Button -->
+            <a href="/admin/home" class="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 transition-colors mb-8">
+                <span>←</span>
+                <span>Volver al inicio</span>
+            </a>
 
-    <div class="layout">
-        <aside>
-            <nav class="menu">
-                <a href="/admin/home" class="active">Inicio</a>
-                <a href="/admin/stats">Estadísticas</a>
-                <a href="/admin/orders">Historial de<br>órdenes</a>
-                <a href="/admin/clients">Clientes</a>
-            </nav>
-        </aside>
+            <!-- Page Title -->
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-10">Agregar Producto</h1>
 
-        <main>
-            <div class="page-shell" aria-hidden="true">
-                <section class="banner">
-                    <div class="banner-text">
-                        <h2>Preventa Activa: Productos Exclusivos Mundial 2026</h2>
-                    </div>
-                    <div class="banner-right">
-                        <img src="/img/niñoMundial.png" alt="Mundial 2026" class="banner-illustration">
-                    </div>
-                </section>
+            <!-- Card Container -->
+            <div class="bg-white rounded-2xl shadow-md p-8">
+                <!-- Tabs -->
+                <div class="flex border-b border-gray-200 mb-8">
+                    <button class="product-tab-btn active py-4 px-8 font-semibold text-lg text-gray-900 border-b-4 border-b-blue-600 transition-all hover:text-blue-600" data-product-tab="manual" type="button">
+                        Agregar producto manualmente
+                    </button>
+                    <button class="product-tab-btn py-4 px-8 font-semibold text-lg text-gray-500 border-b-4 border-b-transparent transition-all hover:text-gray-900" data-product-tab="bulk" type="button">
+                        Carga masiva de productos
+                    </button>
+                </div>
 
-                <section class="actions-card">
-                    <a class="btn-action btn-add btn-action-link" href="/admin/home_agregarProducto">Agregar Producto</a>
-                    <button class="btn-action btn-del" type="button">Eliminar Producto</button>
-                </section>
-
-                <section class="catalog-card">
-                    <div class="catalog-header">
-                        <h3>Catalogo de Productos</h3>
-                        <input class="search-catalog" type="text" placeholder="Buscar Productos" />
-                    </div>
-
-                    <div class="product-grid">
-                        <div class="product-card"></div>
-                        <div class="product-card"></div>
-                        <div class="product-card"></div>
-                        <div class="product-card"></div>
-                    </div>
-                </section>
-            </div>
-
-            <div class="product-modal-overlay">
-                <section class="product-modal" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
-                    <a class="product-modal-close" href="/admin/home" aria-label="Cerrar vista">
-                        &times;
-                    </a>
-
-                    <h2 class="product-modal-title" id="productModalTitle">Agregar Producto</h2>
-
-                    <div class="product-modal-tabs" role="tablist" aria-label="Opciones de carga">
-                        <button
-                            class="product-modal-tab active"
-                            type="button"
-                            role="tab"
-                            aria-selected="true"
-                            data-product-tab="manual">
-                            Agregar producto manualmente
-                        </button>
-                        <button
-                            class="product-modal-tab"
-                            type="button"
-                            role="tab"
-                            aria-selected="false"
-                            data-product-tab="bulk">
-                            Carga masiva de productos
-                        </button>
-                    </div>
-
-                    <div class="product-modal-panel active" data-product-panel="manual">
-                        <form class="product-modal-form">
-                            <div class="product-field product-field-full">
-                                <label for="productName">Nombre del producto:</label>
-                                <input id="productName" type="text" placeholder="Ingresa el nombre del producto">
-                            </div>
-
-                            <div class="product-field product-field-full">
-                                <label for="productDescription">Descripción:</label>
-                                <input id="productDescription" type="text" placeholder="Ingresa la descripcion completa del producto">
-                            </div>
-
-                            <div class="product-form-grid product-form-grid-top">
-                                <div class="product-field">
-                                    <label for="productKey">Clave del producto:</label>
-                                    <input id="productKey" type="text" placeholder="Ingresa la clave del producto">
-                                </div>
-
-                                <div class="product-field">
-                                    <label for="saleUnit">Unidad de venta:</label>
-                                    <div class="product-select-wrap">
-                                        <select id="saleUnit">
-                                            <option selected disabled>Selecciona la unidad de venta</option>
-                                            <option>Pieza</option>
-                                            <option>Caja</option>
-                                            <option>Paquete</option>
-                                            <option>Litro</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="product-field">
-                                    <label for="measureUnit">Unidad de medida:</label>
-                                    <div class="product-select-wrap">
-                                        <select id="measureUnit">
-                                            <option selected disabled>Selecciona la unidad de medida</option>
-                                            <option>Mililitros</option>
-                                            <option>Litros</option>
-                                            <option>Kilogramos</option>
-                                            <option>Gramos</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="product-form-grid product-form-grid-bottom">
-                                <div class="product-field">
-                                    <label for="productImage">Imagen:</label>
-                                    <label class="product-upload-box" for="productImage">
-                                        <span>Haz clic aquí o Arrastra la imagen</span>
-                                    </label>
-                                    <input id="productImage" type="file" accept="image/*" hidden>
-                                </div>
-
-                                <div class="product-form-stack">
-                                    <div class="product-field">
-                                        <label for="productVolume">Volumen:</label>
-                                        <input id="productVolume" type="text" placeholder="Ingresa el volumen">
-                                    </div>
-
-                                    <div class="product-availability">
-                                        <span class="product-availability-label">Marcar producto activo:</span>
-                                        <div class="product-switch-row">
-                                            <span>No</span>
-                                            <label class="product-switch">
-                                                <input type="checkbox" checked>
-                                                <span class="product-switch-slider"></span>
-                                            </label>
-                                            <span>Si</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="product-form-stack product-form-stack-right">
-                                    <div class="product-field">
-                                        <label for="productWeight">Peso:</label>
-                                        <input id="productWeight" type="text" placeholder="Ingresa el peso en kilogramos">
-                                    </div>
-
-                                    <div class="product-submit-wrap">
-                                        <button class="product-submit-btn" type="submit">Agregar</button>
-                                        <p>Antes de agregar llena correctamente todos los campos</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="product-modal-panel" data-product-panel="bulk">
-                        <div class="bulk-upload-card">
-                            <h3>Carga masiva de productos</h3>
-                            <p>Sube un archivo con el listado de productos para registrar varios elementos al mismo tiempo.</p>
-                            <label class="bulk-upload-dropzone" for="bulkFile">
-                                <span>Haz clic aquí o arrastra tu archivo CSV o Excel</span>
-                            </label>
-                            <input id="bulkFile" type="file" accept=".csv,.xlsx,.xls" hidden>
-                            <button class="product-submit-btn bulk-upload-btn" type="button">Subir archivo</button>
+                <!-- Manual Tab -->
+                <div class="product-panel active space-y-6" data-product-panel="manual">
+                    <form class="space-y-6">
+                        <!-- Full Width Field -->
+                        <div class="space-y-2">
+                            <label for="productName" class="block text-sm font-semibold text-gray-900">Nombre del producto:</label>
+                            <input id="productName" type="text" placeholder="Ingresa el nombre del producto" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors" />
                         </div>
+
+                        <div class="space-y-2">
+                            <label for="productDescription" class="block text-sm font-semibold text-gray-900">Descripción:</label>
+                            <input id="productDescription" type="text" placeholder="Ingresa la descripción completa del producto" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors" />
+                        </div>
+
+                        <!-- Grid 3 Columns -->
+                        <div class="grid grid-cols-3 gap-6">
+                            <div class="space-y-2">
+                                <label for="productKey" class="block text-sm font-semibold text-gray-900">Clave del producto:</label>
+                                <input id="productKey" type="text" placeholder="Ingresa la clave" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors" />
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="saleUnit" class="block text-sm font-semibold text-gray-900">Unidad de venta:</label>
+                                <select id="saleUnit" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors">
+                                    <option selected disabled>Selecciona la unidad</option>
+                                    <option>Pieza</option>
+                                    <option>Caja</option>
+                                    <option>Paquete</option>
+                                    <option>Litro</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="measureUnit" class="block text-sm font-semibold text-gray-900">Unidad de medida:</label>
+                                <select id="measureUnit" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors">
+                                    <option selected disabled>Selecciona la unidad</option>
+                                    <option>Mililitros</option>
+                                    <option>Litros</option>
+                                    <option>Kilogramos</option>
+                                    <option>Gramos</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Grid -->
+                        <div class="grid grid-cols-3 gap-6">
+                            <!-- Image Upload -->
+                            <div class="space-y-2">
+                                <label for="productImage" class="block text-sm font-semibold text-gray-900">Imagen:</label>
+                                <label class="block w-full p-6 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-blue-600 hover:bg-blue-50 transition-all">
+                                    <span class="text-sm text-gray-600 font-medium">Arrastra la imagen</span>
+                                    <input id="productImage" type="file" accept="image/*" hidden />
+                                </label>
+                            </div>
+
+                            <!-- Volume & Active Toggle -->
+                            <div class="space-y-4">
+                                <div class="space-y-2">
+                                    <label for="productVolume" class="block text-sm font-semibold text-gray-900">Volumen:</label>
+                                    <input id="productVolume" type="text" placeholder="Ingresa el volumen" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors" />
+                                </div>
+
+                                <div class="space-y-2">
+                                    <span class="block text-sm font-semibold text-gray-900">Marcar producto activo:</span>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-sm text-gray-600">No</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" class="sr-only peer" checked />
+                                            <div class="w-11 h-6 bg-gray-300 peer-checked:bg-blue-600 rounded-full peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                                        </label>
+                                        <span class="text-sm text-gray-600">Sí</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Weight & Submit -->
+                            <div class="space-y-4">
+                                <div class="space-y-2">
+                                    <label for="productWeight" class="block text-sm font-semibold text-gray-900">Peso:</label>
+                                    <input id="productWeight" type="text" placeholder="Ingresa el peso (kg)" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors" />
+                                </div>
+
+                                <div class="space-y-2">
+                                    <button class="w-full py-3 bg-blue-600 text-white font-bold text-sm rounded-lg hover:bg-blue-700 transition-all" type="submit">
+                                        Agregar
+                                    </button>
+                                    <p class="text-xs text-gray-500 text-center">Llena correctamente todos los campos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Bulk Tab -->
+                <div class="product-panel hidden space-y-6" data-product-panel="bulk">
+                    <div class="text-center space-y-6 py-12">
+                        <h3 class="text-2xl font-bold text-gray-900">Carga masiva de productos</h3>
+                        <p class="text-gray-600">Sube un archivo con el listado de productos para registrar varios elementos al mismo tiempo.</p>
+                        <label class="block p-12 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-blue-600 hover:bg-blue-50 transition-all">
+                            <span class="text-base text-gray-600 font-medium">Haz clic o arrastra tu archivo CSV o Excel</span>
+                            <input id="bulkFile" type="file" accept=".csv,.xlsx,.xls" hidden />
+                        </label>
+                        <button class="mx-auto px-8 py-3 bg-blue-600 text-white font-bold text-sm rounded-lg hover:bg-blue-700 transition-all" type="button">
+                            Subir archivo
+                        </button>
                     </div>
-                </section>
+                </div>
             </div>
         </main>
     </div>
 
-    <footer class="admin-footer">
-        <div class="admin-footer-inner">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG">
-            <p>The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. © 2026 PPG Industries, Inc.All Rights Reserved</p>
-        </div>
-    </footer>
+    <%- include('partials/footer.ejs') %>
 
     <script>
         const productTabs = document.querySelectorAll('[data-product-tab]');
@@ -214,16 +165,22 @@
                 const targetPanel = tab.dataset.productTab;
 
                 productTabs.forEach((item) => {
-                    item.classList.toggle('active', item === tab);
-                    item.setAttribute('aria-selected', item === tab ? 'true' : 'false');
+                    item.classList.toggle('border-b-blue-600', item === tab);
+                    item.classList.toggle('border-b-transparent', item !== tab);
+                    item.classList.toggle('text-gray-900', item === tab);
+                    item.classList.toggle('text-gray-500', item !== tab);
                 });
 
                 productPanels.forEach((panel) => {
-                    panel.classList.toggle('active', panel.dataset.productPanel === targetPanel);
+                    if (panel.dataset.productPanel === targetPanel) {
+                        panel.classList.remove('hidden');
+                    } else {
+                        panel.classList.add('hidden');
+                    }
                 });
             });
         });
     </script>
 
 </body>
-</html> 
+</html>

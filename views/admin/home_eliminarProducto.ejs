@@ -4,164 +4,69 @@
 <head>
     <meta charset="UTF-8">
     <title>Eliminar Producto</title>
-    <link rel="stylesheet" href="/style_admin_eliminarProducto.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
 </head>
 
-<body>
+<body class="bg-gray-50">
 
-    <header>
-        <div class="logo-area">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
-        </div>
+    <%- include('partials/header.ejs') %>
 
-        <div class="search-bar">
-            <input type="text" placeholder="Buscar Producto" />
-        </div>
+    <div class="flex min-h-screen flex-col">
+        <%- include('partials/sidebar.ejs') %>
 
-        <div class="header-user">
-            <a href="/logout" class="btn-logout">Cerrar sesión</a>
-            <div class="user-icon">
-                <img src="/img/iconoPerfil.png" alt="Usuario">
-            </div>
-        </div>
-    </header>
+        <!-- Main Content -->
+        <main class="ml-48 pt-2 px-10 pb-9 flex-1">
+            <!-- Back Button -->
+            <a href="/admin/home" class="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 transition-colors mb-8">
+                <span>←</span>
+                <span>Volver al inicio</span>
+            </a>
 
-    <div class="layout">
-        <aside>
-            <nav class="menu">
-                <a href="/admin/home" class="active">Inicio</a>
-                <a href="/admin/stats">Estadísticas</a>
-                <a href="/admin/orders">Historial de<br>órdenes</a>
-                <a href="/admin/clients">Clientes</a>
-            </nav>
-        </aside>
+            <!-- Page Title -->
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-10">Eliminar Producto</h1>
 
-        <main>
-            <div class="page-shell" aria-hidden="true">
-                <section class="banner">
-                    <div class="banner-text">
-                        <h2>Preventa Activa: Productos Exclusivos Mundial 2026</h2>
-                    </div>
-                    <div class="banner-right">
-                        <img src="/img/niñoMundial.png" alt="Mundial 2026" class="banner-illustration">
-                    </div>
-                </section>
-
-                <section class="actions-card">
-                    <a class="btn-action btn-add btn-action-link" href="/admin/home_agregarProducto">Agregar Producto</a>
-                    <a class="btn-action btn-del btn-action-link" href="/admin/home_eliminarProducto">Eliminar Producto</a>
-                </section>
-
-                <section class="catalog-card">
-                    <div class="catalog-header">
-                        <h3>Catalogo de Productos</h3>
-                        <input class="search-catalog" type="text" placeholder="Buscar Productos" />
-                    </div>
-
-                    <div class="product-grid">
-                        <div class="product-card"></div>
-                        <div class="product-card"></div>
-                        <div class="product-card"></div>
-                        <div class="product-card"></div>
-                    </div>
-                </section>
+            <!-- Search Section -->
+            <div class="bg-white rounded-2xl shadow-md p-8 mb-8">
+                <div class="flex gap-4">
+                    <input type="text" placeholder="Busca producto por nombre o clave" class="flex-1 px-5 py-3 border-2 border-gray-300 rounded-full text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors" />
+                    <button type="button" aria-label="Buscar producto" class="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all">
+                        Buscar
+                    </button>
+                </div>
             </div>
 
-            <div class="delete-modal-overlay">
-                <section class="delete-modal" role="dialog" aria-modal="true" aria-labelledby="deleteProductTitle">
-                    <a class="delete-modal-close" href="/admin/home" aria-label="Cerrar vista">
-                        &times;
-                    </a>
+            <!-- Products Section -->
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Selecciona el Producto a Eliminar</h2>
 
-                    <div class="delete-modal-header">
-                        <h2 id="deleteProductTitle">Eliminar Producto</h2>
-                    </div>
-
-                    <div class="delete-modal-search">
-                        <input type="text" placeholder="Busca producto por nombre o clave del producto">
-                        <button type="button" aria-label="Buscar producto">
-                            <span class="search-icon"></span>
-                        </button>
-                    </div>
-
-                    <section class="delete-selection-card">
-                        <div class="delete-selection-title">
-                            <h3>Selecciona el Producto a Eliminar</h3>
-                        </div>
-
-                        <div class="delete-products-grid">
-                            <article class="delete-product-card">
-                                <div class="delete-product-image">
-                                    <img src="/img/botePintura.png" alt="Sellador Comex">
-                                </div>
-                                <div class="delete-product-info">
-                                    <p>Sellador Comex 5×1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</p>
-                                    <button type="button">Eliminar Producto</button>
-                                </div>
-                            </article>
-
-                            <article class="delete-product-card">
-                                <div class="delete-product-image">
-                                    <img src="/img/botePintura.png" alt="Sellador Comex">
-                                </div>
-                                <div class="delete-product-info">
-                                    <p>Sellador Comex 5×1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</p>
-                                    <button type="button">Eliminar Producto</button>
-                                </div>
-                            </article>
-
-                            <article class="delete-product-card">
-                                <div class="delete-product-image">
-                                    <img src="/img/botePintura.png" alt="Sellador Comex">
-                                </div>
-                                <div class="delete-product-info">
-                                    <p>Sellador Comex 5×1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</p>
-                                    <button type="button">Eliminar Producto</button>
-                                </div>
-                            </article>
-
-                            <article class="delete-product-card">
-                                <div class="delete-product-image">
-                                    <img src="/img/botePintura.png" alt="Sellador Comex">
-                                </div>
-                                <div class="delete-product-info">
-                                    <p>Sellador Comex 5×1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</p>
-                                    <button type="button">Eliminar Producto</button>
-                                </div>
-                            </article>
-
-                            <article class="delete-product-card">
-                                <div class="delete-product-image">
-                                    <img src="/img/botePintura.png" alt="Sellador Comex">
-                                </div>
-                                <div class="delete-product-info">
-                                    <p>Sellador Comex 5×1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</p>
-                                    <button type="button">Eliminar Producto</button>
-                                </div>
-                            </article>
-
-                            <article class="delete-product-card">
-                                <div class="delete-product-image">
-                                    <img src="/img/botePintura.png" alt="Sellador Comex">
-                                </div>
-                                <div class="delete-product-info">
-                                    <p>Sellador Comex 5×1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</p>
-                                    <button type="button">Eliminar Producto</button>
-                                </div>
-                            </article>
-                        </div>
-                    </section>
-                </section>
+                <div class="grid grid-cols-1 gap-4">
+                    <% for (let i = 0; i < 6; i++) { %>
+                        <article class="bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-red-500 hover:bg-red-50 transition-all shadow-sm hover:shadow-md flex gap-6">
+                            <div class="flex-shrink-0 w-28 h-28 rounded-lg bg-gray-100 flex items-center justify-center">
+                                <img src="/img/botePintura.png" alt="Sellador Comex" class="max-h-24 max-w-full object-contain">
+                            </div>
+                            <div class="flex-1 flex flex-col justify-between">
+                                <p class="text-base font-semibold text-gray-900">
+                                    Sellador Comex 5×1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml
+                                </p>
+                                <button type="button" class="self-start px-6 py-2.5 bg-red-500 text-white font-bold text-sm rounded-lg hover:bg-red-600 transition-all">
+                                    Eliminar Producto
+                                </button>
+                            </div>
+                        </article>
+                    <% } %>
+                </div>
             </div>
         </main>
     </div>
 
-    <footer class="admin-footer">
-        <div class="admin-footer-inner">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG">
-            <p>The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. © 2026 PPG Industries, Inc.All Rights Reserved</p>
-        </div>
-    </footer>
+    <%- include('partials/footer.ejs') %>
 
 </body>
 </html>

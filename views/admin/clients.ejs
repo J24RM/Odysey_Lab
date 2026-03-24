@@ -4,10 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Clientes</title>
-    <link rel="stylesheet" href="/style_admin_clientes.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
 </head>
 
-<body>
+<body class="bg-gray-50">
     <% const clientes = [
         {
             id: 'jose_nava',
@@ -57,89 +63,55 @@
         }
     ]; %>
 
-    <header>
-        <div class="logo-area">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
-        </div>
+    <%- include('partials/header.ejs') %>
 
-        <div class="search-bar">
-            <input type="text" placeholder="Buscar" />
-        </div>
+    <div class="flex min-h-screen flex-col">
+        <%- include('partials/sidebar.ejs') %>
 
-        <div class="header-user">
-            <a href="/logout" class="btn-logout">Cerrar sesión</a>
-            <div class="user-icon">
-                <img src="/img/iconoPerfil.png" alt="Usuario">
-            </div>
-        </div>
-    </header>
+        <!-- Main Content -->
+        <main class="ml-48 pt-2 px-10 pb-9 flex-1">
+            <section class="space-y-6">
+                <h1 class="text-3xl font-extrabold text-gray-900">Clientes</h1>
 
-    <div class="layout">
-        <aside>
-            <nav class="menu">
-                <a href="/admin/home">Inicio</a>
-                <a href="/admin/stats">Estadísticas</a>
-                <a href="/admin/orders">Historial de<br>órdenes</a>
-                <a href="/admin/clients" class="active">Clientes</a>
-            </nav>
-        </aside>
-
-        <main>
-            <section class="clients-page">
-                <h1 class="clients-title">Clientes</h1>
-
-                <div class="clients-toolbar">
-                    <div class="clients-search">
-                        <input type="text" placeholder="Buscar Cliente">
-                        <button type="button" aria-label="Buscar cliente">
-                            <span class="search-icon"></span>
-                        </button>
+                <!-- Toolbar -->
+                <div class="flex items-center gap-4">
+                    <div class="flex-1 relative">
+                        <input type="text" placeholder="Buscar Cliente" class="w-full px-5 py-2.5 border-2 border-gray-300 rounded-full text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors" />
                     </div>
-
-                    <button class="btn-filter" type="button">Filtrar</button>
+                    <button type="button" class="px-6 py-2.5 bg-white border-2 border-gray-300 rounded-lg font-semibold text-sm text-gray-900 hover:bg-gray-100 transition-all">
+                        Filtrar
+                    </button>
                 </div>
 
-                <section class="clients-table-card">
-                    <div class="clients-table-head">
-                        <span>Perfil</span>
-                        <span>Nombre</span>
-                        <span>Correo Electronico</span>
-                        <span>Ultima sesion</span>
+                <!-- Clients Table -->
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+                    <!-- Table Header -->
+                    <div class="grid grid-cols-4 gap-4 px-6 py-4 border-b-2 border-gray-200 bg-gray-50">
+                        <span class="font-bold text-sm text-gray-700 uppercase tracking-wide">Perfil</span>
+                        <span class="font-bold text-sm text-gray-700 uppercase tracking-wide">Nombre</span>
+                        <span class="font-bold text-sm text-gray-700 uppercase tracking-wide">Correo Electrónico</span>
+                        <span class="font-bold text-sm text-gray-700 uppercase tracking-wide">Última sesión</span>
                     </div>
 
-                    <div class="client-divider client-divider-head"></div>
-
-                    <div class="clients-table-body">
-                        <% clientes.forEach((cliente, index) => { %>
-                            <a class="client-row-button" href="/admin/clients/<%= cliente.id %>">
-                                <article class="client-row">
-                                    <div class="client-avatar-cell">
-                                        <div class="client-avatar">
-                                            <img src="/img/iconoPerfil.png" alt="Perfil de cliente">
-                                        </div>
-                                    </div>
-                                    <span class="client-name"><%= cliente.nombre %></span>
-                                    <span class="client-email"><%= cliente.correo %></span>
-                                    <span class="client-last-session"><%= cliente.ultimaSesion %></span>
-                                </article>
+                    <!-- Table Body -->
+                    <div class="divide-y divide-gray-200">
+                        <% clientes.forEach((cliente) => { %>
+                            <a href="/admin/clients/<%= cliente.id %>" class="grid grid-cols-4 gap-4 px-6 py-4 items-center hover:bg-blue-50 transition-colors">
+                                <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                                    <img src="/img/iconoPerfil.png" alt="Perfil de cliente" class="w-full h-full object-cover">
+                                </div>
+                                <span class="font-semibold text-gray-900"><%= cliente.nombre %></span>
+                                <span class="text-gray-600 text-sm"><%= cliente.correo %></span>
+                                <span class="text-gray-500 text-sm"><%= cliente.ultimaSesion %></span>
                             </a>
-
-                            <% if (index !== clientes.length - 1) { %>
-                                <div class="client-divider"></div>
-                            <% } %>
                         <% }); %>
                     </div>
-                </section>
+                </div>
             </section>
         </main>
     </div>
 
-    <footer class="admin-footer">
-        <div class="admin-footer-inner">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG">
-            <p>The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. © 2026 PPG Industries, Inc.All Rights Reserved</p>
-        </div>
-    </footer>
+    <%- include('partials/footer.ejs') %>
 
 </body>
 </html>

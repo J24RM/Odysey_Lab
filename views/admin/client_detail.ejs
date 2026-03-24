@@ -4,76 +4,64 @@
 <head>
     <meta charset="UTF-8">
     <title>Cliente</title>
-    <link rel="stylesheet" href="/style_admin_client_detail.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
 </head>
 
-<body>
-    <header>
-        <div class="logo-area">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
-        </div>
+<body class="bg-gray-50">
+    <%- include('partials/header.ejs') %>
 
-        <div class="search-bar">
-            <input type="text" placeholder="Buscar" />
-        </div>
+    <div class="flex min-h-screen flex-col">
+        <%- include('partials/sidebar.ejs') %>
 
-        <div class="header-user">
-            <a href="/logout" class="btn-logout">Cerrar sesión</a>
-            <div class="user-icon">
-                <img src="/img/iconoPerfil.png" alt="Usuario">
-            </div>
-        </div>
-    </header>
+        <!-- Main Content -->
+        <main class="ml-48 pt-2 px-10 pb-9 flex-1 space-y-6">
+            <!-- Modal -->
+            <div class="bg-white rounded-2xl shadow-md max-w-3xl">
+                <!-- Header -->
+                <div class="flex items-center justify-between px-8 py-6 border-b border-gray-200">
+                    <h2 class="text-2xl font-extrabold text-gray-900">Cliente</h2>
+                    <a href="/admin/clients" class="text-3xl text-gray-400 hover:text-gray-600 transition-colors font-light">
+                        ×
+                    </a>
+                </div>
 
-    <div class="layout">
-        <aside>
-            <nav class="menu">
-                <a href="/admin/home">Inicio</a>
-                <a href="/admin/stats">Estadísticas</a>
-                <a href="/admin/orders">Historial de<br>órdenes</a>
-                <a href="/admin/clients" class="active">Clientes</a>
-            </nav>
-        </aside>
-
-        <main>
-            <div class="client-detail-page-shell" aria-hidden="true">
-                <section class="clients-page">
-                    <h1 class="clients-title">Clientes</h1>
-                    <div class="clients-toolbar">
-                        <div class="clients-search">
-                            <input type="text" placeholder="Buscar Cliente">
-                            <button type="button" aria-label="Buscar cliente">
-                                <span class="search-icon"></span>
-                            </button>
+                <!-- Profile Section -->
+                <div class="px-8 py-6 border-b border-gray-200">
+                    <div class="flex items-start gap-8">
+                        <!-- Avatar -->
+                        <div class="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 bg-gray-200">
+                            <img src="/img/iconoPerfil.png" alt="Perfil del cliente" class="w-full h-full object-cover">
                         </div>
-                        <button class="btn-filter" type="button">Filtrar</button>
-                    </div>
-                    <section class="clients-table-card clients-table-card-placeholder"></section>
-                </section>
-            </div>
 
-            <div class="client-detail-modal-overlay">
-                <section class="client-detail-modal">
-                    <div class="client-detail-header">
-                        <h2>Cliente</h2>
-                        <a class="client-detail-close" href="/admin/clients" aria-label="Cerrar vista">&times;</a>
-                    </div>
-
-                    <div class="client-detail-body">
-                        <div class="client-detail-profile">
-                            <div class="client-detail-avatar">
-                                <img src="/img/iconoPerfil.png" alt="Perfil del cliente">
+                        <!-- Info -->
+                        <div class="space-y-3 flex-1">
+                            <div>
+                                <span class="text-sm font-semibold text-gray-600">Nombre:</span>
+                                <p class="text-base font-bold text-gray-900"><%= cliente.nombre %></p>
                             </div>
-                        </div>
+                            <div>
+                                <span class="text-sm font-semibold text-gray-600">Correo Electrónico:</span>
+                                <p class="text-base font-bold text-gray-900"><%= cliente.correo %></p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-semibold text-gray-600">Teléfono:</span>
+                                <p class="text-base font-bold text-gray-900"><%= cliente.telefono %></p>
+                            </div>
+                            <div>
+                                <span class="text-sm font-semibold text-gray-600">Última sesión:</span>
+                                <p class="text-base font-bold text-gray-900"><%= cliente.ultimaSesion %></p>
+                            </div>
 
-                        <div class="client-detail-info">
-                            <p>Nombre: <span><%= cliente.nombre %></span></p>
-                            <p>Correo electronico: <span><%= cliente.correo %></span></p>
-                            <p>Telefono: <span><%= cliente.telefono %></span></p>
-                            <p>Ultima sesion: <span><%= cliente.ultimaSesion %></span></p>
-
-                            <div class="client-detail-branch-select">
-                                <select>
+                            <!-- Branch Select -->
+                            <div>
+                                <label class="text-sm font-semibold text-gray-600 block mb-2">Sucursal:</label>
+                                <select class="w-full max-w-xs px-4 py-2.5 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors">
                                     <% cliente.sucursales.forEach((sucursal) => { %>
                                         <option><%= sucursal %></option>
                                     <% }); %>
@@ -81,33 +69,31 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="client-detail-orders">
-                        <h3>Historial de Pedidos:</h3>
-                        <div class="client-detail-order-list">
-                            <% cliente.pedidos.forEach((pedido) => { %>
-                                <article class="client-detail-order-row">
-                                    <span><%= pedido.folio %></span>
-                                    <span><%= pedido.fecha %></span>
-                                    <span><%= pedido.sucursal %></span>
-                                    <span><%= pedido.total %></span>
-                                    <span class="client-detail-order-status <%= pedido.estado === 'Cancelada' ? 'client-detail-order-status-cancelled' : 'client-detail-order-status-confirmed' %>">
-                                        <%= pedido.estado %>
-                                    </span>
-                                </article>
-                            <% }); %>
-                        </div>
+                <!-- Orders Section -->
+                <div class="px-8 py-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Historial de Pedidos</h3>
+
+                    <div class="space-y-0 border border-gray-200 rounded-lg overflow-hidden">
+                        <% cliente.pedidos.forEach((pedido, index) => { %>
+                            <article class="flex items-center justify-between px-6 py-4 hover:bg-blue-50 transition-colors <%= index !== 0 ? 'border-t border-gray-200' : '' %>">
+                                <span class="font-semibold text-gray-900"><%= pedido.folio %></span>
+                                <span class="text-gray-600 text-sm"><%= pedido.fecha %></span>
+                                <span class="text-gray-600 text-sm"><%= pedido.sucursal %></span>
+                                <span class="font-semibold text-gray-900"><%= pedido.total %></span>
+                                <% const statusColor = pedido.estado === 'Cancelada' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' %>
+                                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold <%= statusColor %>">
+                                    <%= pedido.estado %>
+                                </span>
+                            </article>
+                        <% }); %>
                     </div>
-                </section>
+                </div>
             </div>
         </main>
     </div>
 
-    <footer class="admin-footer">
-        <div class="admin-footer-inner">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG">
-            <p>The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. © 2026 PPG Industries, Inc.All Rights Reserved</p>
-        </div>
-    </footer>
+    <%- include('partials/footer.ejs') %>
 </body>
 </html>

@@ -6,84 +6,22 @@
 <title>Estadísticas Generales</title>
 <!-- Tailwind CSS CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
-<script>
-    tailwind.config = {
-    theme: {
-        extend: {
-            colors: {
-            'ppg-blue': '#0078a9',
-            'ppg-dark': '#252f3d',
-            'text-dark': '#1a1a2e',
-            'text-muted': '#6b7280',
-            },
-        fontFamily: {
-            sans: ['Inter', 'Arial', 'sans-serif'],
-        },
-        }
-    }
-    }
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-    /* Donut chart rotation — not possible with pure Tailwind */
-    .donut-svg {
-    transform: rotate(-90deg);
+    * {
+        font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
 </style>
 </head>
 
-<body class="font-sans bg-[#f4f6f9] m-0">
+<body class="bg-gray-50">
 
-<!-- TOP NAV -->
-<header
-    class="bg-[#0078A91A] text-[rgb(5,0,0)] px-7 flex items-center justify-between h-[70px] z-[100] border-b border-[#c9ddf5] shadow-[0_2px_8px_rgba(0,91,171,0.08)]">
-    <img src="/img/ppg-logo.svg" alt="Logo" class="w-[45px] h-auto mr-4">
-    <div>
-    <div></div>
-    </div>
+<%- include('partials/header.ejs') %>
 
-    <!-- BUSCADOR DE ESTADÍSTICAS -->
-    <div class="flex-1 max-w-[520px] mx-8">
-        <select onchange="window.location.href = this.value"
-        class="w-full py-2.5 px-5 border-[1.5px] border-[#b8cfe8] rounded-full font-sans text-[15px] bg-white text-text-dark outline-none transition-colors duration-200 cursor-pointer focus:border-ppg-blue">
-        <option value="/admin/stats">Estadísticas generales</option>
-        <option value="/admin/stats">Estadísticas de pedidos</option>
-        </select>
-    </div>
-
-    <!-- CERRAR SESIÓN -->
-    <div class="flex items-center gap-2.5">
-        <a href="/logout"
-        class="inline-flex items-center justify-center py-2 px-3.5 rounded-full border border-[#b8cfe8] bg-white text-[#005bab] text-sm font-bold no-underline transition-all duration-200 hover:bg-[#005bab] hover:text-white hover:border-[#005bab]">
-        Cerrar sesión
-        </a>
-        <div class="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer overflow-hidden">
-        <img src="/img/iconoPerfil.png" alt="Usuario" class="w-full h-full object-cover">
-        </div>
-    </div>
-
-</header>
-
-<!-- SIDEBAR -->
-<div class="w-[220px] h-[calc(100vh-70px)] bg-ppg-dark py-5 fixed top-[70px] left-0 max-[900px]:w-[60px]">
-    <ul class="list-none p-0">
-        <li class="my-5"><a href="/admin/home"
-            class="text-white no-underline text-lg py-2.5 px-5 block hover:bg-white/20 hover:rounded-md max-[900px]:text-[0px] max-[900px]:p-3.5 max-[900px]:text-center">Inicio</a>
-        </li>
-        <li class="my-5"><a href="/admin/stats"
-            class="text-white no-underline text-lg py-2.5 px-5 block hover:bg-white/20 hover:rounded-md max-[900px]:text-[0px] max-[900px]:p-3.5 max-[900px]:text-center">Estadísticas</a>
-        </li>
-        <li class="my-5"><a href="/admin/orders"
-            class="text-white no-underline text-lg py-2.5 px-5 block hover:bg-white/20 hover:rounded-md max-[900px]:text-[0px] max-[900px]:p-3.5 max-[900px]:text-center">Historial
-            de órdenes</a></li>
-        <li class="my-5"><a href="/admin/clients"
-            class="text-white no-underline text-lg py-2.5 px-5 block hover:bg-white/20 hover:rounded-md max-[900px]:text-[0px] max-[900px]:p-3.5 max-[900px]:text-center">Clientes</a>
-        </li>
-    </ul>
-</div>
+<%- include('partials/sidebar.ejs') %>
 
 <!-- MAIN CONTENT -->
-<main
-    class="ml-[240px] px-9 py-[30px] mt-5 min-h-[calc(100vh-70px)] max-[900px]:ml-[60px] max-[900px]:px-4 max-[900px]:py-5">
+<main class="ml-48 pt-2 px-10 pb-9 flex-1 min-h-[calc(100vh-70px)]">
 
     <% if (!dbConnected) { %>
     <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
@@ -222,12 +160,7 @@
         </div>
 </main>
 
-<footer class="relative z-20 bg-[#252f3d] px-4 py-3">
-    <div class="max-w-[1280px] mx-auto flex items-center gap-3 max-[700px]:flex-col max-[700px]:items-start">
-        <img src="/img/ppg-logo.svg" alt="Logo PPG" class="w-[44px] h-auto shrink-0">
-        <p class="flex-1 text-center text-white text-[14px] font-semibold leading-[1.15] max-[700px]:text-left">The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. © 2026 PPG Industries, Inc.All Rights Reserved</p>
-    </div>
-</footer>
+<%- include('partials/footer.ejs') %>
 
 </body>
 
