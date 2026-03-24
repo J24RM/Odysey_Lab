@@ -4,72 +4,62 @@
 <head>
     <meta charset="UTF-8">
     <title>Detalle de Producto</title>
-    <link rel="stylesheet" href="/style_admin_product_detail.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
 </head>
 
-<body>
+<body class="bg-gray-50">
 
-    <header>
-        <div class="logo-area">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
-        </div>
+    <%- include('partials/header.ejs') %>
 
-        <div class="search-bar">
-            <input type="text" placeholder="Buscar Producto" />
-        </div>
+    <div class="flex min-h-screen flex-col">
+        <%- include('partials/sidebar.ejs') %>
 
-        <div class="header-user">
-            <a href="/logout" class="btn-logout">Cerrar sesión</a>
-            <div class="user-icon">
-                <img src="/img/iconoPerfil.png" alt="Usuario">
-            </div>
-        </div>
-    </header>
-
-    <div class="layout">
-        <aside>
-            <nav class="menu">
-                <a href="/admin/home" class="active">Inicio</a>
-                <a href="/admin/stats">Estadísticas</a>
-                <a href="/admin/orders">Historial de<br>órdenes</a>
-                <a href="/admin/clients">Clientes</a>
-            </nav>
-        </aside>
-
-        <main>
-            <section class="product-detail-page">
-                <a href="/admin/home" class="product-back-link" aria-label="Volver a inicio">
-                    <span class="product-back-arrow">←</span>
+        <!-- Main Content -->
+        <main class="ml-48 pt-2 px-10 pb-9 flex-1">
+            <section class="space-y-8">
+                <!-- Back Button -->
+                <a href="/admin/home" class="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 transition-colors">
+                    <span>←</span>
                     <span>Volver</span>
                 </a>
 
-                <h1 class="product-detail-title">Detalle del producto</h1>
+                <h1 class="text-3xl font-extrabold text-gray-900">Detalle del producto</h1>
 
-                <section class="product-detail-top">
-                    <div class="product-detail-content">
-                        <div class="product-detail-image-wrap">
-                            <img src="<%= producto.imagen %>" alt="<%= producto.nombre %>">
+                <!-- Product Detail Section -->
+                <div class="grid grid-cols-3 gap-8">
+                    <!-- Left: Product Info -->
+                    <div class="col-span-2 space-y-6">
+                        <!-- Image -->
+                        <div class="bg-white rounded-2xl p-8 shadow-md flex items-center justify-center min-h-96">
+                            <img src="<%= producto.imagen %>" alt="<%= producto.nombre %>" class="max-w-full max-h-full object-contain">
                         </div>
 
-                        <div class="product-detail-main">
-                            <h2><%= producto.nombre %></h2>
-                            <div class="product-rating">★★★★★</div>
-                            <div class="product-detail-separator"></div>
-
-                            <p class="product-price">$ <%= producto.precio %></p>
-
-                            <div class="product-meta">
-                                <p>-Peso: <%= producto.peso %></p>
-                                <p>-Volumen: <%= producto.volumen %></p>
-                                <p>-Unidad de Venta: <%= producto.unidadVenta %></p>
-                                <p>-Unidad de Medida: <%= producto.unidadMedida %></p>
+                        <!-- Product Details -->
+                        <div class="bg-white rounded-2xl p-8 shadow-md space-y-5">
+                            <h2 class="text-2xl font-extrabold text-gray-900"><%= producto.nombre %></h2>
+                            <div class="text-2xl text-yellow-500">★★★★★</div>
+                            <div class="border-t-2 border-gray-200 pt-4">
+                                <p class="text-3xl font-extrabold text-gray-900">$<%= producto.precio %></p>
                             </div>
 
-                            <div class="product-detail-separator product-detail-separator-wide"></div>
+                            <!-- Metadata -->
+                            <div class="space-y-2 text-gray-600">
+                                <p class="text-sm"><strong>Peso:</strong> <%= producto.peso %></p>
+                                <p class="text-sm"><strong>Volumen:</strong> <%= producto.volumen %></p>
+                                <p class="text-sm"><strong>Unidad de Venta:</strong> <%= producto.unidadVenta %></p>
+                                <p class="text-sm"><strong>Unidad de Medida:</strong> <%= producto.unidadMedida %></p>
+                            </div>
 
-                            <div class="product-description">
-                                <h3>Descripcion:</h3>
-                                <ul>
+                            <!-- Description -->
+                            <div class="border-t-2 border-gray-200 pt-4 space-y-3">
+                                <h3 class="font-bold text-gray-900 text-lg">Descripción</h3>
+                                <ul class="list-disc list-inside space-y-1 text-gray-600 text-sm">
                                     <% producto.descripcion.forEach((item) => { %>
                                         <li><%= item %></li>
                                     <% }); %>
@@ -78,19 +68,29 @@
                         </div>
                     </div>
 
-                    <aside class="product-actions-card">
-                        <a href="/admin/home_agregarProducto" class="product-action-btn product-action-link">Editar</a>
-                        <a href="/admin/stats" class="product-action-btn product-action-link">Ver estadísticas del producto</a>
-                        <a href="/admin/home_eliminarProducto" class="product-action-btn product-action-btn-delete product-action-link">Eliminar producto</a>
+                    <!-- Right: Actions -->
+                    <aside class="space-y-4">
+                        <div class="bg-white rounded-2xl p-6 shadow-md space-y-4 h-fit">
+                            <a href="/admin/home_agregarProducto" class="block w-full py-3 px-4 bg-blue-600 text-white font-bold text-center rounded-lg hover:bg-blue-700 transition-colors">
+                                Editar
+                            </a>
+                            <a href="/admin/stats" class="block w-full py-3 px-4 bg-gray-100 text-gray-900 font-bold text-center rounded-lg hover:bg-gray-200 transition-colors">
+                                Ver estadísticas del producto
+                            </a>
+                            <a href="/admin/home_eliminarProducto" class="block w-full py-3 px-4 bg-red-500 text-white font-bold text-center rounded-lg hover:bg-red-600 transition-colors">
+                                Eliminar producto
+                            </a>
+                        </div>
                     </aside>
-                </section>
+                </div>
 
-                <section class="similar-products-section">
-                    <h2>Productos similares</h2>
-                    <div class="similar-products-grid">
+                <!-- Similar Products Section -->
+                <section class="space-y-6">
+                    <h2 class="text-2xl font-extrabold text-gray-900">Productos similares</h2>
+                    <div class="grid grid-cols-4 gap-5">
                         <% producto.similars.forEach((imagen) => { %>
-                            <div class="similar-product-card">
-                                <img src="<%= imagen %>" alt="Producto similar">
+                            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                                <img src="<%= imagen %>" alt="Producto similar" class="w-full h-48 object-cover">
                             </div>
                         <% }); %>
                     </div>
@@ -99,12 +99,7 @@
         </main>
     </div>
 
-    <footer class="admin-footer">
-        <div class="admin-footer-inner">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG">
-            <p>The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. © 2026 PPG Industries, Inc.All Rights Reserved</p>
-        </div>
-    </footer>
+    <%- include('partials/footer.ejs') %>
 
 </body>
 </html>

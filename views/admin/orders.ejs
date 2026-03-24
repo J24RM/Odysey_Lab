@@ -3,11 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Historial de ordenes</title>
-    <link rel="stylesheet" href="/style_admin_hist_ordenes.css">
+    <title>Historial de órdenes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
 </head>
 
-<body>
+<body class="bg-gray-50">
     <% const pedidos = [
         { orden: 'A0001', fecha: '12 de Marzo de 2026', cliente: 'Concesionario Jurica', total: '$189.00', estatus: 'Pendiente' },
         { orden: 'A0002', fecha: '12 de Marzo de 2026', cliente: 'Concesionario Jurica', total: '$189.00', estatus: 'Confirmada' },
@@ -18,106 +24,75 @@
         { orden: 'A0007', fecha: '12 de Marzo de 2026', cliente: 'Concesionario Jurica', total: '$189.00', estatus: 'Confirmada' }
     ]; %>
 
-    <header>
-        <div class="logo-area">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG" class="logo-header">
-        </div>
+    <%- include('partials/header.ejs') %>
 
-        <div class="search-bar">
-            <input type="text" placeholder="Buscar Orden" />
-        </div>
+    <div class="flex min-h-screen flex-col">
+        <%- include('partials/sidebar.ejs') %>
 
-        <div class="header-user">
-            <a href="/logout" class="btn-logout">Cerrar sesión</a>
-            <div class="user-icon">
-                <img src="/img/iconoPerfil.png" alt="Usuario">
-            </div>
-        </div>
-    </header>
-
-
-    <div class="layout">
-        <aside>
-            <nav class="menu">
-                <a href="/admin/home">Inicio</a>
-                <a href="/admin/stats">Estadísticas</a>
-                <a href="/admin/orders" class="active">Historial de órdenes</a>
-                <a href="/admin/clients">Clientes</a>
-            </nav>
-        </aside>
-
-        <main>
-            <section class="orders-page">
-                <div class="orders-header">
-                    <h1 class="titulo-historial">Historial de Pedidos</h1>
-
-                    <div class="orders-actions">
-                        <button class="btn-exportar" type="button">Exportar todo el historial</button>
-
-                        <div class="dropdown dropdown-filter">
-                            <button class="dropdown-btn dropdown-btn-large" type="button">
-                                30 dias
-                                <span class="arrow">⌄</span>
+        <!-- Main Content -->
+        <main class="ml-48 pt-2 px-10 pb-9 flex-1">
+            <section class="space-y-6">
+                <!-- Header -->
+                <div class="flex items-center justify-between">
+                    <h1 class="text-3xl font-extrabold text-gray-900">Historial de Pedidos</h1>
+                    <div class="flex items-center gap-4">
+                        <button type="button" class="px-5 py-2.5 bg-white border-2 border-gray-300 rounded-lg font-semibold text-sm text-gray-900 hover:bg-gray-100 transition-all">
+                            Exportar todo el historial
+                        </button>
+                        <div class="relative">
+                            <button type="button" class="px-5 py-2.5 bg-white border-2 border-gray-300 rounded-lg font-semibold text-sm text-gray-900 hover:bg-gray-100 transition-all flex items-center gap-2">
+                                30 días
+                                <span>⌄</span>
                             </button>
-
-                            <div class="dropdown-content">
-                                <a href="#">7 dias</a>
-                                <a href="#">30 dias</a>
-                                <a href="#">90 dias</a>
-                                <a href="#">Ultimo año</a>
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="orders-toolbar">
-                    <div class="orders-search">
-                        <input type="text" placeholder="Buscar historial de pedido">
-                        <button type="button" aria-label="Buscar pedido">
-                            <span class="search-icon"></span>
-                        </button>
-                    </div>
+                <!-- Search -->
+                <div class="flex-1 relative">
+                    <input type="text" placeholder="Buscar historial de pedido" class="w-full px-5 py-2.5 border-2 border-gray-300 rounded-full text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors" />
                 </div>
 
-                <p class="orders-label">Pedidos más recientes:</p>
+                <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide">Pedidos más recientes:</p>
 
-                <section class="orders-table-card">
-                    <div class="orders-table-head">
-                        <span>Orden</span>
-                        <span>Fecha</span>
-                        <span>Cliente</span>
-                        <span>Total</span>
-                        <span>Estatus de pedido</span>
+                <!-- Orders Table -->
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+                    <!-- Table Header -->
+                    <div class="grid grid-cols-5 gap-4 px-6 py-4 border-b-2 border-gray-200 bg-gray-50">
+                        <span class="font-bold text-sm text-gray-700 uppercase tracking-wide">Orden</span>
+                        <span class="font-bold text-sm text-gray-700 uppercase tracking-wide">Fecha</span>
+                        <span class="font-bold text-sm text-gray-700 uppercase tracking-wide">Cliente</span>
+                        <span class="font-bold text-sm text-gray-700 uppercase tracking-wide">Total</span>
+                        <span class="font-bold text-sm text-gray-700 uppercase tracking-wide">Estatus</span>
                     </div>
 
-                    <div class="orders-table-body">
+                    <!-- Table Body -->
+                    <div class="divide-y divide-gray-200">
                         <% pedidos.forEach((pedido) => { %>
-                            <a class="orders-row-link" href="/admin/orders/<%= pedido.orden %>">
-                                <article class="orders-row">
-                                    <span><%= pedido.orden %></span>
-                                    <span><%= pedido.fecha %></span>
-                                    <span><%= pedido.cliente %></span>
-                                    <span><%= pedido.total %></span>
-                                    <span class="status-cell">
-                                        <span class="status-pill <%= pedido.estatus === 'Pendiente' ? 'status-pending' : pedido.estatus === 'Cancelada' ? 'status-cancelled' : 'status-confirmed' %>">
-                                            <%= pedido.estatus %>
-                                        </span>
+                            <a href="/admin/orders/<%= pedido.orden %>" class="grid grid-cols-5 gap-4 px-6 py-4 items-center hover:bg-blue-50 transition-colors">
+                                <span class="font-semibold text-gray-900"><%= pedido.orden %></span>
+                                <span class="text-gray-600 text-sm"><%= pedido.fecha %></span>
+                                <span class="text-gray-600 text-sm"><%= pedido.cliente %></span>
+                                <span class="font-semibold text-gray-900"><%= pedido.total %></span>
+                                <div>
+                                    <% const statusColors = {
+                                        'Pendiente': 'bg-yellow-100 text-yellow-800',
+                                        'Cancelada': 'bg-red-100 text-red-800',
+                                        'Confirmada': 'bg-green-100 text-green-800'
+                                    } %>
+                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold <%= statusColors[pedido.estatus] || 'bg-gray-100 text-gray-800' %>">
+                                        <%= pedido.estatus %>
                                     </span>
-                                </article>
+                                </div>
                             </a>
                         <% }); %>
                     </div>
-                </section>
+                </div>
             </section>
         </main>
     </div>
 
-    <footer class="admin-footer">
-        <div class="admin-footer-inner">
-            <img src="/img/ppg-logo.svg" alt="Logo PPG">
-            <p>The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. © 2026 PPG Industries, Inc.All Rights Reserved</p>
-        </div>
-    </footer>
+    <%- include('partials/footer.ejs') %>
 
 </body>
 </html>
