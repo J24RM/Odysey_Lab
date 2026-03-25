@@ -20,7 +20,7 @@ exports.postLogin = (request, response) => {
     else if (usuario === "c" ) {
         request.session.usuario = usuario;
         request.session.rol = "cliente";
-        return response.redirect('/home');
+        return response.redirect('/cliente/home');
     }
 
     response.render('login', { mensaje: "Credenciales incorrectas" });

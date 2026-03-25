@@ -1,0 +1,61 @@
+<header class="nav-bg border-b nav-border w-full">
+  <div class="w-full px-8 py-2 flex items-center gap-8">
+
+    <!-- Logo PPG -->
+    <div class="flex-shrink-0">
+      <a href="/home">
+        <button class="relative flex items-center justify-center w-16 h-16 hover:border-[#0078A9] transition-all duration-200">
+          <img src="/img/ppg-logo.svg" alt="" class="w-full h-full object-contain">
+        </button>
+      </a>
+    </div>
+
+    <!-- Sucursal -->
+    <div class="flex-shrink-0">
+      <button id="btnSucursal" data-bs-toggle="modal" data-bs-target="#modalSelector"
+        class="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-4 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:border-[#0078A9] transition-all duration-200 shadow-sm whitespace-nowrap">
+        Sucursal: Jurica
+        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Buscador -->
+    <div class="flex-1">
+      <input type="text" placeholder="Buscar Producto"
+        class="w-full bg-white border border-gray-300 rounded-lg px-4 py-1.5 text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0078A9] focus:border-transparent shadow-sm transition-all duration-200"
+      />
+    </div>
+
+    <!-- Mis Pedidos -->
+    <div class="flex-shrink-0">
+      <a href="/mis-pedidos">
+        <button class="flex items-center justify-center bg-white border-2 border-gray-300 rounded-lg w-16 h-10 text-xs font-semibold text-gray-700 hover:border-[#0078A9] hover:text-[#0078A9] transition-all duration-200 leading-tight text-center whitespace-nowrap">
+          Mis<br/>Pedidos
+        </button>
+      </a>
+    </div>
+
+    <!-- Carrito -->
+    <div class="flex-shrink-0 relative">
+      <a href="/cart">
+        <button class="relative flex items-center justify-center w-10 h-10 hover:border-[#0078A9] transition-all duration-200">
+          <img src="/img/carrito.png" alt="">
+          <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center shadow">3</span>
+        </button>
+      </a>
+    </div>
+
+    <!-- Usuario -->
+    <div class="flex-shrink-0">
+      <button id="btnPerfil" data-bs-toggle="modal" data-bs-target="#modalSelector"
+        class="flex items-center justify-center w-10 h-10 rounded-full border-2 border-gray-300 bg-white hover:border-[#0078A9] transition-all duration-200">
+        <img src="/img/iconoPerfil.png" alt="">
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<script src="/nav_bar.js"></script>

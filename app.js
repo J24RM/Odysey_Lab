@@ -9,7 +9,7 @@ const path = require("path");
 // Archivos de rutas
 const authRoutes = require('./routes/auth.routes');
 const adminRoutes = require('./routes/admin.routes');
-const clienteRoutes = require('./routes/cliente.routes');
+const clienteRoutes = require('./routes/cliente.routes')
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -41,12 +41,9 @@ app.get('/', (request, response) => {
 const adminHistOrdenesRoutes = require('./routes/admin_hist_ordenes.routes');
 app.use(adminHistOrdenesRoutes);
 
-
-
-
 //Rutas del Carrito
 const carrito = require('./routes/carrito.routes');
-app.use("/carrito", carrito);
+app.use("/cart", carrito);
 
 
 //Middleware global de autenticacion
@@ -76,8 +73,7 @@ const requireCliente = (request, response, next) => {
 //Rutas para admin 
 app.use('/admin', requireAdmin, adminRoutes);
 
-//Rutas para cliente
-app.use(requireCliente, clienteRoutes);
+app.use('/cliente', clienteRoutes);
 
 app.use((request, response, next) => {
     response.status(404).send("La ruta no existe");

@@ -69,4 +69,16 @@ module.exports = class Orden {
         if (error) throw error;
         return;
     }
+
+
+    static async detalleOrden(id_orden){
+        const{data: productosCarrito, error} = await supabase
+            .from('detalle_orden')
+            .select('id_producto, cantidad')
+            .eq('id_orden', id_orden)
+
+        if (error) throw error;
+
+        return productosCarrito;
+    }
 }

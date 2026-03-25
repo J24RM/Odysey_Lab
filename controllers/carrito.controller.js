@@ -1,22 +1,49 @@
 const ordenModel = require('../models/orden.model')
 const detalle_ordenModel = require('../models/detalle_orden.model');
+const productoModel = require('../models/producto.model')
 const { compile } = require('ejs');
 
 exports.getCarrito = async (request, response, next) => {
+    try {
+        const id_carrito = 51; // req.session.id_carrito;
+        let productosCarrito = null;
+        let detalleProductos = null;
 
+        if (id_carrito != null) {
+            productosCarrito = await detalle_ordenModel.detalleOrden(id_carrito);
 
+            // detalleOrden regresa un array, hay que iterar cada producto
+            detalleProductos = await Promise.all(
+                productosCarrito.map(item =>
+                    productoModel.encontrarProductoPorId(item.id_producto)
+                )
+            );
+        }
 
+        response.render('cart', {
+            // csrfToken: request.csrfToken(),
+            username: request.session.username || '',
+            error: null,
+            productosCarrito: productosCarrito,
+            detalleProductos: detalleProductos,
+        });
+
+    } catch (err) {
+        next(err);
+    }
 };
 
 exports.agregarItem = async (request, response, next) => {
     try {
+        // const id_usuario = request.session.id_usuario;
+
         // Obtener o crear carrito
-        const orden = await ordenModel.obtenerOrdenEnEstadoCarrito(request.body.id_usuario);
-        request.session.id_orden = orden.id;
+        const carrito = await ordenModel.obtenerOrdenEnEstadoCarrito(request.body.id_usuario);
+        request.session.id_carrito = carrito.id;
 
         // Agregar producto
         await detalle_ordenModel.agregarProductoAlCarrito(
-            orden.id_orden,
+            carrito.id_orden,
             request.body.id_producto,
             request.body.cantidad_ingresada
         );
@@ -31,15 +58,14 @@ exports.agregarItem = async (request, response, next) => {
 exports.actualizarItem = async (request, response, next) => {
     const { id_producto } = request.params;
     const { cantidad_ingresada } = request.body;
-    const id_orden =  3 ; // req.session.id_orden;
-
+    const id_carrito =  51 ; // req.session.id_carrito;
     try {
         if (cantidad_ingresada == 0) {
-            await detalle_ordenModel.eliminarProducto(id_orden, id_producto);
+            await detalle_ordenModel.eliminarProducto(id_carrito, id_producto);
             return response.json({ eliminado: true });
         } else {
             await detalle_ordenModel.modificarCantidad(
-                id_orden,
+                id_carrito,
                 id_producto,
                 cantidad_ingresada
             );
@@ -52,8 +78,4 @@ exports.actualizarItem = async (request, response, next) => {
     } catch (error) {
         return response.status(500).json({ error: error.message });
     }
-};
-
-exports.eliminarItem = (request, response) => {
-
 };
