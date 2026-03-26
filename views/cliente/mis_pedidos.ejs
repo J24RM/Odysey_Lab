@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/style_cliente_pedidos.css">
     <title>Historial de pedidos</title>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800">
 
 <%
 const pedidos = [];
@@ -23,175 +23,150 @@ for (let i = 1; i <= 20; i++) {
 }
 %>
 
-<nav class="navbar navbar-expand-lg" style="background-color: rgba(0, 120, 169, 0.1);">
-    <div class="container-fluid align-items-center">
-
+<nav class="w-full flex items-center justify-between px-6 py-3 border-b border-gray-200" style="background-color: rgba(0, 120, 169, 0.1);">
     <!-- Logo -->
-    <a class="navbar-brand" href="/home">
-        <img src="/img/ppg-logo.svg" width="60">
+    <a href="/home" class="flex-shrink-0">
+        <img src="/img/ppg-logo.svg" class="w-[60px]" alt="PPG">
     </a>
 
     <!-- Sucursal -->
-    <ul class="navbar-nav me-3">
-    <li class="nav-item">
-        <a class="btn btn-light" id="btnSucursal" data-bs-toggle="modal" data-bs-target="#modalSelector">
+    <div class="ml-6 flex-shrink-0">
+        <button id="btnSucursal" data-bs-toggle="modal" data-bs-target="#modalSelector" class="bg-white border text-gray-800 border-gray-300 rounded-md px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">
             Sucursal: Jurica
-        </a>
-    </li>
-    </ul>
+        </button>
+    </div>
 
     <!-- Buscador centrado -->
-    <form class="mx-auto search-bar" style="width: 45%;">
-        <div class="input-group">
-        <input
-            type="search"
-            class="form-control text-center"
-            placeholder="Buscar Producto"
-            aria-label="Buscar Producto"
-        >
+    <form class="mx-auto w-[45%]">
+        <div class="relative">
+            <input type="search" class="w-full text-center border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0078A9] text-gray-800" placeholder="Buscar Producto" aria-label="Buscar Producto">
         </div>
     </form>
 
     <!-- Menu derecho -->
-    <ul class="navbar-nav ms-auto align-items-center">
-
-    <li class="nav-item me-3">
-        <a class="btn btn-light" href="/mis-pedidos">Mis Pedidos</a>
-    </li>
-
-    <li class="nav-item me-3">
-        <a href="/cart">
-            <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" width="35">
+    <div class="flex items-center space-x-6 shrink-0">
+        <a href="/mis-pedidos" class="bg-white border text-gray-800 border-gray-300 rounded-md px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">Mis Pedidos</a>
+        <a href="/cart" class="hover:opacity-80 transition-opacity">
+            <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" class="w-[35px]" alt="Carrito">
         </a>
-    </li>
-
-    <li class="nav-item">
-        <a href="#" id="btnPerfil" data-bs-toggle="modal" data-bs-target="#modalSelector" style="display:block;">
-            <img src="/img/iconoPerfil.png" width="40" height="40" style="border-radius:50%; object-fit:cover;">
-        </a>
-    </li>
-
-    </ul>
-
+        <button id="btnPerfil" data-bs-toggle="modal" data-bs-target="#modalSelector" class="block hover:opacity-80 transition-opacity">
+            <img src="/img/iconoPerfil.png" class="w-[40px] h-[40px] rounded-full object-cover shadow-sm border" alt="Perfil">
+        </button>
     </div>
 </nav>
 
 <!-- Card de informacion (modales) -->
-<div class="modal fade" id="modalSelector" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title" id="modalTitle"></h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
+<div id="modalSelector" class="tw-modal hidden fixed inset-0 bg-black/50 z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] flex flex-col">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+            <h5 class="text-lg font-semibold text-gray-800" id="modalTitle"></h5>
+            <button class="btn-close-modal text-gray-500 hover:text-gray-700 text-3xl leading-none">&times;</button>
         </div>
-        <div class="modal-body" id="modalBody">
+        <div class="p-4 overflow-y-auto text-gray-800" id="modalBody">
         </div>
-    </div>
     </div>
 </div>
 
 <!-- Modal Detalle de Orden -->
-<div class="modal fade" id="modalDetalleOrden" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content detalle-orden-modal">
-        <div class="modal-header border-0 pb-0">
-            <h4 class="modal-title mx-auto fw-bold">Detalle de orden</h4>
-            <button type="button" class="btn-close position-absolute end-0 me-3" data-bs-dismiss="modal" aria-label="Close"></button>
+<div id="modalDetalleOrden" class="tw-modal hidden fixed inset-0 bg-black/50 z-50 items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col relative detalle-orden-modal text-gray-800">
+        <div class="flex items-center justify-center pt-4 pb-2 border-b border-gray-100">
+            <h4 class="text-xl font-bold mx-auto">Detalle de orden</h4>
+            <button type="button" class="btn-close-modal absolute right-4 top-4 text-gray-500 hover:text-gray-700 text-3xl leading-none">&times;</button>
         </div>
-        <div class="modal-body pt-3 px-4">
+        <div class="p-6 overflow-y-auto">
             
             <!-- Resumen de la orden (fondo celeste) -->
-            <div class="resumen-orden-box mb-4">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <p class="mb-1 fw-bold">Folio: <span class="fw-normal">A0001</span></p>
-                        <p class="mb-0 fw-bold">Fecha: <span class="fw-normal">18/02/26</span></p>
+            <div class="resumen-orden-box mb-6 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="md:w-1/3">
+                        <p class="mb-1 font-bold">Folio: <span class="font-normal text-gray-700">A0001</span></p>
+                        <p class="mb-0 font-bold">Fecha: <span class="font-normal text-gray-700">18/02/26</span></p>
                     </div>
-                    <div class="col-md-5">
-                        <p class="mb-1 fw-bold">Sucursal: <span class="fw-normal">Jurica</span></p>
-                        <p class="mb-0 fw-bold">Total de productos: <span class="fw-normal">10</span></p>
+                    <div class="md:w-5/12">
+                        <p class="mb-1 font-bold">Sucursal: <span class="font-normal text-gray-700">Jurica</span></p>
+                        <p class="mb-0 font-bold">Total de productos: <span class="font-normal text-gray-700">10</span></p>
                     </div>
-                    <div class="col-md-3 text-md-end">
-                        <p class="mb-1 fw-bold d-flex align-items-center justify-content-md-end gap-2">
-                            Estado de la orden: <span class="status-pill status-confirmed d-inline-block px-2 py-1" style="font-size:11px; min-width:auto;">Confirmada</span>
+                    <div class="md:w-1/4 md:text-right">
+                        <p class="mb-1 font-bold flex items-center md:justify-end gap-2">
+                            Estado de la orden: <span class="status-pill status-confirmed inline-block px-2 py-1 text-[11px] rounded-full">Confirmada</span>
                         </p>
-                        <p class="mb-0 fw-bold d-flex align-items-center justify-content-md-end gap-2">
-                            Subtotal: <span class="fw-normal">7,280.00</span>
+                        <p class="mb-0 font-bold flex items-center md:justify-end gap-2">
+                            Subtotal: <span class="font-normal text-gray-700">7,280.00</span>
                         </p>
                     </div>
                 </div>
             </div>
 
             <!-- Titulo y Exportar -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0">Desglose de orden:</h5>
-                <button class="btn btn-exportar-small shadow-sm">Exportar</button>
+            <div class="flex justify-between items-center mb-4">
+                <h5 class="font-bold text-lg mb-0 text-gray-800">Desglose de orden:</h5>
+                <button class="btn btn-exportar-small shadow-sm border rounded px-3 py-1 bg-white hover:bg-gray-50 text-sm font-semibold text-gray-800">Exportar</button>
             </div>
 
             <!-- Lista de productos -->
-            <div class="productos-lista">
+            <div class="productos-lista space-y-4">
                 
                 <!-- Producto 1 -->
-                <div class="producto-item">
-                    <div class="img-box">
-                        <img src="/img/cubeta_ejemplo.png" alt="Producto" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1170/1170679.png'">
+                <div class="producto-item flex flex-col sm:flex-row items-center gap-4 border-b border-gray-100 pb-4">
+                    <div class="img-box w-16 h-16 shrink-0 bg-gray-50 border border-gray-200 rounded p-1">
+                        <img src="/img/cubeta_ejemplo.png" alt="Producto" class="w-full h-full object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1170/1170679.png'">
                     </div>
-                    <div class="producto-info flex-grow-1">
-                        <h6 class="fw-normal mb-2" style="font-size: 14px; max-width: 90%;">Sellador Comex 5x1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</h6>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="cantidad-box">
+                    <div class="producto-info flex-grow text-center sm:text-left">
+                        <h6 class="font-medium text-gray-700 mb-2 text-sm sm:max-w-[90%]">Sellador Comex 5x1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</h6>
+                        <div class="flex items-center justify-center sm:justify-start gap-2">
+                            <div class="cantidad-box text-sm text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded">
                                 Unidades: 2
                             </div>
                         </div>
                     </div>
-                    <div class="producto-precio text-end">
-                        <div class="fw-bold fs-5">$ 1,600</div>
-                        <div class="text-muted" style="font-size: 11px;">($ 800/ unidad)</div>
+                    <div class="producto-precio text-center sm:text-right shrink-0 mt-2 sm:mt-0">
+                        <div class="font-bold text-lg text-gray-800">$ 1,600</div>
+                        <div class="text-gray-500 text-[11px]">($ 800 / unidad)</div>
                     </div>
                 </div>
 
                 <!-- Producto 2 -->
-                <div class="producto-item">
-                    <div class="img-box">
-                        <img src="/img/cubeta_ejemplo.png" alt="Producto" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1170/1170679.png'">
+                <div class="producto-item flex flex-col sm:flex-row items-center gap-4 border-b border-gray-100 pb-4">
+                    <div class="img-box w-16 h-16 shrink-0 bg-gray-50 border border-gray-200 rounded p-1">
+                        <img src="/img/cubeta_ejemplo.png" alt="Producto" class="w-full h-full object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1170/1170679.png'">
                     </div>
-                    <div class="producto-info flex-grow-1">
-                        <h6 class="fw-normal mb-2" style="font-size: 14px; max-width: 90%;">Sellador Comex 5x1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</h6>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="cantidad-box">
+                    <div class="producto-info flex-grow text-center sm:text-left">
+                        <h6 class="font-medium text-gray-700 mb-2 text-sm sm:max-w-[90%]">Sellador Comex 5x1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</h6>
+                        <div class="flex items-center justify-center sm:justify-start gap-2">
+                            <div class="cantidad-box text-sm text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded">
                                 Unidades: 2
                             </div>
                         </div>
                     </div>
-                    <div class="producto-precio text-end">
-                        <div class="fw-bold fs-5">$ 1,600</div>
-                        <div class="text-muted" style="font-size: 11px;">($ 800/ unidad)</div>
+                    <div class="producto-precio text-center sm:text-right shrink-0 mt-2 sm:mt-0">
+                        <div class="font-bold text-lg text-gray-800">$ 1,600</div>
+                        <div class="text-gray-500 text-[11px]">($ 800 / unidad)</div>
                     </div>
                 </div>
 
                 <!-- Producto 3 -->
-                <div class="producto-item">
-                    <div class="img-box">
-                        <img src="/img/cubeta_ejemplo.png" alt="Producto" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1170/1170679.png'">
+                <div class="producto-item flex flex-col sm:flex-row items-center gap-4 border-b border-gray-100 pb-4">
+                    <div class="img-box w-16 h-16 shrink-0 bg-gray-50 border border-gray-200 rounded p-1">
+                        <img src="/img/cubeta_ejemplo.png" alt="Producto" class="w-full h-full object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1170/1170679.png'">
                     </div>
-                    <div class="producto-info flex-grow-1">
-                        <h6 class="fw-normal mb-2" style="font-size: 14px; max-width: 90%;">Sellador Comex 5x1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</h6>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="cantidad-box">
+                    <div class="producto-info flex-grow text-center sm:text-left">
+                        <h6 class="font-medium text-gray-700 mb-2 text-sm sm:max-w-[90%]">Sellador Comex 5x1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador</h6>
+                        <div class="flex items-center justify-center sm:justify-start gap-2">
+                            <div class="cantidad-box text-sm text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded">
                                 Unidades: 2
                             </div>
                         </div>
                     </div>
-                    <div class="producto-precio text-end">
-                        <div class="fw-bold fs-5">$ 1,600</div>
-                        <div class="text-muted" style="font-size: 11px;">($ 800/ unidad)</div>
+                    <div class="producto-precio text-center sm:text-right shrink-0 mt-2 sm:mt-0">
+                        <div class="font-bold text-lg text-gray-800">$ 1,600</div>
+                        <div class="text-gray-500 text-[11px]">($ 800 / unidad)</div>
                     </div>
                 </div>
 
             </div>
 
         </div>
-    </div>
     </div>
 </div>
 
@@ -277,6 +252,5 @@ for (let i = 1; i <= 20; i++) {
 </footer>
 
 <script src="/nav_bar.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
