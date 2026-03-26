@@ -2,6 +2,7 @@
 Title "Modificar Producto del Carrito"
 
 actor Navegador as nav
+control "carrito.js" as JS
 boundary "carrito.routes.js" as ruta
 boundary "carrito.ejs" as UI
 control "carrito.controller.js" as ctrl
@@ -42,7 +43,29 @@ end
 ctrl --> ruta: JSON (resultado)
 deactivate ctrl
 activate ruta
-ruta --> nav: JSON
+
+ruta --> JS: JSON (resultado)
 deactivate ruta
+
+activate JS
+alt data.eliminado = true
+    
+    JS -> UI: mostrarEliminado(nombre, idProducto)\nrow.remove()
+    activate UI
+    deactivate UI
+else data.eliminado = false
+    JS -> UI: qtySpan.textContent = data.nuevaCantidad\nprice.textContent = precio × nuevaCantidad
+    activate UI
+    deactivate UI
+end
+JS -> UI: actualizarSubtotal()
+deactivate JS
+
+
+activate UI
+UI --> nav: Vista actualizada
+deactivate UI
 activate nav
+
+
 @enduml

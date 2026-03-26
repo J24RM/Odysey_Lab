@@ -14,7 +14,7 @@ function actualizarSubtotal() {
   document.getElementById('qty-display').textContent = 'Cantidad de productos: ' + totalQty;
 }
 
-async function changeQty(idProducto, delta) {
+async function cambiarCantidad(idProducto, delta) {
   const qtySpan = document.getElementById('qty-' + idProducto);
   const nuevaCantidad = parseInt(qtySpan.textContent) + delta;
 
@@ -39,7 +39,7 @@ async function changeQty(idProducto, delta) {
   actualizarSubtotal();
 }
 
-async function removeProduct(idProducto) {
+async function eliminarProducto(idProducto) {
   const res = await fetch('/cart/items/' + idProducto, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

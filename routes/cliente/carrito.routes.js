@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const carritoController = require("../controllers/carrito.controller")
+const carritoController = require("../../controllers/cliente/carrito.controller")
 
 // carrito.routes.js
 router.get('/', carritoController.getCarrito);

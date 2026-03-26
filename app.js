@@ -42,7 +42,7 @@ const adminHistOrdenesRoutes = require('./routes/admin_hist_ordenes.routes');
 app.use(adminHistOrdenesRoutes);
 
 //Rutas del Carrito
-const carrito = require('./routes/carrito.routes');
+const carrito = require('./routes/cliente/carrito.routes');
 app.use("/cart", carrito);
 
 
