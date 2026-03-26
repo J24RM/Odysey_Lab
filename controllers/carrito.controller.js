@@ -5,7 +5,7 @@ const { compile } = require('ejs');
 
 exports.getCarrito = async (request, response, next) => {
     try {
-        const id_carrito = 51; // req.session.id_carrito;
+        const id_carrito = 3 // req.session.id_carrito;
         let productosCarrito = null;
         let detalleProductos = null;
 
@@ -39,7 +39,7 @@ exports.agregarItem = async (request, response, next) => {
 
         // Obtener o crear carrito
         const carrito = await ordenModel.obtenerOrdenEnEstadoCarrito(request.body.id_usuario);
-        request.session.id_carrito = carrito.id;
+        request.session.id_carrito = carrito.id_orden;
 
         // Agregar producto
         await detalle_ordenModel.agregarProductoAlCarrito(
@@ -48,7 +48,7 @@ exports.agregarItem = async (request, response, next) => {
             request.body.cantidad_ingresada
         );
 
-        response.json({ message: "Producto agregado" });
+        response.redirect('/cart')
 
     } catch (err) {
         next(err);
@@ -58,7 +58,8 @@ exports.agregarItem = async (request, response, next) => {
 exports.actualizarItem = async (request, response, next) => {
     const { id_producto } = request.params;
     const { cantidad_ingresada } = request.body;
-    const id_carrito =  51 ; // req.session.id_carrito;
+    const id_carrito =  3 ; // req.session.id_carrito;
+    
     try {
         if (cantidad_ingresada == 0) {
             await detalle_ordenModel.eliminarProducto(id_carrito, id_producto);

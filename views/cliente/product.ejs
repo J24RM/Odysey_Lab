@@ -1,93 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <title>Cliente Product</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Detalle de Producto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    * { font-family: 'Public Sans', sans-serif; }
+    .nav-bg { background-color: rgba(0, 120, 169, 0.1); }
+    .nav-border { border-color: rgba(0, 120, 169, 0.2); }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'ppg-dark': '#002736',
+            'ppg-blue': '#0078A9',
+            'ppg-light-blue': '#8FBADE',
+          },
+        }
+      }
+    }
+  </script>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen">
 
-<nav class="navbar navbar-expand-lg" style="background-color: rgba(0, 120, 169, 0.1);">
-    <div class="container-fluid align-items-center">
+  <%- include('../includes/_navbar') %>
 
-    <!-- Logo -->
-    <a class="navbar-brand" href="/home">
-        <img src="/img/ppg-logo.svg" width="60">
-    </a>
 
-    <!-- Sucursal -->
-    <ul class="navbar-nav me-3">
-    <li class="nav-item">
-        <a class="btn btn-light" id="btnSucursal" data-bs-toggle="modal" data-bs-target="#modalSelector">
-            Sucursal: Jurica
-        </a>
-    </li>
-    </ul>
+  <!-- SECCIÓN PRINCIPAL DEL PRODUCTO -->
+  <section class="max-w-6xl mx-auto px-6 py-10">
+    <div class="flex flex-col lg:flex-row gap-10 items-start">
 
-    <!-- Buscador centrado -->
-    <form class="mx-auto search-bar" style="width: 45%;">
-        <div class="input-group">
-        <input
-            type="search"
-            class="form-control text-center"
-            placeholder="Buscar Producto"
-            aria-label="Buscar Producto"
+      <!-- Columna izquierda: imágenes -->
+      <div class="flex flex-col gap-4 items-center lg:w-[340px] shrink-0">
+        <!-- Imagen principal -->
+        <div class="w-full flex justify-center">
+          <img src="/img/botePintura.png" alt="Sellador Comex 5x1 Clásico" class="w-64 h-64 object-contain" />
+        </div>
+        <!-- Miniaturas -->
+        <div class="flex gap-3 justify-center">
+          <div class="w-16 h-16 border-2 border-yellow-400 rounded overflow-hidden flex items-center justify-center bg-yellow-50 cursor-pointer">
+            <img src="/img/botePintura.png" alt="thumb1" class="w-full h-full object-contain p-1"/>
+          </div>
+          <div class="w-16 h-16 border border-gray-200 rounded overflow-hidden flex items-center justify-center bg-gray-50 cursor-pointer hover:border-yellow-400 transition">
+            <img src="/img/botePintura.png" alt="thumb2" class="w-full h-full object-contain p-1"/>
+          </div>
+          <div class="w-16 h-16 border-2 border-yellow-400 rounded overflow-hidden flex items-center justify-center bg-yellow-50 cursor-pointer">
+            <img src="/img/botePintura.png" alt="thumb3" class="w-full h-full object-contain p-1"/>
+          </div>
+          <div class="w-16 h-16 border border-gray-200 rounded overflow-hidden flex items-center justify-center bg-gray-50 cursor-pointer hover:border-yellow-400 transition">
+            <img src="/img/botePintura.png" alt="thumb4" class="w-full h-full object-contain p-1"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna central: información del producto -->
+      <div class="flex-1 min-w-0">
+        <!-- Título -->
+        <h1 class="text-2xl font-bold text-gray-900 leading-snug mb-3">
+          Sellador Comex 5×1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador
+        </h1>
+
+        <!-- Estrellas -->
+        <div class="flex items-center gap-1 mb-4">
+          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
+          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
+          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
+          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
+          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
+        </div>
+
+        <hr class="border-gray-200 mb-4"/>
+
+        <!-- Precio -->
+        <p class="text-3xl font-bold text-gray-900 mb-4">$ 800</p>
+
+        <!-- Especificaciones -->
+        <div class="text-sm text-gray-700 space-y-1 mb-4">
+          <p>-Peso: 2Kg</p>
+          <p>-Volumen: 0.3 m3</p>
+          <p>-Unidad de Venta:</p>
+          <p>-Unidad de Medida:</p>
+        </div>
+
+        <hr class="border-gray-200 mb-4"/>
+
+        <!-- Descripción -->
+        <div class="text-sm text-gray-800">
+          <p class="font-semibold mb-2">Descripcion:</p>
+          <ul class="list-disc list-inside space-y-2 text-gray-700">
+            <li>Alta calidad y rendimiento profesional: Fórmula acrílica premium para superficies interiores y exteriores, con gran durabilidad</li>
+            <li>Excelente cobertura: Cubre fácilmente imperfecciones con una sola mano en la mayoría de las superficies</li>
+          </ul>
+        </div>
+      </div>
+
+      <div
+        class="lg:w-56 shrink-0 rounded-xl p-5 flex flex-col gap-4 bg-white"
+        style="box-shadow: 0 4px 24px rgba(0,0,0,0.12);"
+      >
+        <!-- Precio -->
+        <p class="text-4xl font-extrabold text-gray-900">$ 800</p>
+
+        <!-- Sucursal -->
+        <p class="text-sm font-semibold" style="color: #0078A9;">Sucursal: Galerias</p>
+
+        <!-- Cantidad -->
+        <div class="border border-gray-400 rounded-md px-4 py-2 text-sm font-semibold text-gray-800 bg-white">
+          Cantidad: 5
+        </div>
+          <!-- Botón agregar al carrito -->
+          <form action="/cart/items" method="POST">
+            <input type="hidden" name="cantidad_ingresada" value="5"/>
+            <input type="hidden" name="id_producto" value="17"/>
+            <input type="hidden" name="id_usuario" value="35"/>
+            <button type="submit" style="background-color: #002736;" 
+            class="w-full text-white text-sm font-semibold rounded-md py-3">
+              Agregar al carrito
+            </button>
+          </form>
+        
+        
+        <!-- Botón calificar producto -->
+        <button
+          class="w-full text-white text-sm font-semibold rounded-md py-3 hover:opacity-90 transition"
+          style="background-color: #8FBADE;"
+          
         >
-        </div>
-    </form>
-
-    <!-- Menu derecho -->
-    <ul class="navbar-nav ms-auto align-items-center">
-
-    <li class="nav-item me-3">
-        <a class="btn btn-light" href="/mis-pedidos">Mis Pedidos</a>
-    </li>
-
-    <li class="nav-item me-3">
-        <a href="/cart">
-            <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" width="35">
-        </a>
-    </li>
-
-    <li class="nav-item">
-        <a href="#" id="btnPerfil" data-bs-toggle="modal" data-bs-target="#modalSelector" style="display:block;">
-            <img src="/img/iconoPerfil.png" width="40" height="40" style="border-radius:50%; object-fit:cover;">
-        </a>
-    </li>
-
-    </ul>
+          Calificar producto
+        </button>
+      </div>
 
     </div>
-</nav>
+  </section>
 
-<!-- Card de informacion -->
-<div class="modal fade" id="modalSelector" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+  <!-- SECCIÓN PRODUCTOS SIMILARES -->
+  <section class="max-w-6xl mx-auto px-6 pb-10">
+    <h2 class="text-xl font-bold text-gray-900 mb-4">Productos similares</h2>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <% for (let i = 0; i < 4; i++) { %>
+      <div class="border border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:shadow-md transition cursor-pointer">
+        <img src="/img/botePintura.png" alt="Producto similar" class="w-24 h-24 object-contain"/>
+      </div>
+      <% } %>
 
-    <div class="modal-content">
-
-    <div class="modal-header">
-        <h5 class="modal-title" id="modalTitle"></h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
-    </div>
-
-        <div class="modal-body" id="modalBody">
-        </div>
 
     </div>
+  </section>
 
-    </div>
-</div>
-
-<!-- Contenido principal -->
-<div class="container mt-5">
-    <h1>Detalle de Producto</h1>
-    <p>Producto ID: <%= productoId %></p>
-    <p>Aquí va la información del producto seleccionado</p>
-</div>
-
-<script src="/nav_bar.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

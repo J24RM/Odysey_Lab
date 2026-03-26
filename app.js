@@ -73,7 +73,12 @@ const requireCliente = (request, response, next) => {
 //Rutas para admin 
 app.use('/admin', requireAdmin, adminRoutes);
 
+// Rutas del Cliente
 app.use('/cliente', clienteRoutes);
+
+// Rutas del producto
+const producto = require('./routes/producto.routes');
+app.use('/product', producto);
 
 app.use((request, response, next) => {
     response.status(404).send("La ruta no existe");
