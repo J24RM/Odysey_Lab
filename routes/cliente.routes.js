@@ -5,7 +5,6 @@ const router = express.Router();
 
 const authController = require('../controllers/auth.controller');
 const productoController = require('../controllers/producto.controller');
-const carritoController = require('../controllers/carrito.controller');
 const cuentaController = require('../controllers/cuenta.controller');
 const clienteController = require('../controllers/cliente.controllers');
 

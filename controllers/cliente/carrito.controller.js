@@ -1,6 +1,6 @@
-const ordenModel = require('../models/orden.model')
-const detalle_ordenModel = require('../models/detalle_orden.model');
-const productoModel = require('../models/producto.model')
+const ordenModel = require('../../models/orden.model')
+const detalle_ordenModel = require('../../models/detalle_orden.model');
+const productoModel = require('../../models/producto.model')
 const { compile } = require('ejs');
 
 exports.getCarrito = async (request, response, next) => {
@@ -8,6 +8,7 @@ exports.getCarrito = async (request, response, next) => {
         const id_carrito = 3 // req.session.id_carrito;
         let productosCarrito = null;
         let detalleProductos = null;
+        let sucursal = "Apaseo";
 
         if (id_carrito != null) {
             productosCarrito = await detalle_ordenModel.detalleOrden(id_carrito);
@@ -20,12 +21,13 @@ exports.getCarrito = async (request, response, next) => {
             );
         }
 
-        response.render('cart', {
+        response.render('cliente/cart', {
             // csrfToken: request.csrfToken(),
             username: request.session.username || '',
             error: null,
             productosCarrito: productosCarrito,
             detalleProductos: detalleProductos,
+            sucursal: sucursal,
         });
 
     } catch (err) {

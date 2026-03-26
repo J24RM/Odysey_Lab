@@ -2,7 +2,6 @@
 Title "Agregar un producto al carrito"
 actor Navegador as nav
 boundary "carrito.routes.js" as ruta
-boundary "carrito.ejs" as UI
 control "carrito.controller.js" as ctrl
 entity "orden.model.js" as model
 entity "detalle_orden.model.js" as model2
@@ -57,11 +56,8 @@ end
 model2 -->> ctrl: Se actualizo el carrito
 deactivate model2
 
-ctrl --> UI :response.render('carrito.ejs')
+ctrl --> nav :response.redirect('/cart')
 deactivate ctrl
-activate UI
-UI --> nav :HTML
-deactivate UI
 
 activate nav
 
