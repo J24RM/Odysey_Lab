@@ -8,9 +8,9 @@ document.getElementById("btnSucursal").addEventListener("click", () => {
     title.textContent = "Seleccionar Sucursal"
 
     body.innerHTML = `
-    <div class="card p-2 mb-2">Sucursal Querétaro</div>
-    <div class="card p-2 mb-2">Sucursal Monterrey</div>
-    <div class="card p-2 mb-2">Sucursal Guadalajara</div>
+    <div class="bg-white border rounded shadow-sm p-3 mb-3 hover:bg-gray-50 cursor-pointer transition-colors text-gray-800">Sucursal Querétaro</div>
+    <div class="bg-white border rounded shadow-sm p-3 mb-3 hover:bg-gray-50 cursor-pointer transition-colors text-gray-800">Sucursal Monterrey</div>
+    <div class="bg-white border rounded shadow-sm p-3 mb-3 hover:bg-gray-50 cursor-pointer transition-colors text-gray-800">Sucursal Guadalajara</div>
     `
 })
 
@@ -51,12 +51,53 @@ document.getElementById("btnPerfil").addEventListener("click", () => {
                     <option>Sucursal: Norte</option>
                 </select>
 
-                <a href="/logout" class="btn btn-outline-dark" style="font-weight: 600; padding: 8px 20px; border-radius: 6px;">
+                <a href="/logout" class="border border-gray-800 text-gray-800 hover:bg-gray-100 transition-colors" style="font-weight: 600; padding: 8px 20px; border-radius: 6px; text-decoration: none;">
                     Cerrar sesión
                 </a>
             </div>
         </div>
     </div>
     `
+})
+
+// Modal toggling logic for Tailwind CSS custom modals
+document.addEventListener("DOMContentLoaded", () => {
+    const modals = document.querySelectorAll('.tw-modal');
+    
+    // Open modals
+    document.querySelectorAll('[data-bs-toggle="modal"]').forEach(trigger => {
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetSelector = trigger.getAttribute('data-bs-target');
+            if (targetSelector) {
+                const targetModal = document.querySelector(targetSelector);
+                if (targetModal) {
+                    targetModal.classList.remove('hidden');
+                    targetModal.classList.add('flex');
+                }
+            }
+        });
+    });
+
+    // Close modals
+    document.querySelectorAll('.btn-close-modal').forEach(closeBtn => {
+        closeBtn.addEventListener('click', (e) => {
+            const modal = e.target.closest('.tw-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        });
+    });
+
+    // Close when clicking outside of modal content
+    modals.forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        });
+    });
 })
 
