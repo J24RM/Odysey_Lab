@@ -1,4 +1,5 @@
 // Controllers
+const Usuario = require('../models/usuario.model');
 
 //Muestra el Login
 exports.getLogin = (request, response) => {
@@ -6,24 +7,42 @@ exports.getLogin = (request, response) => {
 };
 
 //Ingresa credenciales
-//Para iniciar sesion de prueba:
-//Usuario: admin
-//Contraseña: a
-exports.postLogin = (request, response) => {
-    const { usuario, password } = request.body;
+exports.postLogin = async (request, response) => {
+    try {
+        const { usuario, password } = request.body;
 
-    if (usuario === "admin" && password === "a") {
-        request.session.usuario = usuario;
-        request.session.rol = "admin";
-        return response.redirect('/admin/home');
-    }
-    else if (usuario === "c" ) {
-        request.session.usuario = usuario;
-        request.session.rol = "cliente";
-        return response.redirect('/cliente/home');
-    }
+        // Buscar usuario por email en la BD
+        let usuarioData;
+        try {
+            usuarioData = await Usuario.encontrarPorEmail(usuario);
+        } catch (error) {
+            // Si no encuentra el usuario, tratarlo como credenciales incorrectas
+            usuarioData = null;
+        }
 
-    response.render('login', { mensaje: "Credenciales incorrectas" });
+        // Validar que existe el usuario y la contraseña coincide
+        if (!usuarioData || usuarioData.password_hash !== password) {
+            return response.render('login', { mensaje: "Usuario y/o contraseña incorrectos" });
+        }
+
+        // Guardar solo id_usuario en la sesión
+        request.session.usuario = usuarioData.id_usuario;
+        request.session.id_rol = usuarioData.id_rol;
+
+        // Redirigir según id_rol (1 = cliente, 2 = admin)
+        if (usuarioData.id_rol === 2) {
+            return response.redirect('/admin/home');
+        } else if (usuarioData.id_rol === 1) {
+            return response.redirect('/cliente/home');
+        }
+
+        // Si id_rol no es reconocido
+        response.render('login', { mensaje: "Usuario y/o contraseña incorrectos" });
+
+    } catch (error) {
+        console.error('Error en login:', error);
+        response.render('login', { mensaje: "Error en el servidor. Intenta de nuevo." });
+    }
 };
 
 //Ruta protegida admin
@@ -36,8 +55,8 @@ exports.getAdminAgregarProducto = (request, response) => {
     response.render('admin/home_agregarProducto', { usuario: request.session.usuario });
 };
 
-exports.getAdminEliminarProducto = (request, response) => {
-    response.render('admin/home_eliminarProducto', { usuario: request.session.usuario });
+exports.getAdminEditarProducto = (request, response) => {
+    response.render('admin/home_editarProducto', { usuario: request.session.usuario });
 };
 
 //Ruta protegida cliente
