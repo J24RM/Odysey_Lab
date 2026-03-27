@@ -5,7 +5,7 @@ const { compile } = require('ejs');
 
 exports.getCarrito = async (request, response, next) => {
     try {
-        const id_carrito = 3 // req.session.id_carrito;
+        const id_carrito = 6 // request.session.id_carrito;
         let productosCarrito = null;
         let detalleProductos = null;
         let sucursal = "Apaseo";
@@ -53,14 +53,14 @@ exports.agregarItem = async (request, response, next) => {
         response.redirect('/cart')
 
     } catch (err) {
-        next(err);
+        response.redirect('/cart?error=' + encodeURIComponent(err.message));
     }
 };
 
 exports.actualizarItem = async (request, response, next) => {
     const { id_producto } = request.params;
     const { cantidad_ingresada } = request.body;
-    const id_carrito =  3 ; // req.session.id_carrito;
+    const id_carrito = 6 // request.session.id_carrito;
     
     try {
         if (cantidad_ingresada == 0) {
