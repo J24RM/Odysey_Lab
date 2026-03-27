@@ -51,10 +51,6 @@ exports.getAdminHome = (request, response) => {
     response.render('admin/home', { usuario: request.session.usuario });
 };
 
-exports.getAdminAgregarProducto = (request, response) => {
-    response.render('admin/home_agregarProducto', { usuario: request.session.usuario });
-};
-
 exports.getAdminEditarProducto = (request, response) => {
     response.render('admin/home_editarProducto', { usuario: request.session.usuario });
 };
