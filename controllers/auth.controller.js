@@ -1,5 +1,6 @@
 // Controllers
 const Usuario = require('../models/usuario.model');
+const Producto = require('../models/producto.model');
 
 //Muestra el Login
 exports.getLogin = (request, response) => {
@@ -56,8 +57,26 @@ exports.getAdminEditarProducto = (request, response) => {
 };
 
 //Ruta protegida cliente
-exports.getClienteHome = (request, response) => {
-    response.render('cliente/home', { usuario: request.session.usuario });
+exports.getClienteHome = async (request, response) => {
+    try {
+        const searchQuery = request.query.search || '';
+        let productos;
+        
+        if (searchQuery) {
+            productos = await Producto.search(searchQuery);
+        } else {
+            productos = await Producto.fetchAll();
+        }
+
+        response.render('cliente/home', { 
+            usuario: request.session.usuario,
+            productos: productos,
+            searchQuery: searchQuery
+        });
+    } catch (error) {
+        console.error('Error fetching products for client home:', error);
+        response.status(500).send('Error interno del servidor');
+    }
 };
 
 //Se accede al dar clic en "Cerrar sesion"

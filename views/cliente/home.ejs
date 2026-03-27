@@ -7,11 +7,11 @@
     <link rel="stylesheet" href="/style_cliente_home.css">
     <title>Cliente Home</title>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 flex flex-col min-h-screen">
 <%- include('../includes/_navbar') %>
 
 <!-- Contenido principal aqui -->
-<main class="client-main">
+<main class="client-main flex-1">
     <section class="banner">
         <div class="banner-text">
             <h2>Preventa Activa: Productos Exclusivos <span>Mundial 2026</span></h2>
@@ -50,22 +50,28 @@
 
     <!-- Product Grid -->
     <div class="product-grid">
-        <% for (let i = 0; i < 20; i++) { %>
-            <a href="/cliente/product/<%= i + 1 %>" class="product-card">
-                <div class="product-img-wrap">
-                    <img src="/img/cubeta_ejemplo.png" alt="Sellador Comex" onerror="this.src='/img/botePintura.png'">
-                </div>
-                <div class="product-name">
-                    Sellador Comex 5x1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador
-                </div>
-                <div class="product-rating">
-                    ★★★★★
-                </div>
-                <div class="product-price">
-                    $ 800
-                </div>
-                <button class="btn-add-cart">agregar al carrito</button>
-            </a>
+        <% if (productos && productos.length > 0) { %>
+            <% productos.forEach(producto => { %>
+                <a href="/cliente/product/<%= producto.id_producto %>" class="product-card">
+                    <div class="product-img-wrap">
+                        <img src="<%= producto.url_imagen || '/img/botePintura.png' %>" alt="<%= producto.nombre %>" onerror="this.src='/img/botePintura.png'">
+                    </div>
+                    <div class="product-name">
+                        <%= producto.nombre %>
+                    </div>
+                    <div class="product-rating">
+                        ★★★★★
+                    </div>
+                    <div class="product-price">
+                        $ <%= producto.precio_unitario %>
+                    </div>
+                    <button class="btn-add-cart">agregar al carrito</button>
+                </a>
+            <% }) %>
+        <% } else { %>
+            <div class="col-span-full py-10 text-center text-gray-500">
+                No se encontraron productos.
+            </div>
         <% } %>
     </div>
 

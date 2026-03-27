@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/style_cliente_pedidos.css">
     <title>Historial de pedidos</title>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
 
 <%
 const pedidos = [];
@@ -131,7 +131,7 @@ for (let i = 1; i <= 20; i++) {
 </div>
 
 <!-- Contenido principal -->
-<div class="pedidos-container">
+<div class="pedidos-container flex-1">
     <h1 class="pedidos-titulo">Ordenes</h1>
 
     <!-- Barra de herramientas -->

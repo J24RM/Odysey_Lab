@@ -2,7 +2,13 @@ const Producto = require('../models/producto.model');
 
 //Obtener todos los productos (admin)
 exports.getProductos = async (request, response) => {
-
+    try {
+        const productos = await Producto.fetchAll();
+        // Render or send based on requirements (currently empty in file)
+    } catch (error) {
+        console.error('Error fetching products for admin:', error);
+        response.status(500).send('Error interno del servidor');
+    }
 };
 
 //Mostrar formulario de agregar producto
@@ -98,73 +104,80 @@ exports.postAgregarProducto = async (request, response) => {
 };
 
 //Ver producto especifico (admin)
-exports.getProductoAdmin = (request, response) => {
-    const { id } = request.params;
+exports.getProductoAdmin = async (request, response) => {
+    try {
+        const { id } = request.params;
+        const productoRaw = await Producto.findById(id);
 
-    const productosDemo = {
-        sellador_1: {
-            id,
-            nombre: 'Sellador Comex 5×1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador',
-            precio: '800',
-            peso: '2Kg',
-            volumen: '0.3 m3',
-            unidadVenta: 'Pieza',
-            unidadMedida: 'Mililitros',
-            descripcion: [
-                'Alta calidad y rendimiento profesional: Fórmula acrílica premium para superficies interiores y exteriores, con gran durabilidad',
-                'Excelente cobertura: Cubre fácilmente imperfecciones con una sola mano en la mayoría de las superficies'
-            ],
-            imagen: '/img/botePintura.png',
+        if (!productoRaw) {
+            return response.status(404).send('Producto no encontrado');
+        }
+
+        // Mapping DB fields to view structure
+        const producto = {
+            id: productoRaw.id_producto,
+            nombre: productoRaw.nombre,
+            precio: productoRaw.precio_unitario,
+            peso: productoRaw.peso || 'N/A',
+            volumen: productoRaw.volumen || 'N/A',
+            unidadVenta: productoRaw.unidad_venta || 'N/A',
+            unidadMedida: productoRaw.unidad_medida || 'N/A',
+            descripcion: productoRaw.descripcion ? [productoRaw.descripcion] : ['Sin descripción disponible'],
+            imagen: productoRaw.url_imagen || '/img/botePintura.png',
             similars: [
                 '/img/botePintura.png',
                 '/img/botePintura.png',
                 '/img/botePintura.png',
                 '/img/botePintura.png'
             ]
-        }
-    };
+        };
 
-    const producto = productosDemo[id] || productosDemo.sellador_1;
-
-    response.render('admin/product', {
-        usuario: request.session.usuario,
-        productoId: id,
-        producto
-    });
+        response.render('admin/product', {
+            usuario: request.session.usuario,
+            productoId: id,
+            producto
+        });
+    } catch (error) {
+        console.error('Error in getProductoAdmin:', error);
+        response.status(500).send('Error interno del servidor');
+    }
 };
 
 //Ver producto especifico (cliente)
-exports.getProductoCliente = (request, response) => {
-    const { id } = request.params;
+exports.getProductoCliente = async (request, response) => {
+    try {
+        const { id } = request.params;
+        const productoRaw = await Producto.findById(id);
 
-    const productosDemo = {
-        sellador_1: {
-            id,
-            nombre: 'Sellador Comex 5×1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador',
-            precio: '800',
-            peso: '2Kg',
-            volumen: '0.3 m3',
-            unidadVenta: 'Pieza',
-            unidadMedida: 'Mililitros',
-            descripcion: [
-                'Alta calidad y rendimiento profesional: Fórmula acrílica premium para superficies interiores y exteriores, con gran durabilidad',
-                'Excelente cobertura: Cubre fácilmente imperfecciones con una sola mano en la mayoría de las superficies'
-            ],
-            imagen: '/img/botePintura.png',
+        if (!productoRaw) {
+            return response.status(404).send('Producto no encontrado');
+        }
+
+        const producto = {
+            id: productoRaw.id_producto,
+            nombre: productoRaw.nombre,
+            precio: productoRaw.precio_unitario,
+            peso: productoRaw.peso || 'N/A',
+            volumen: productoRaw.volumen || 'N/A',
+            unidadVenta: productoRaw.unidad_venta || 'N/A',
+            unidadMedida: productoRaw.unidad_medida || 'N/A',
+            descripcion: productoRaw.descripcion ? [productoRaw.descripcion] : ['Sin descripción disponible'],
+            imagen: productoRaw.url_imagen || '/img/botePintura.png',
             similars: [
                 '/img/botePintura.png',
                 '/img/botePintura.png',
                 '/img/botePintura.png',
                 '/img/botePintura.png'
             ]
-        }
-    };
+        };
 
-    const producto = productosDemo[id] || productosDemo.sellador_1;
-
-    response.render('cliente/product', {
-        usuario: request.session.usuario,
-        productoId: id,
-        producto
-    });
+        response.render('cliente/product', {
+            usuario: request.session.usuario,
+            productoId: id,
+            producto
+        });
+    } catch (error) {
+        console.error('Error in getProductoCliente:', error);
+        response.status(500).send('Error interno del servidor');
+    }
 };
