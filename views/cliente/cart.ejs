@@ -49,6 +49,13 @@
 
       <div id="eliminados" class="flex flex-col gap-2 mb-4"></div>
 
+        <!-- Error -->
+      <div id="error-container"
+        class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50
+          bg-red-100 border border-red-400 text-red-700
+          px-6 py-3 rounded-xl shadow-md text-sm font-medium">
+        </div>  
+
 <div id="cart-items">
   <% productosCarrito.forEach(function(item, index) { %>
     <% const producto = detalleProductos[index] && detalleProductos[index][0] %>

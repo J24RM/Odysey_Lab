@@ -26,6 +26,11 @@ async function cambiarCantidad(idProducto, delta) {
 
   const data = await res.json();
 
+  if (!res.ok) {
+        mostrarError('No se pudo actualizar el producto ');
+        return;
+    }
+
   if (data.eliminado) {
     const nombre = document.getElementById('nombre-' + idProducto).textContent;
     mostrarEliminado(nombre, idProducto);
@@ -48,6 +53,11 @@ async function eliminarProducto(idProducto) {
 
   const data = await res.json();
 
+  if (!res.ok) {
+            mostrarError('No se pudo eliminar el producto');
+            return;
+  }
+
   if (data.eliminado) {
   const nombre = document.getElementById('nombre-' + idProducto).textContent;
   mostrarEliminado(nombre, idProducto);
@@ -64,4 +74,20 @@ function mostrarEliminado(nombre, idProducto) {
   document.getElementById('row-' + idProducto).replaceWith(aviso);
 }
 
-document.addEventListener('DOMContentLoaded', actualizarSubtotal);
+// Error
+function mostrarError(mensaje) {
+    const contenedor = document.getElementById('error-container');
+    contenedor.textContent = mensaje;
+    contenedor.classList.remove('hidden');
+    setTimeout(() => contenedor.classList.add('hidden'), 4000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    actualizarSubtotal();
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error')) {
+        mostrarError('No se pudo agregar el producto:');
+        window.history.replaceState({}, '', '/cart');
+    }
+});
+

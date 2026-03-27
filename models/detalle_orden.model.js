@@ -14,10 +14,11 @@ module.exports = class Orden {
 
         if (error) throw error;
 
+        cantidad_ingresada = parseInt(cantidad_ingresada)
+
         // Si existe 
         if (producto){
             const nuevaCantidad = producto.cantidad + cantidad_ingresada;
-            console.log("Se actualizo la cantidad")
 
             const { error: updateError } = await supabase
                 .from('detalle_orden')
@@ -31,7 +32,6 @@ module.exports = class Orden {
         }
 
         // Si no existe 
-        console.log("Se agrego el producto")
         const { error: insertError } = await supabase
             .from('detalle_orden')
             .insert([
