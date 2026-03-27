@@ -52,8 +52,28 @@ exports.getAdminHome = (request, response) => {
     response.render('admin/home', { usuario: request.session.usuario });
 };
 
-exports.getAdminEditarProducto = (request, response) => {
-    response.render('admin/home_editarProducto', { usuario: request.session.usuario });
+exports.getAdminEditarProducto = async (request, response) => {
+    try {
+        const productos = await Producto.fetchLimit(10);
+        response.render('admin/home_editarProducto', {
+            usuario: request.session.usuario,
+            productos: productos,
+            formulario: null,
+            mensaje: null,
+            error: null,
+            productoSeleccionado: null
+        });
+    } catch (error) {
+        console.error('Error fetching products:', error);
+        response.render('admin/home_editarProducto', {
+            usuario: request.session.usuario,
+            productos: [],
+            formulario: null,
+            mensaje: null,
+            error: 'Error al cargar los productos',
+            productoSeleccionado: null
+        });
+    }
 };
 
 //Ruta protegida cliente

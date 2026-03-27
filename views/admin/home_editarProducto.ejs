@@ -34,10 +34,12 @@
             <!-- Search Section -->
             <div class="bg-white rounded-2xl shadow-md p-8 mb-8">
                 <div class="flex gap-4">
-                    <input type="text" placeholder="Busca producto por nombre o clave" class="flex-1 px-5 py-3 border-2 border-gray-300 rounded-full text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors" />
-                    <button type="button" aria-label="Buscar producto" class="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all">
-                        Buscar
-                    </button>
+                    <input
+                        id="searchInput"
+                        type="text"
+                        placeholder="Busca por nombre, clave o ID"
+                        class="flex-1 px-5 py-3 border-2 border-gray-300 rounded-full text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors"
+                    />
                 </div>
             </div>
 
@@ -45,21 +47,43 @@
             <div>
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Selecciona el producto a editar</h2>
 
-                <div class="grid grid-cols-1 gap-4">
-                    <% for (let i = 0; i < 6; i++) { %>
-                        <article class="bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all shadow-sm hover:shadow-md flex gap-6">
-                            <div class="flex-shrink-0 w-28 h-28 rounded-lg bg-gray-100 flex items-center justify-center">
-                                <img src="/img/botePintura.png" alt="Sellador Comex" class="max-h-24 max-w-full object-contain">
-                            </div>
-                            <div class="flex-1 flex flex-col justify-between">
-                                <p class="text-base font-semibold text-gray-900">
-                                    Sellador Comex 5×1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml
-                                </p>
-                                <button type="button" class="self-start px-6 py-2.5 bg-blue-600 text-white font-bold text-sm rounded-lg hover:bg-blue-700 transition-all">
-                                    Editar producto
-                                </button>
-                            </div>
-                        </article>
+                <!-- Error Banner -->
+                <% if (error && !productoSeleccionado) { %>
+                <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+                    <p class="text-red-700 font-semibold"><%= error %></p>
+                </div>
+                <% } %>
+
+                <!-- Products Grid -->
+                <div id="productsGrid" class="grid grid-cols-1 gap-4">
+                    <% if (productos && productos.length > 0) { %>
+                        <% productos.forEach(p => { %>
+                            <article class="producto-card bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all shadow-sm hover:shadow-md flex gap-6 cursor-pointer" data-id="<%= p.id_producto %>">
+                                <div class="flex-shrink-0 w-28 h-28 rounded-lg bg-gray-100 flex items-center justify-center">
+                                    <% if (p.url_imagen) { %>
+                                        <img src="/uploads/<%= p.url_imagen %>" alt="<%= p.nombre %>" class="max-h-24 max-w-full object-contain">
+                                    <% } else { %>
+                                        <span class="text-gray-400 text-sm">Sin imagen</span>
+                                    <% } %>
+                                </div>
+                                <div class="flex-1 flex flex-col justify-between">
+                                    <div>
+                                        <p class="text-base font-semibold text-gray-900"><%= p.nombre %></p>
+                                        <p class="text-sm text-gray-600">Clave: <%= p.clave || 'N/A' %></p>
+                                        <p class="text-sm text-gray-600">ID: <%= p.id_producto %></p>
+                                    </div>
+                                    <button type="button" class="self-start px-6 py-2.5 bg-blue-600 text-white font-bold text-sm rounded-lg hover:bg-blue-700 transition-all editar-btn">
+                                        Editar producto
+                                    </button>
+                                </div>
+                            </article>
+                        <% }); %>
+                    <% } else if (productoSeleccionado) { %>
+                        <!-- Form will be displayed here -->
+                    <% } else { %>
+                        <div class="text-center py-12">
+                            <p class="text-gray-500">No hay productos para mostrar</p>
+                        </div>
                     <% } %>
                 </div>
             </div>
@@ -67,6 +91,329 @@
     </div>
 
     <%- include('partials/footer.ejs') %>
+
+    <!-- Modal de Formulario de Edición -->
+    <div id="editModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-2xl mx-auto my-8 w-full">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Editar Producto</h2>
+
+            <!-- Error Banner in Modal -->
+            <div id="modalError" class="hidden mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+                <p id="modalErrorText" class="text-red-700 font-semibold"></p>
+            </div>
+
+            <form id="editForm" class="space-y-6" enctype="multipart/form-data">
+                <!-- Full Width Field -->
+                <div class="space-y-2">
+                    <label for="editProductName" class="block text-sm font-semibold text-gray-900">Nombre del producto:</label>
+                    <input id="editProductName" name="nombre" type="text" placeholder="Ingresa el nombre del producto" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors" />
+                </div>
+
+                <div class="space-y-2">
+                    <label for="editProductDescription" class="block text-sm font-semibold text-gray-900">Descripción:</label>
+                    <input id="editProductDescription" name="descripcion" type="text" placeholder="Ingresa la descripción completa del producto" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors" />
+                </div>
+
+                <!-- Grid 3 Columns -->
+                <div class="grid grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <label for="editProductKey" class="block text-sm font-semibold text-gray-900">Clave del producto:</label>
+                        <input id="editProductKey" name="clave" type="text" placeholder="Ingresa la clave" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors" />
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="editSaleUnit" class="block text-sm font-semibold text-gray-900">Unidad de venta:</label>
+                        <select id="editSaleUnit" name="unidad_venta" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors">
+                            <option selected disabled>Selecciona la unidad</option>
+                            <option value="Rollo">Rollo</option>
+                            <option value="Kit">Kit</option>
+                            <option value="Caja">Caja</option>
+                            <option value="Pieza">Pieza</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="editMeasureUnit" class="block text-sm font-semibold text-gray-900">Unidad de medida:</label>
+                        <select id="editMeasureUnit" name="unidad_medida" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors">
+                            <option selected disabled>Selecciona la unidad</option>
+                            <option value="Litros">Litros</option>
+                            <option value="Mililitros">Mililitros</option>
+                            <option value="Kilogramos">Kilogramos</option>
+                            <option value="Gramos">Gramos</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Bottom Grid -->
+                <div class="grid grid-cols-3 gap-6">
+                    <!-- Image Upload -->
+                    <div class="space-y-2">
+                        <label for="editProductImage" class="block text-sm font-semibold text-gray-900">Imagen:</label>
+                        <div class="text-center">
+                            <img id="currentImage" src="" alt="" class="max-h-24 max-w-full object-contain mb-3 mx-auto">
+                            <label class="block w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-center cursor-pointer hover:border-blue-600 hover:bg-blue-50 transition-all">
+                                <span class="text-sm text-gray-600 font-medium">Cambiar imagen</span>
+                                <input id="editProductImage" name="imagen" type="file" accept="image/png,image/jpg,image/jpeg" hidden />
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Price & Active Toggle -->
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label for="editProductPrice" class="block text-sm font-semibold text-gray-900">Precio unitario:</label>
+                            <input id="editProductPrice" name="precio_unitario" type="number" placeholder="Ingresa el precio" min="0" step="0.01" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors" />
+                        </div>
+
+                        <div class="space-y-2">
+                            <span class="block text-sm font-semibold text-gray-900">Marcar producto activo:</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm text-gray-600">No</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input id="editActiveToggle" type="checkbox" name="activo" value="on" class="sr-only peer" />
+                                    <div class="w-11 h-6 bg-gray-300 peer-checked:bg-blue-600 rounded-full peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                                </label>
+                                <span class="text-sm text-gray-600">Sí</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weight & Buttons -->
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label for="editProductWeight" class="block text-sm font-semibold text-gray-900">Peso (kg):</label>
+                            <input id="editProductWeight" name="peso" type="number" placeholder="Ingresa el peso" min="0" step="0.01" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg text-sm focus:border-blue-600 focus:outline-none transition-colors" />
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button id="editCancelBtn" type="button" class="flex-1 py-3 px-4 border-2 border-gray-300 text-gray-900 font-bold rounded-lg hover:border-gray-400 transition-all">
+                                Cancelar
+                            </button>
+                            <button id="editSubmitBtn" type="button" class="flex-1 py-3 px-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all">
+                                Guardar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div id="confirmModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md mx-auto">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Confirmar cambios</h2>
+            <p class="text-gray-600 mb-8">¿Estás seguro de los cambios en este producto?</p>
+            <div class="flex gap-4">
+                <button id="confirmCancelBtn" type="button" class="flex-1 py-3 px-4 border-2 border-gray-300 text-gray-900 font-bold rounded-lg hover:border-gray-400 transition-all">
+                    Cancelar
+                </button>
+                <button id="confirmSubmitBtn" type="button" class="flex-1 py-3 px-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Resultado -->
+    <div id="resultModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-8 max-w-md mx-auto">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">¡Éxito!</h2>
+            <p id="resultMessage" class="text-gray-600 mb-8"></p>
+            <button id="closeResultBtn" type="button" class="w-full py-3 px-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all">
+                Cerrar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const productsGrid = document.getElementById('productsGrid');
+        const editModal = document.getElementById('editModal');
+        const editForm = document.getElementById('editForm');
+        const editCancelBtn = document.getElementById('editCancelBtn');
+        const editSubmitBtn = document.getElementById('editSubmitBtn');
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+        const confirmSubmitBtn = document.getElementById('confirmSubmitBtn');
+        const resultModal = document.getElementById('resultModal');
+        const closeResultBtn = document.getElementById('closeResultBtn');
+        const modalError = document.getElementById('modalError');
+        const modalErrorText = document.getElementById('modalErrorText');
+        let selectedProductId = null;
+
+        // Función para inicializar event listeners en los botones de editar
+        function initializeEditButtons() {
+            document.querySelectorAll('.editar-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const productId = btn.closest('.producto-card').dataset.id;
+                    openEditForm(productId);
+                });
+            });
+        }
+
+        // Inicializar botones de los primeros 10 productos
+        initializeEditButtons();
+
+        // Búsqueda en tiempo real
+        searchInput.addEventListener('input', async (e) => {
+            const query = e.target.value;
+
+            try {
+                const url = query ? `/admin/api/productos?q=${encodeURIComponent(query)}` : '/admin/api/productos';
+                const response = await fetch(url);
+                const productos = await response.json();
+
+                productsGrid.innerHTML = '';
+
+                if (productos.length === 0) {
+                    productsGrid.innerHTML = '<div class="text-center py-12"><p class="text-gray-500">No se encontraron productos</p></div>';
+                    return;
+                }
+
+                productos.forEach(p => {
+                    const article = document.createElement('article');
+                    article.className = 'producto-card bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all shadow-sm hover:shadow-md flex gap-6 cursor-pointer';
+                    article.dataset.id = p.id_producto;
+
+                    const imageHtml = p.url_imagen
+                        ? `<img src="/uploads/${p.url_imagen}" alt="${p.nombre}" class="max-h-24 max-w-full object-contain">`
+                        : '<span class="text-gray-400 text-sm">Sin imagen</span>';
+
+                    article.innerHTML = `
+                        <div class="flex-shrink-0 w-28 h-28 rounded-lg bg-gray-100 flex items-center justify-center">
+                            ${imageHtml}
+                        </div>
+                        <div class="flex-1 flex flex-col justify-between">
+                            <div>
+                                <p class="text-base font-semibold text-gray-900">${p.nombre}</p>
+                                <p class="text-sm text-gray-600">Clave: ${p.clave || 'N/A'}</p>
+                                <p class="text-sm text-gray-600">ID: ${p.id_producto}</p>
+                            </div>
+                            <button type="button" class="self-start px-6 py-2.5 bg-blue-600 text-white font-bold text-sm rounded-lg hover:bg-blue-700 transition-all editar-btn">
+                                Editar producto
+                            </button>
+                        </div>
+                    `;
+
+                    productsGrid.appendChild(article);
+                });
+                // Inicializar event listeners para los nuevos botones
+                initializeEditButtons();
+            } catch (error) {
+                console.error('Error searching products:', error);
+                modalErrorText.textContent = 'Error al buscar productos';
+                modalError.classList.remove('hidden');
+            }
+        });
+
+        // Cargar y abrir formulario de edición
+        async function openEditForm(productId) {
+            selectedProductId = productId;
+
+            try {
+                const response = await fetch(`/admin/api/productos/${productId}`);
+                const producto = await response.json();
+
+                // Llenar el formulario
+                document.getElementById('editProductName').value = producto.nombre || '';
+                document.getElementById('editProductDescription').value = producto.descripcion || '';
+                document.getElementById('editProductKey').value = producto.clave || '';
+                document.getElementById('editSaleUnit').value = producto.unidad_venta || '';
+                document.getElementById('editMeasureUnit').value = producto.unidad_medida || '';
+                document.getElementById('editProductPrice').value = producto.precio_unitario || '';
+                document.getElementById('editProductWeight').value = producto.peso || '';
+                document.getElementById('editActiveToggle').checked = producto.activo === true;
+
+                // Mostrar imagen actual
+                if (producto.url_imagen) {
+                    document.getElementById('currentImage').src = `/uploads/${producto.url_imagen}`;
+                    document.getElementById('currentImage').style.display = 'block';
+                } else {
+                    document.getElementById('currentImage').style.display = 'none';
+                }
+
+                // Limpiar errores
+                modalError.classList.add('hidden');
+
+                editModal.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error loading product:', error);
+                modalErrorText.textContent = 'Error al cargar el producto';
+                modalError.classList.remove('hidden');
+            }
+        }
+
+        // Cerrar modal de edición
+        editCancelBtn.addEventListener('click', () => {
+            editModal.classList.add('hidden');
+            editForm.reset();
+            selectedProductId = null;
+        });
+
+        // Validar y mostrar modal de confirmación
+        editSubmitBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            const nombre = document.getElementById('editProductName').value.trim();
+            const descripcion = document.getElementById('editProductDescription').value.trim();
+            const clave = document.getElementById('editProductKey').value.trim();
+            const unidad_venta = document.getElementById('editSaleUnit').value;
+            const unidad_medida = document.getElementById('editMeasureUnit').value;
+            const precio = document.getElementById('editProductPrice').value.trim();
+            const peso = document.getElementById('editProductWeight').value.trim();
+
+            if (!nombre || !descripcion || !clave || !unidad_venta || !unidad_medida || !precio || !peso) {
+                modalErrorText.textContent = 'Por favor, llena todos los campos correctamente.';
+                modalError.classList.remove('hidden');
+                return;
+            }
+
+            modalError.classList.add('hidden');
+            confirmModal.classList.remove('hidden');
+        });
+
+        // Cancelar confirmación
+        confirmCancelBtn.addEventListener('click', () => {
+            confirmModal.classList.add('hidden');
+        });
+
+        // Confirmar y enviar
+        confirmSubmitBtn.addEventListener('click', async () => {
+            confirmModal.classList.add('hidden');
+
+            try {
+                const formData = new FormData(editForm);
+                const response = await fetch(`/admin/editar_producto/${selectedProductId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al guardar el producto');
+                }
+
+                editModal.classList.add('hidden');
+                editForm.reset();
+
+                const resultMessage = document.getElementById('resultMessage');
+                resultMessage.textContent = 'El producto se editó correctamente';
+
+                resultModal.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error saving product:', error);
+                modalErrorText.textContent = 'Error al guardar el producto. Intenta de nuevo.';
+                modalError.classList.remove('hidden');
+            }
+        });
+
+        // Cerrar modal de resultado
+        closeResultBtn.addEventListener('click', () => {
+            resultModal.classList.add('hidden');
+            window.location.href = '/admin/home';
+        });
+    </script>
 
 </body>
 </html>
