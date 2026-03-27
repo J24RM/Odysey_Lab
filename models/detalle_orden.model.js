@@ -72,6 +72,7 @@ module.exports = class Orden {
 
 
     static async detalleOrden(id_orden){
+        console.log("Se obtuvo carrito")
         const{data: productosCarrito, error} = await supabase
             .from('detalle_orden')
             .select('id_producto, cantidad')

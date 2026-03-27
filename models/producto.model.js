@@ -23,9 +23,14 @@ module.exports = class Producto {
         return producto;
     }
 
-    // Alias for compatibility with other controllers
-    static async encontrarProductoPorId(id_producto) {
-        return this.findById(id_producto);
+    static async encontrarProductoPorId(id_producto){
+        const {data:detalleProducto ,error} = await supabase
+            .from('producto')
+            .select('*')
+            .eq('id_producto', id_producto)
+        if (error) throw error;
+
+        return detalleProducto;
     }
 
     static async search(query) {

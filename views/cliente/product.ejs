@@ -109,7 +109,7 @@
           <!-- Botón agregar al carrito -->
           <form action="/cart/items" method="POST">
             <input type="hidden" name="cantidad_ingresada" value=5/>
-            <input type="hidden" name="id_producto" value="13"/>
+            <input type="hidden" name="id_producto" value="<%= productoId %>"/>
             <input type="hidden" name="id_usuario" value="35"/>
             <button type="submit" style="background-color: #002736;" 
             class="w-full text-white text-sm font-semibold rounded-md py-3">

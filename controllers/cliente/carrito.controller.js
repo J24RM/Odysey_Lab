@@ -14,11 +14,13 @@ exports.getCarrito = async (request, response, next) => {
             productosCarrito = await detalle_ordenModel.detalleOrden(id_carrito);
 
             // detalleOrden regresa un array, hay que iterar cada producto
+            console.log([productosCarrito])
             detalleProductos = await Promise.all(
                 productosCarrito.map(item =>
                     productoModel.encontrarProductoPorId(item.id_producto)
                 )
             );
+            console.log(productosCarrito)
         }
 
         response.render('cliente/cart', {
