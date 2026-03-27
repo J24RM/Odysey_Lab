@@ -98,7 +98,7 @@ Menu Horizontal: rgba(0, 120, 169, 0.1)
     <!-- Product Grid -->
     <div class="product-grid">
         <% for (let i = 0; i < 20; i++) { %>
-            <div class="product-card">
+            <a href="/cliente/product/<%= i + 1 %>" class="product-card">
                 <div class="product-img-wrap">
                     <img src="/img/cubeta_ejemplo.png" alt="Sellador Comex" onerror="this.src='/img/botePintura.png'">
                 </div>
@@ -112,7 +112,7 @@ Menu Horizontal: rgba(0, 120, 169, 0.1)
                     $ 800
                 </div>
                 <button class="btn-add-cart">agregar al carrito</button>
-            </div>
+            </a>
         <% } %>
     </div>
 

@@ -38,22 +38,15 @@
       <div class="flex flex-col gap-4 items-center lg:w-[340px] shrink-0">
         <!-- Imagen principal -->
         <div class="w-full flex justify-center">
-          <img src="/img/botePintura.png" alt="Sellador Comex 5x1 Clásico" class="w-64 h-64 object-contain" />
+          <img src="<%= producto.imagen %>" alt="<%= producto.nombre %>" class="w-64 h-64 object-contain" />
         </div>
         <!-- Miniaturas -->
         <div class="flex gap-3 justify-center">
-          <div class="w-16 h-16 border-2 border-yellow-400 rounded overflow-hidden flex items-center justify-center bg-yellow-50 cursor-pointer">
-            <img src="/img/botePintura.png" alt="thumb1" class="w-full h-full object-contain p-1"/>
-          </div>
+          <% for (let i = 0; i < producto.similars.length; i++) { %>
           <div class="w-16 h-16 border border-gray-200 rounded overflow-hidden flex items-center justify-center bg-gray-50 cursor-pointer hover:border-yellow-400 transition">
-            <img src="/img/botePintura.png" alt="thumb2" class="w-full h-full object-contain p-1"/>
+            <img src="<%= producto.similars[i] %>" alt="thumb<%= i+1 %>" class="w-full h-full object-contain p-1"/>
           </div>
-          <div class="w-16 h-16 border-2 border-yellow-400 rounded overflow-hidden flex items-center justify-center bg-yellow-50 cursor-pointer">
-            <img src="/img/botePintura.png" alt="thumb3" class="w-full h-full object-contain p-1"/>
-          </div>
-          <div class="w-16 h-16 border border-gray-200 rounded overflow-hidden flex items-center justify-center bg-gray-50 cursor-pointer hover:border-yellow-400 transition">
-            <img src="/img/botePintura.png" alt="thumb4" class="w-full h-full object-contain p-1"/>
-          </div>
+          <% } %>
         </div>
       </div>
 
@@ -61,7 +54,7 @@
       <div class="flex-1 min-w-0">
         <!-- Título -->
         <h1 class="text-2xl font-bold text-gray-900 leading-snug mb-3">
-          Sellador Comex 5×1 Clásico Preparación de Superficies PPG Silicona o Poliuretano 4000 ml Sellador
+          <%= producto.nombre %>
         </h1>
 
         <!-- Estrellas -->
@@ -76,14 +69,14 @@
         <hr class="border-gray-200 mb-4"/>
 
         <!-- Precio -->
-        <p class="text-3xl font-bold text-gray-900 mb-4">$ 800</p>
+        <p class="text-3xl font-bold text-gray-900 mb-4">$ <%= producto.precio %></p>
 
         <!-- Especificaciones -->
         <div class="text-sm text-gray-700 space-y-1 mb-4">
-          <p>-Peso: 2Kg</p>
-          <p>-Volumen: 0.3 m3</p>
-          <p>-Unidad de Venta:</p>
-          <p>-Unidad de Medida:</p>
+          <p>-Peso: <%= producto.peso %></p>
+          <p>-Volumen: <%= producto.volumen %></p>
+          <p>-Unidad de Venta: <%= producto.unidadVenta %></p>
+          <p>-Unidad de Medida: <%= producto.unidadMedida %></p>
         </div>
 
         <hr class="border-gray-200 mb-4"/>
@@ -92,8 +85,9 @@
         <div class="text-sm text-gray-800">
           <p class="font-semibold mb-2">Descripcion:</p>
           <ul class="list-disc list-inside space-y-2 text-gray-700">
-            <li>Alta calidad y rendimiento profesional: Fórmula acrílica premium para superficies interiores y exteriores, con gran durabilidad</li>
-            <li>Excelente cobertura: Cubre fácilmente imperfecciones con una sola mano en la mayoría de las superficies</li>
+            <% for (let desc of producto.descripcion) { %>
+              <li><%= desc %></li>
+            <% } %>
           </ul>
         </div>
       </div>
@@ -103,7 +97,7 @@
         style="box-shadow: 0 4px 24px rgba(0,0,0,0.12);"
       >
         <!-- Precio -->
-        <p class="text-4xl font-extrabold text-gray-900">$ 800</p>
+        <p class="text-4xl font-extrabold text-gray-900">$ <%= producto.precio %></p>
 
         <!-- Sucursal -->
         <p class="text-sm font-semibold" style="color: #0078A9;">Sucursal: Galerias</p>
@@ -115,8 +109,8 @@
           <!-- Botón agregar al carrito -->
           <form action="/cart/items" method="POST">
             <input type="hidden" name="cantidad_ingresada" value="5"/>
-            <input type="hidden" name="id_producto" value="17"/>
-            <input type="hidden" name="id_usuario" value="35"/>
+            <input type="hidden" name="id_producto" value="<%= producto.id %>"/>
+            <input type="hidden" name="id_usuario" value="<%= usuario %>"/>
             <button type="submit" style="background-color: #002736;" 
             class="w-full text-white text-sm font-semibold rounded-md py-3">
               Agregar al carrito
