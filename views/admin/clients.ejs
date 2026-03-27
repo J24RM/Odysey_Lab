@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <% const clientes = [
+        {
+            id: 'jose_nava',
+            nombre: 'Jose Nava',
+            correo: 'joseNava@gmail.com',
+            ultimaSesion: 'Hace 1 dia',
+            telefono: '442 891 2133',
+            sucursales: ['Concesionario Jurica', 'Concesionario Centro'],
+            pedidos: [
+                { folio: 'A0001', fecha: '12 de Marzo de 2026', sucursal: 'Concesionario Jurica', total: '$189.00', estado: 'Confirmada' },
+                { folio: 'A0002', fecha: '12 de Marzo de 2026', sucursal: 'Concesionario Jurica', total: '$189.00', estado: 'Cancelada' },
+                { folio: 'A0003', fecha: '12 de Marzo de 2026', sucursal: 'Concesionario Jurica', total: '$189.00', estado: 'Confirmada' }
+            ]
+        },
+        {
+            id: 'nicolas_bravo_miguel',
+            nombre: 'Nicolás Bravo Miguel',
+            correo: 'nicoBM@gmail.com',
+            ultimaSesion: 'Hace 10 horas',
+            telefono: '442 334 2298',
+            sucursales: ['Concesionario Norte'],
+            pedidos: [
+                { folio: 'A0004', fecha: '10 de Marzo de 2026', sucursal: 'Concesionario Norte', total: '$280.00', estado: 'Confirmada' }
+            ]
+        },
+        {
+            id: 'dante_hernandez',
+            nombre: 'Dante Hernandez',
+            correo: 'danteHer@gmail.com',
+            ultimaSesion: 'Hace 20 dias',
+            telefono: '442 100 1122',
+            sucursales: ['Concesionario Jurica', 'Concesionario Sur'],
+            pedidos: [
+                { folio: 'A0005', fecha: '03 de Marzo de 2026', sucursal: 'Concesionario Sur', total: '$450.00', estado: 'Confirmada' }
+            ]
+        },
+        {
+            id: 'jesus_rodriguez',
+            nombre: 'Jesus Rodriguez',
+            correo: 'chuyRo@gmail.com',
+            ultimaSesion: 'Hace 3 horas',
+            telefono: '442 555 0099',
+            sucursales: ['Concesionario Centro'],
+            pedidos: [
+                { folio: 'A0006', fecha: '20 de Marzo de 2026', sucursal: 'Concesionario Centro', total: '$129.00', estado: 'Confirmada' }
+            ]
+        }
+    ]; %>
+
+    <%- include('partials/header.ejs') %>
+
+    <div class="flex min-h-screen flex-col">
+        <%- include('partials/sidebar.ejs') %>
+
+        <!-- Main Content -->
+        <main class="ml-48 pt-2 px-10 pb-9 flex-1">
+            <section class="space-y-6">
+                <h1 class="text-3xl font-extrabold text-gray-900">Clientes</h1>
+
+                <!-- Toolbar -->
+                <div class="flex items-center gap-4">
+                    <div class="flex-1 relative">
+                        <input type="text" placeholder="Buscar Cliente" class="w-full px-5 py-2.5 border-2 border-gray-300 rounded-full text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors" />
+                    </div>
+                    <button type="button" class="px-6 py-2.5 bg-white border-2 border-gray-300 rounded-lg font-semibold text-sm text-gray-900 hover:bg-gray-100 transition-all">
+                        Filtrar
+                    </button>
+                </div>
+
+                <!-- Clients Table -->
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+                    <!-- Table Header -->
+                    <div class="grid grid-cols-4 gap-4 px-6 py-4 border-b-2 border-gray-200 bg-gray-50">
+                        <span class="font-bold text-sm text-gray-700 uppercase tracking-wide">Perfil</span>
+                        <span class="font-bold text-sm text-gray-700 uppercase tracking-wide">Nombre</span>
+                        <span class="font-bold text-sm text-gray-700 uppercase tracking-wide">Correo Electrónico</span>
+                        <span class="font-bold text-sm text-gray-700 uppercase tracking-wide">Última sesión</span>
+                    </div>
+
+                    <!-- Table Body -->
+                    <div class="divide-y divide-gray-200">
+                        <% clientes.forEach((cliente) => { %>
+                            <a href="/admin/clients/<%= cliente.id %>" class="grid grid-cols-4 gap-4 px-6 py-4 items-center hover:bg-blue-50 transition-colors">
+                                <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                                    <img src="/img/iconoPerfil.png" alt="Perfil de cliente" class="w-full h-full object-cover">
+                                </div>
+                                <span class="font-semibold text-gray-900"><%= cliente.nombre %></span>
+                                <span class="text-gray-600 text-sm"><%= cliente.correo %></span>
+                                <span class="text-gray-500 text-sm"><%= cliente.ultimaSesion %></span>
+                            </a>
+                        <% }); %>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <%- include('partials/footer.ejs') %>
+
+</body>
+</html>

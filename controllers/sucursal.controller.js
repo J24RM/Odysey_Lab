@@ -1,0 +1,3 @@
+exports.getSucursalesDeMiCuenta = (request, response) => {
+
+};

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <%- include('partials/header.ejs') %>
+
+    <div class="flex min-h-screen flex-col">
+        <%- include('partials/sidebar.ejs') %>
+
+        <!-- Main Content -->
+        <main class="ml-48 pt-2 px-10 pb-9 flex-1">
+            <!-- Welcome Section -->
+            <div class="bg-gradient-to-r from-white to-blue-50 border-l-4 border-l-blue-600 border border-blue-200 rounded-2xl px-5 py-4 mb-7 shadow-sm">
+                <h2 class="text-3xl font-extrabold text-blue-600 m-0">Bienvenido administrador</h2>
+            </div>
+
+            <!-- Banner Section -->
+            <section class="bg-white rounded-2xl p-7 shadow-md mb-7 overflow-hidden relative">
+                <!-- Decorative background circle -->
+                <div class="absolute -top-10 -right-10 w-56 h-56 rounded-full bg-blue-100 opacity-40"></div>
+
+                <div class="flex items-center justify-between gap-6 relative z-10">
+                    <div>
+                        <h2 class="text-4xl font-extrabold text-blue-600 underline decoration-orange-500 decoration-2 underline-offset-4 max-w-sm leading-tight">
+                            Preventa Activa: Productos Exclusivos Mundial 2026
+                        </h2>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <img src="/img/niñoMundial.png" alt="Mundial 2026" class="h-32 w-auto object-contain">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <section class="bg-white rounded-2xl p-7 shadow-md mb-7 flex gap-6">
+                <a href="/admin/agregar_producto" class="flex-1 py-5 px-5 bg-green-400 text-green-900 font-extrabold text-lg rounded-xl transition-all hover:shadow-lg hover:-translate-y-0.5">
+                    Agregar Producto
+                </a>
+                <a href="/admin/editar_producto" class="flex-1 py-5 px-5 bg-blue-400 text-blue-900 font-extrabold text-lg rounded-xl transition-all hover:shadow-lg hover:-translate-y-0.5">
+                    Editar Producto
+                </a>
+            </section>
+
+            <!-- Catalog Section -->
+            <section class="bg-white rounded-2xl p-7 shadow-md">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-6 gap-4">
+                    <h3 class="text-2xl font-extrabold text-gray-900 m-0">Catálogo de Productos</h3>
+                    <input type="text" placeholder="Buscar Productos" class="px-4 py-2.5 border-2 border-gray-300 rounded-full text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors w-64" />
+                </div>
+
+                <!-- Product Grid -->
+                <div class="grid grid-cols-4 gap-5">
+                    <% for (let i = 0; i < 6; i++) { %>
+                        <a href="/admin/product/sellador_1" class="border-2 border-blue-100 rounded-xl p-4 text-center transition-all hover:shadow-lg hover:border-blue-600 hover:-translate-y-1">
+                            <div class="h-32 flex items-center justify-center mb-3">
+                                <img src="/img/botePintura.png" alt="Sellador Comex" class="max-h-28 max-w-full object-contain">
+                            </div>
+                            <p class="text-sm font-bold text-gray-900 text-left leading-snug mb-2">
+                                Sellador Comex 5×1 Clásico Preparación de Superfícies PPG Silicona o Poliuretano 4000 ml
+                            </p>
+                            <span class="inline-block mt-3 px-3 py-1 bg-blue-100 text-blue-600 text-xs font-bold rounded-full">
+                                Sellador
+                            </span>
+                        </a>
+                    <% } %>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <%- include('partials/footer.ejs') %>
+
+</body>
+</html>

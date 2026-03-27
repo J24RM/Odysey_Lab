@@ -1,0 +1,35 @@
+<nav class="w-full flex items-center justify-between px-6 py-3 border-b border-gray-200" style="background-color: rgba(0, 120, 169, 0.1);">
+    <!-- Logo -->
+    <a href="/cliente/home" class="flex-shrink-0">
+        <img src="/img/ppg-logo.svg" class="w-[60px]" alt="PPG">
+    </a>
+
+    <!-- Sucursal -->
+    <div class="ml-6 flex-shrink-0">
+        <button id="btnSucursal" data-bs-toggle="modal" data-bs-target="#modalSelector" class="bg-white border text-gray-800 border-gray-300 rounded-md px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">
+            Sucursal: Jurica
+        </button>
+    </div>
+
+    <!-- Buscador centrado -->
+    <form action="/cliente/home" method="GET" class="mx-auto w-[45%]">
+        <div class="relative">
+            <input type="search" name="search" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" class="w-full text-center border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0078A9] text-gray-800" placeholder="Buscar Producto" aria-label="Buscar Producto">
+        </div>
+    </form>
+
+    <!-- Menu derecho -->
+    <div class="flex items-center space-x-6 shrink-0">
+        <a href="/cliente/mis-pedidos" class="bg-white border text-gray-800 border-gray-300 rounded-md px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">Mis Pedidos</a>
+        <a href="/cart" class="hover:opacity-80 transition-opacity">
+            <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" class="w-[35px]" alt="Carrito">
+        </a>
+        <button id="btnPerfil" data-bs-toggle="modal" data-bs-target="#modalSelector" class="block hover:opacity-80 transition-opacity">
+            <img src="/img/iconoPerfil.png" class="w-[40px] h-[40px] rounded-full object-cover shadow-sm border" alt="Perfil">
+        </button>
+    </div>
+</nav>
+
+<%- include('_modal_info') %>
+
+<script src="/nav_bar.js"></script>

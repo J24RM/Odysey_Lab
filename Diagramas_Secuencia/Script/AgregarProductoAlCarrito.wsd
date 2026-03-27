@@ -1,0 +1,64 @@
+@startuml Agregar producto al carrito
+Title "Agregar un producto al carrito"
+actor Navegador as nav
+boundary "carrito.routes.js" as ruta
+control "carrito.controller.js" as ctrl
+entity "orden.model.js" as model
+entity "detalle_orden.model.js" as model2
+database "Postgres (Supabase)" as DB
+
+activate nav
+nav -> ruta: POST /carrito/items (id_producto, cantidad_ingresada)
+deactivate nav
+
+activate ruta
+ruta -> ctrl:  agregarItem(request, response)
+deactivate ruta
+
+activate ctrl
+ctrl ->> model: obtenerOrdenEnEstadoCarrito(id_usuario)
+activate model
+
+
+model ->> DB: .from('orden') .select('*') .eq('estado', 'carrito') .eq('id_usuario', id_usuario)
+activate DB
+DB -->> model: orden/null
+deactivate DB
+
+alt Carrito no existente
+    model ->> DB: Insert orden ([{estado = "Carrito" ,id_usuario: id_usuario,}])
+activate DB
+DB -->> model : nuevaOrden
+deactivate DB
+end
+
+model -->> ctrl: orden
+deactivate model
+ctrl ->> model2: agregarProductoAlCarrito(orden.id_orden, id_producto, cantidad_ingresada)
+activate model2
+model2 ->> DB: .from('detalle_orden') .select('*') .eq('id_orden', id_orden) .eq('id_producto', id_producto)
+activate DB
+DB -->> model2: detalle_orden
+deactivate DB
+
+alt El producto esta en el carrito
+    model2 ->> DB: Update cantidad += cantidad_ingresada
+    activate DB
+    DB -->> model2: Se actualizo la cantidad del producto
+    deactivate DB
+else El producto no esta en el carrito
+    model2 ->> DB: Insert detalle_orden ([{cantidad = cantidad_ingresada, id_orden: id_orden,id_producto: id_producto}])
+    activate DB
+    DB -->> model2: Producto Agregado
+    deactivate DB
+end
+
+model2 -->> ctrl: Se actualizo el carrito
+deactivate model2
+
+ctrl --> nav :response.redirect('/cart')
+deactivate ctrl
+
+activate nav
+
+@enduml

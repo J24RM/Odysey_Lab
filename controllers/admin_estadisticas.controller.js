@@ -1,8 +1,32 @@
-//Accede al panel de estadisticas
-exports.getEstadisticas = (request, response) => {
-    if (!request.session.usuario) {
-        return response.redirect('/login');
+const Estadisticas = require('../models/estadisticas.model');
+
+//Accede al panel de estadisticas generales
+exports.getEstadisticas = async (request, response) => {
+    let pageData = {
+        usuario: request.session.usuario,
+        totalMensual: 0,
+        productosMensual: 0,
+        totalSemanal: 0,
+        productosSemanal: 0,
+        productoMasVendido: null,
+        porcentajeProducto: 0,
+        topSucursales: [],
+        porcentajeSucursales: 0,
+        dbConnected: false
+    };
+
+    try {
+        const stats = await Estadisticas.getEstadisticasGenerales();
+        if (stats) {
+            pageData = { ...pageData, ...stats, dbConnected: true };
+        }
+    } catch (error) {
+        console.error("Error fetching admin estadísticas from Model:", error);
     }
 
-    response.render('admin_estadisticas', { usuario: request.session.usuario });
+    response.render('admin/stats', pageData);
+};
+
+exports.getEstadisticas2 = (request, response) => {
+    response.render('admin_estadisticas2', { usuario: request.session.usuario });
 };

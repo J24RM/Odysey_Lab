@@ -1,0 +1,432 @@
+/* Detalle de cliente admin */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --font-sans: "Aptos", "Segoe UI Variable", "Segoe UI", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    --font-display: "Aptos Display", "Segoe UI Variable Display", "Segoe UI", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    --navy: #252f3d;
+    --navy-light: #263447;
+    --ppg-blue: #005bab;
+    --ppg-blue-light: #0078A91A;
+    --bg: #f0f4f9;
+    --sidebar-w: 220px;
+    --header-h: 70px;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: #1a1a2e;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    position: static;
+    height: var(--header-h);
+    background: var(--ppg-blue-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    z-index: 100;
+    border-bottom: 1px solid #c9ddf5;
+    box-shadow: 0 2px 8px rgba(0, 91, 171, 0.08);
+}
+
+.logo-area img {
+    height: 44px;
+    display: block;
+}
+
+.search-bar {
+    flex: 1;
+    max-width: 520px;
+    margin: 0 32px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px 20px;
+    border: 1.5px solid #b8cfe8;
+    border-radius: 50px;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    background: #fff;
+    color: #1a1a2e;
+    outline: none;
+}
+
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid #b8cfe8;
+    background: #ffffff;
+    color: var(--ppg-blue);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.user-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.user-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.layout {
+    position: relative;
+    display: flex;
+    min-height: calc(100vh - var(--header-h));
+    flex: 1;
+}
+
+aside {
+    width: var(--sidebar-w);
+    background: var(--navy);
+    padding: 36px 0 24px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+}
+
+aside nav a {
+    display: block;
+    padding: 16px 32px;
+    color: #a8bdd4;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    border-left: 3px solid transparent;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+aside nav a:hover,
+aside nav a.active {
+    background: var(--navy-light);
+    color: #ffffff;
+    border-left-color: var(--ppg-blue);
+}
+
+main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.client-detail-page-shell {
+    min-height: calc(100vh - var(--header-h));
+    padding: 14px 26px 36px;
+    opacity: 0.38;
+}
+
+.clients-page {
+    background: #ffffff;
+    min-height: 100%;
+    padding: 8px 16px 28px;
+}
+
+.clients-title {
+    font-family: var(--font-display);
+    font-size: clamp(58px, 6vw, 86px);
+    font-weight: 800;
+    color: #05070c;
+    line-height: 1.02;
+    margin-bottom: 28px;
+}
+
+.clients-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 760px) 250px;
+    gap: 18px 30px;
+    align-items: center;
+    margin-bottom: 34px;
+}
+
+.clients-search {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 760px;
+}
+
+.clients-search input {
+    width: 100%;
+    padding: 10px 18px;
+    border: 1.5px solid #222222;
+    border-radius: 12px;
+    background: #ffffff;
+    text-align: center;
+    font-size: 16px;
+    outline: none;
+}
+
+.clients-search button,
+.btn-filter {
+    min-height: 38px;
+    border: 1.5px solid #17497b;
+    border-radius: 10px;
+    background: #2d89da;
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.clients-search button {
+    width: 56px;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.search-icon {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 5px solid #ffffff;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-62%, -62%);
+}
+
+.search-icon::after {
+    content: "";
+    position: absolute;
+    width: 13px;
+    height: 5px;
+    background: #ffffff;
+    border-radius: 4px;
+    right: -10px;
+    bottom: -6px;
+    transform: rotate(45deg);
+}
+
+.clients-table-card-placeholder {
+    min-height: 520px;
+    background: #dff0fb;
+    border-radius: 14px;
+}
+
+.client-detail-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(76, 94, 112, 0.42);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.client-detail-modal {
+    width: min(100%, 1170px);
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 22px 60px rgba(34, 48, 68, 0.28);
+}
+
+.client-detail-header {
+    position: relative;
+    background: #e7f4fe;
+    padding: 24px 34px 30px;
+    text-align: center;
+}
+
+.client-detail-header h2 {
+    font-family: var(--font-display);
+    font-size: clamp(44px, 5vw, 60px);
+    font-weight: 800;
+    color: #06090e;
+}
+
+.client-detail-close {
+    position: absolute;
+    top: 14px;
+    right: 24px;
+    text-decoration: none;
+    color: #1b1b1b;
+    font-size: 56px;
+    line-height: 1;
+}
+
+.client-detail-body {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 34px;
+    padding: 34px 30px 18px;
+    align-items: start;
+}
+
+.client-detail-profile {
+    display: flex;
+    justify-content: center;
+}
+
+.client-detail-avatar {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.client-detail-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.client-detail-info {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-top: 4px;
+}
+
+.client-detail-info p {
+    font-size: clamp(26px, 3vw, 34px);
+    color: #111111;
+}
+
+.client-detail-info span {
+    font-weight: 500;
+}
+
+.client-detail-branch-select {
+    width: min(100%, 400px);
+    margin-top: 8px;
+    position: relative;
+}
+
+.client-detail-branch-select select {
+    width: 100%;
+    min-height: 62px;
+    border: 1px solid #d6dde7;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 6px 14px rgba(17, 24, 39, 0.18);
+    padding: 0 70px 0 36px;
+    font-size: 26px;
+    color: #111111;
+    appearance: none;
+    outline: none;
+}
+
+.client-detail-branch-select::after {
+    content: "⌄";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #f7eef4;
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+    color: #47434b;
+    pointer-events: none;
+}
+
+.client-detail-orders {
+    padding: 0 28px 20px;
+}
+
+.client-detail-orders h3 {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 500;
+    margin-bottom: 18px;
+}
+
+.client-detail-order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.client-detail-order-row {
+    display: grid;
+    grid-template-columns: 120px 210px 1fr 140px 170px;
+    gap: 16px;
+    align-items: center;
+    background: #dff0fb;
+    padding: 14px 14px;
+    font-size: 18px;
+    color: #111111;
+}
+
+.client-detail-order-status {
+    justify-self: end;
+    min-width: 146px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.client-detail-order-status-confirmed {
+    background: #45db4b;
+}
+
+.client-detail-order-status-cancelled {
+    background: #ea4a43;
+}
+
+.admin-footer {
+    background: #252f3d;
+    padding: 12px 16px;
+    margin-top: auto;
+    position: relative;
+    z-index: 20;
+}
+
+.admin-footer-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.admin-footer-inner img {
+    width: 44px;
+    height: auto;
+    flex-shrink: 0;
+}
+
+.admin-footer-inner p {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.15;
+    flex: 1;
+    text-align: center;
+}
