@@ -23,49 +23,9 @@ for (let i = 1; i <= 20; i++) {
 }
 %>
 
-<nav class="w-full flex items-center justify-between px-6 py-3 border-b border-gray-200" style="background-color: rgba(0, 120, 169, 0.1);">
-    <!-- Logo -->
-    <a href="/cliente/home" class="flex-shrink-0">
-        <img src="/img/ppg-logo.svg" class="w-[60px]" alt="PPG">
-    </a>
+<%- include('../includes/_navbar') %>
 
-    <!-- Sucursal -->
-    <div class="ml-6 flex-shrink-0">
-        <button id="btnSucursal" data-bs-toggle="modal" data-bs-target="#modalSelector" class="bg-white border text-gray-800 border-gray-300 rounded-md px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">
-            Sucursal: Jurica
-        </button>
-    </div>
 
-    <!-- Buscador centrado -->
-    <form class="mx-auto w-[45%]">
-        <div class="relative">
-            <input type="search" class="w-full text-center border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0078A9] text-gray-800" placeholder="Buscar Producto" aria-label="Buscar Producto">
-        </div>
-    </form>
-
-    <!-- Menu derecho -->
-    <div class="flex items-center space-x-6 shrink-0">
-        <a href="/cliente/mis-pedidos" class="bg-white border text-gray-800 border-gray-300 rounded-md px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">Mis Pedidos</a>
-        <a href="/cart" class="hover:opacity-80 transition-opacity">
-            <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" class="w-[35px]" alt="Carrito">
-        </a>
-        <button id="btnPerfil" data-bs-toggle="modal" data-bs-target="#modalSelector" class="block hover:opacity-80 transition-opacity">
-            <img src="/img/iconoPerfil.png" class="w-[40px] h-[40px] rounded-full object-cover shadow-sm border" alt="Perfil">
-        </button>
-    </div>
-</nav>
-
-<!-- Card de informacion (modales) -->
-<div id="modalSelector" class="tw-modal hidden fixed inset-0 bg-black/50 z-50 items-center justify-center p-4">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] flex flex-col">
-        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-            <h5 class="text-lg font-semibold text-gray-800" id="modalTitle"></h5>
-            <button class="btn-close-modal text-gray-500 hover:text-gray-700 text-3xl leading-none">&times;</button>
-        </div>
-        <div class="p-4 overflow-y-auto text-gray-800" id="modalBody">
-        </div>
-    </div>
-</div>
 
 <!-- Modal Detalle de Orden -->
 <div id="modalDetalleOrden" class="tw-modal hidden fixed inset-0 bg-black/50 z-50 items-center justify-center p-4">
@@ -243,14 +203,7 @@ for (let i = 1; i <= 20; i++) {
     </div>
 </div>
 
-<!-- Footer -->
-<footer class="pedidos-footer">
-    <div class="pedidos-footer-inner">
-        <img src="/img/ppg-logo.svg" alt="Logo PPG">
-        <p>The PPG logo is a registered trademark and Colorful Communities and We protect and beautify the world are trademarks of PPG Industries Ohio, Inc. &copy; 2026 PPG Industries, Inc.All Rights Reserved</p>
-    </div>
-</footer>
+<%- include('../includes/_footer') %>
 
-<script src="/nav_bar.js"></script>
 </body>
 </html>
