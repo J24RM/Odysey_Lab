@@ -6,9 +6,6 @@ const authController = require('../../controllers/auth.controller');
 // Ruta /admin/home
 router.get('/home', authController.getAdminHome);
 
-// Ruta /admin/agregar_producto
-router.get('/agregar_producto', authController.getAdminAgregarProducto);
-
 // Ruta /admin/editar_producto
 router.get('/editar_producto', authController.getAdminEditarProducto);
 
