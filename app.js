@@ -41,11 +41,6 @@ app.get('/', (request, response) => {
 // app.use(estadisticasRoutes);
 // ESAS LINEAS DAN FALLO
 
-//Rutas del Carrito
-const carrito = require('./routes/cliente/carrito.routes');
-app.use("/cart", carrito);
-
-
 //Middleware global de autenticacion
 app.use((request, response, next) => {
     if (!request.session.usuario) {
@@ -79,11 +74,15 @@ app.use('/admin', requireAdmin, adminEstadisticasRoutes);
 
 
 // Rutas del Cliente
-app.use('/cliente', clienteRoutes);
+app.use('/cliente', requireCliente, clienteRoutes);
 
 // Rutas del producto
 const producto = require('./routes/producto.routes');
-app.use('/product', producto);
+app.use('/product', requireCliente, producto);
+
+//Rutas del Carrito
+const carrito = require('./routes/cliente/carrito.routes');
+app.use("/cart",requireCliente,carrito);
 
 app.use((request, response, next) => {
     response.status(404).send("La ruta no existe");
