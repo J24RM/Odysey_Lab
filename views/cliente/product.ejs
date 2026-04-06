@@ -107,6 +107,7 @@
         </div>
           <!-- Botón agregar al carrito -->
           <form action="/cart/items" method="POST">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <input type="hidden" name="cantidad_ingresada" value=5/>
             <input type="hidden" name="id_producto" value="<%= productoId %>"/>
             <input type="hidden" name="id_usuario" value="35"/>

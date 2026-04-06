@@ -117,6 +117,7 @@
     </div>
 
     <form action="/orden/registrar/<%= id_carrito %>" method="POST">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button type="submit"
         class="w-full text-white font-bold text-base py-4 rounded-2xl hover:opacity-90 active:scale-95 transition-all duration-150 shadow-md"
         style="background-color: #002736;">
