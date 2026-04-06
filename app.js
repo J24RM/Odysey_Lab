@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require("path");
 const multer = require('multer');
+const csrf = require('csurf');
+const csrfProtection = csrf();
 
 // Archivos de rutas
 const authRoutes = require('./routes/auth.routes');
@@ -50,6 +52,13 @@ const fileFilter = (request, file, callback) => {
         callback(null, false);
     }
 };
+
+app.use(csrfProtection);
+
+app.use((req, res, next) => {
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 
 app.use(multer({ storage: fileStorage, fileFilter }).single('imagen'));
 
