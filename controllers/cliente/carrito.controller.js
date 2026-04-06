@@ -25,7 +25,7 @@ exports.getCarrito = async (request, response, next) => {
         }
 
         response.render('cliente/cart', {
-            // csrfToken: request.csrfToken(),
+            csrfToken: request.csrfToken(),
             username: request.session.username || '',
             error: null,
             productosCarrito: productosCarrito,

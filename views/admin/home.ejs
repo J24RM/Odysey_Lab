@@ -58,30 +58,122 @@
                 <!-- Header -->
                 <div class="flex items-center justify-between mb-6 gap-4">
                     <h3 class="text-2xl font-extrabold text-gray-900 m-0">Catálogo de Productos</h3>
-                    <input type="text" placeholder="Buscar Productos" class="px-4 py-2.5 border-2 border-gray-300 rounded-full text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors w-64" />
+                    <input id="searchInput" type="text" placeholder="Buscar Productos" class="px-4 py-2.5 border-2 border-gray-300 rounded-full text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors w-64" />
                 </div>
 
                 <!-- Product Grid -->
-                <div class="grid grid-cols-4 gap-5">
-                    <% for (let i = 0; i < 6; i++) { %>
-                        <a href="/admin/product/sellador_1" class="border-2 border-blue-100 rounded-xl p-4 text-center transition-all hover:shadow-lg hover:border-blue-600 hover:-translate-y-1">
-                            <div class="h-32 flex items-center justify-center mb-3">
-                                <img src="/img/botePintura.png" alt="Sellador Comex" class="max-h-28 max-w-full object-contain">
-                            </div>
-                            <p class="text-sm font-bold text-gray-900 text-left leading-snug mb-2">
-                                Sellador Comex 5×1 Clásico Preparación de Superfícies PPG Silicona o Poliuretano 4000 ml
-                            </p>
-                            <span class="inline-block mt-3 px-3 py-1 bg-blue-100 text-blue-600 text-xs font-bold rounded-full">
-                                Sellador
-                            </span>
-                        </a>
+                <div id="productGrid" class="grid grid-cols-4 gap-5">
+                    <% if (productos && productos.length > 0) { %>
+                        <% productos.forEach(p => { %>
+                            <a href="/admin/product/<%= p.id_producto %>" class="border-2 border-blue-100 rounded-xl p-4 text-center transition-all hover:shadow-lg hover:border-blue-600 hover:-translate-y-1">
+                                <div class="h-32 flex items-center justify-center mb-3">
+                                    <img src="<%= p.url_imagen ? '/uploads/' + p.url_imagen : '/img/botePintura.png' %>" alt="<%= p.nombre %>" class="max-h-28 max-w-full object-contain" onerror="this.src='/img/botePintura.png'">
+                                </div>
+                                <p class="text-sm font-bold text-gray-900 text-left leading-snug mb-2">
+                                    <%= p.nombre %>
+                                </p>
+                                <div class="flex items-center gap-2 justify-center flex-wrap mb-2">
+                                    <span class="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-xs font-bold rounded-full">
+                                        $ <%= p.precio_unitario %>
+                                    </span>
+                                    <% if (!p.activo) { %>
+                                        <span class="inline-block px-3 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-full">
+                                            Inactivo
+                                        </span>
+                                    <% } %>
+                                </div>
+                            </a>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="col-span-4 py-10 text-center text-gray-500">
+                            No se encontraron productos.
+                        </div>
                     <% } %>
                 </div>
+
+                <!-- Pagination -->
+                <% if (totalPages > 1) { %>
+                <div class="flex items-center justify-center gap-2 mt-8 pt-6 border-t border-gray-200">
+                    <% if (page > 1) { %>
+                        <a href="/admin/home?page=<%= page - 1 %>" class="px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-700 font-bold hover:border-blue-600 hover:bg-blue-50 transition">← Anterior</a>
+                    <% } %>
+
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <% if (i === page) { %>
+                            <span class="px-3 py-2 bg-blue-600 text-white font-bold rounded-lg"><%= i %></span>
+                        <% } else if (i <= 3 || i > totalPages - 3 || (i > page - 2 && i < page + 2)) { %>
+                            <a href="/admin/home?page=<%= i %>" class="px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 font-bold hover:border-blue-600 hover:bg-blue-50 transition"><%= i %></a>
+                        <% } else if (i === 4 || i === totalPages - 3) { %>
+                            <span class="px-3 py-2 text-gray-400">...</span>
+                        <% } %>
+                    <% } %>
+
+                    <% if (page < totalPages) { %>
+                        <a href="/admin/home?page=<%= page + 1 %>" class="px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-700 font-bold hover:border-blue-600 hover:bg-blue-50 transition">Siguiente →</a>
+                    <% } %>
+                </div>
+                <% } %>
             </section>
         </main>
     </div>
 
     <%- include('partials/footer.ejs') %>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const productGrid = document.getElementById('productGrid');
+
+        // Búsqueda en tiempo real
+        searchInput.addEventListener('input', async (e) => {
+            const query = e.target.value.trim();
+
+            if (!query) {
+                // Si está vacío, recargar la página para mostrar todos los productos
+                window.location.href = '/admin/home';
+                return;
+            }
+
+            try {
+                const url = `/admin/api/productos?q=${encodeURIComponent(query)}`;
+                const response = await fetch(url);
+                const productos = await response.json();
+
+                productGrid.innerHTML = '';
+
+                if (productos.length === 0) {
+                    productGrid.innerHTML = '<div class="col-span-4 py-10 text-center text-gray-500">No se encontraron productos</div>';
+                    return;
+                }
+
+                productos.forEach(p => {
+                    const imageSrc = p.url_imagen ? `/uploads/${p.url_imagen}` : '/img/botePintura.png';
+                    const inactiveStyle = !p.activo ? '<span class="inline-block px-3 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-full">Inactivo</span>' : '';
+
+                    const article = document.createElement('a');
+                    article.href = `/admin/product/${p.id_producto}`;
+                    article.className = 'border-2 border-blue-100 rounded-xl p-4 text-center transition-all hover:shadow-lg hover:border-blue-600 hover:-translate-y-1';
+                    article.innerHTML = `
+                        <div class="h-32 flex items-center justify-center mb-3">
+                            <img src="${imageSrc}" alt="${p.nombre}" class="max-h-28 max-w-full object-contain" onerror="this.src='/img/botePintura.png'">
+                        </div>
+                        <p class="text-sm font-bold text-gray-900 text-left leading-snug mb-2">
+                            ${p.nombre}
+                        </p>
+                        <div class="flex items-center gap-2 justify-center flex-wrap mb-2">
+                            <span class="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-xs font-bold rounded-full">
+                                $ ${p.precio_unitario}
+                            </span>
+                            ${inactiveStyle}
+                        </div>
+                    `;
+                    productGrid.appendChild(article);
+                });
+            } catch (error) {
+                console.error('Error searching products:', error);
+                productGrid.innerHTML = '<div class="col-span-4 py-10 text-center text-red-500">Error al buscar productos</div>';
+            }
+        });
+    </script>
 
 </body>
 </html>
