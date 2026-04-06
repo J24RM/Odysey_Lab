@@ -112,6 +112,10 @@ app.use('/product', requireCliente, producto);
 const carrito = require('./routes/cliente/carrito.routes');
 app.use("/cart",requireCliente,carrito);
 
+//Rutas de Ordenes
+const ordenRoutes = require('./routes/orden.routes');
+app.use("/orden", requireCliente, ordenRoutes);
+
 app.use((request, response, next) => {
     response.status(404).send("La ruta no existe");
 });

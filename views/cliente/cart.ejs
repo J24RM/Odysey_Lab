@@ -75,7 +75,7 @@
 
       <!-- Info -->
       <div class="flex-1">
-        <a href="/producto/<%= item.id_producto %>"
+        <a href="/product/<%= item.id_producto %>"
             id="nombre-<%= item.id_producto %>"
             class="text-base font-semibold text-gray-900 hover:underline leading-snug">
           <%= producto.nombre %>
@@ -116,11 +116,13 @@
       <p class="text-sm text-gray-500 mt-4 font-medium" id="qty-display">Cantidad de productos: 0</p>
     </div>
 
-    <button
-      class="w-full text-white font-bold text-base py-4 rounded-2xl hover:opacity-90 active:scale-95 transition-all duration-150 shadow-md"
-      style="background-color: #002736;">
-      Realizar orden
-    </button>
+    <form action="/orden/registrar/<%= id_carrito %>" method="POST">
+      <button type="submit"
+        class="w-full text-white font-bold text-base py-4 rounded-2xl hover:opacity-90 active:scale-95 transition-all duration-150 shadow-md"
+        style="background-color: #002736;">
+        Realizar orden
+      </button>
+    </form>
 
     <p class="text-xs text-gray-500 text-center leading-snug px-2">
       <em>Revisa tu orden, solo tendrás 15 minutos para cancelarla una vez la realices</em>

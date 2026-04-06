@@ -5,7 +5,8 @@ const { compile } = require('ejs');
 
 exports.getCarrito = async (request, response, next) => {
     try {
-        const id_carrito = 6 // request.session.id_carrito;
+        const carrito = await ordenModel.obtenerOrdenEnEstadoCarrito(35); // hardcoded user until auth
+        const id_carrito = carrito.id_orden;
         let productosCarrito = null;
         let detalleProductos = null;
         let sucursal = "Apaseo";
@@ -30,6 +31,7 @@ exports.getCarrito = async (request, response, next) => {
             productosCarrito: productosCarrito,
             detalleProductos: detalleProductos,
             sucursal: sucursal,
+            id_carrito: id_carrito,
         });
 
     } catch (err) {
@@ -62,7 +64,8 @@ exports.agregarItem = async (request, response, next) => {
 exports.actualizarItem = async (request, response, next) => {
     const { id_producto } = request.params;
     const { cantidad_ingresada } = request.body;
-    const id_carrito = 6 // request.session.id_carrito;
+    const carrito = await ordenModel.obtenerOrdenEnEstadoCarrito(35); // hardcoded user until auth
+    const id_carrito = carrito.id_orden;
     
     try {
         if (cantidad_ingresada == 0) {
