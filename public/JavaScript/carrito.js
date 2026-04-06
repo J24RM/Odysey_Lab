@@ -20,7 +20,10 @@ async function cambiarCantidad(idProducto, delta) {
 
   const res = await fetch('/cart/items/' + idProducto, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': document.querySelector('input[name="_csrf"]').value
+    },
     body: JSON.stringify({ cantidad_ingresada: nuevaCantidad })
   });
 
@@ -47,7 +50,10 @@ async function cambiarCantidad(idProducto, delta) {
 async function eliminarProducto(idProducto) {
   const res = await fetch('/cart/items/' + idProducto, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': document.querySelector('input[name="_csrf"]').value
+    },
     body: JSON.stringify({ cantidad_ingresada: 0 })
   });
 

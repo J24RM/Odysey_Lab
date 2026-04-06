@@ -48,8 +48,33 @@ exports.postLogin = async (request, response) => {
 
 //Ruta protegida admin
 //Se accede si se validan correctamente las credenciales brindadas
-exports.getAdminHome = (request, response) => {
-    response.render('admin/home', { usuario: request.session.usuario });
+exports.getAdminHome = async (request, response) => {
+    try {
+        const page = parseInt(request.query.page) || 1;
+        const limit = 20;
+        const { productos, total } = await Producto.fetchAllPaginated(page, limit);
+        const totalPages = Math.ceil(total / limit);
+
+        response.render('admin/home', {
+            usuario: request.session.usuario,
+            productos: productos,
+            total: total,
+            page: page,
+            totalPages: totalPages,
+            limit: limit
+        });
+    } catch (error) {
+        console.error('Error fetching products for admin home:', error);
+        response.render('admin/home', {
+            usuario: request.session.usuario,
+            productos: [],
+            total: 0,
+            page: 1,
+            totalPages: 0,
+            limit: 20,
+            error: 'Error al cargar los productos'
+        });
+    }
 };
 
 exports.getAdminEditarProducto = async (request, response) => {
@@ -80,18 +105,31 @@ exports.getAdminEditarProducto = async (request, response) => {
 exports.getClienteHome = async (request, response) => {
     try {
         const searchQuery = request.query.search || '';
-        let productos;
-        
+        const page = parseInt(request.query.page) || 1;
+        const limit = 20;
+        let productos, total;
+
         if (searchQuery) {
+            // Para búsqueda, obtener todos los resultados sin paginación
             productos = await Producto.search(searchQuery);
+            total = productos.length;
         } else {
-            productos = await Producto.fetchAll();
+            // Para catálogo, usar paginación
+            const result = await Producto.fetchPaginated(page, limit);
+            productos = result.productos;
+            total = result.total;
         }
 
-        response.render('cliente/home', { 
+        const totalPages = searchQuery ? 1 : Math.ceil(total / limit);
+
+        response.render('cliente/home', {
             usuario: request.session.usuario,
             productos: productos,
-            searchQuery: searchQuery
+            searchQuery: searchQuery,
+            total: total,
+            page: page,
+            totalPages: totalPages,
+            limit: limit
         });
     } catch (error) {
         console.error('Error fetching products for client home:', error);

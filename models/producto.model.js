@@ -111,4 +111,29 @@ module.exports = class Producto {
         if (error) throw error;
         return data;
     }
+
+    static async fetchPaginated(page = 1, limit = 20) {
+        const offset = (page - 1) * limit;
+        const { data, count, error } = await supabase
+            .from('producto')
+            .select('*', { count: 'exact' })
+            .eq('activo', true)
+            .order('nombre', { ascending: true })
+            .range(offset, offset + limit - 1);
+
+        if (error) throw error;
+        return { productos: data, total: count };
+    }
+
+    static async fetchAllPaginated(page = 1, limit = 20) {
+        const offset = (page - 1) * limit;
+        const { data, count, error } = await supabase
+            .from('producto')
+            .select('*', { count: 'exact' })
+            .order('nombre', { ascending: true })
+            .range(offset, offset + limit - 1);
+
+        if (error) throw error;
+        return { productos: data, total: count };
+    }
 }

@@ -54,7 +54,7 @@
             <% productos.forEach(producto => { %>
                 <a href="/cliente/product/<%= producto.id_producto %>" class="product-card">
                     <div class="product-img-wrap">
-                        <img src="<%= producto.url_imagen || '/img/botePintura.png' %>" alt="<%= producto.nombre %>" onerror="this.src='/img/botePintura.png'">
+                        <img src="<%= producto.url_imagen ? '/uploads/' + producto.url_imagen : '/img/botePintura.png' %>" alt="<%= producto.nombre %>" onerror="this.src='/img/botePintura.png'">
                     </div>
                     <div class="product-name">
                         <%= producto.nombre %>
@@ -75,15 +75,27 @@
         <% } %>
     </div>
 
+    <% if (!searchQuery && totalPages > 1) { %>
     <div class="pagination-container">
-        <a href="#" class="page-link">&lt; Anterior</a>
-        <a href="#" class="page-link active">1</a>
-        <a href="#" class="page-link">2</a>
-        <a href="#" class="page-link">3</a>
-        <span style="color:var(--text-muted); font-size: 14px; margin: 0 4px;">...</span>
-        <a href="#" class="page-link">20</a>
-        <a href="#" class="page-link">Siguiente &gt;</a>
+        <% if (page > 1) { %>
+            <a href="/cliente/home?page=<%= page - 1 %>" class="page-link">&lt; Anterior</a>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <% if (i === page) { %>
+                <a href="/cliente/home?page=<%= i %>" class="page-link active"><%= i %></a>
+            <% } else if (i <= 3 || i > totalPages - 3 || (i > page - 2 && i < page + 2)) { %>
+                <a href="/cliente/home?page=<%= i %>" class="page-link"><%= i %></a>
+            <% } else if (i === 4 || i === totalPages - 3) { %>
+                <span style="color:var(--text-muted); font-size: 14px; margin: 0 4px;">...</span>
+            <% } %>
+        <% } %>
+
+        <% if (page < totalPages) { %>
+            <a href="/cliente/home?page=<%= page + 1 %>" class="page-link">Siguiente &gt;</a>
+        <% } %>
     </div>
+    <% } %>
     
     <hr style="border: 0; height: 1.5px; background: #c0d1e1; margin: 40px 0;">
 </main>

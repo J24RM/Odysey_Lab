@@ -103,6 +103,7 @@
             </div>
 
             <form id="editForm" class="space-y-6" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <!-- Full Width Field -->
                 <div class="space-y-2">
                     <label for="editProductName" class="block text-sm font-semibold text-gray-900">Nombre del producto:</label>
@@ -387,6 +388,9 @@
                 const formData = new FormData(editForm);
                 const response = await fetch(`/admin/editar_producto/${selectedProductId}`, {
                     method: 'POST',
+                    headers: {
+                        'X-CSRF-Token': document.querySelector('input[name="_csrf"]').value
+                    },
                     body: formData
                 });
 
