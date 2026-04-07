@@ -87,7 +87,6 @@ exports.getClienteHome = async (request, response) => {
         } else {
             productos = await Producto.fetchAll();
         }
-
         response.render('cliente/home', { 
             usuario: request.session.usuario,
             productos: productos,

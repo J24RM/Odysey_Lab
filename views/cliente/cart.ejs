@@ -68,7 +68,7 @@
 
       <!-- Imagen -->
       <div class="w-28 h-28 flex-shrink-0 bg-white rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
-        <img src="<%= producto.url_imagen || '/img/botePintura.png' %>"
+        <img src="/uploads/<%= producto.url_imagen || '/img/botePintura.png' %>"
               alt="<%= producto.nombre %>"
               class="object-contain w-24 h-24" />
       </div>
@@ -131,7 +131,9 @@
   </div>
   
 </div>
- 
+
+<meta name="csrf-token" content="<%= csrfToken %>">
 <script src="/JavaScript/carrito.js"></script>
 </body>
 </html>
+

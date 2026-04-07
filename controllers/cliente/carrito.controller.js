@@ -6,15 +6,18 @@ const { compile } = require('ejs');
 exports.getCarrito = async (request, response, next) => {
     try {
         const carrito = await ordenModel.obtenerOrdenEnEstadoCarrito(request.session.usuario); 
+
         if(!carrito){
-            const carrito = await ordenModel.crearCarrito(request.session.usuario);
+            request.session.id_carrito = null;
         }
-        request.session.id_carrito = carrito.id_orden;
+        else{
+            request.session.id_carrito = carrito.id_orden;
+        }
         let productosCarrito = null;
         let detalleProductos = null;
         let sucursal = "Apaseo"; // request.session.sucursal;
 
-        if (id_carrito != null) {
+        if (request.session.id_carrito != null) {
             productosCarrito = await detalle_ordenModel.detalleOrden(request.session.id_carrito);
 
             // detalleOrden regresa un array, hay que iterar cada producto
@@ -44,14 +47,23 @@ exports.agregarItem = async (request, response, next) => {
     try {
         // const id_usuario = request.session.id_usuario;
 
-        // Obtener o crear carrito
+        // Obtener carrito
         const carrito = await ordenModel.obtenerOrdenEnEstadoCarrito(request.session.usuario);
-        request.session.id_carrito = carrito.id_orden;
-        console.log("Id del Carrito" + carrito.id_orden)
+        if(!carrito){
+            const carrito = await ordenModel.crearCarrito(request.session.usuario);
+            request.session.id_carrito = carrito.id_orden;
+            console.log("Se creo un carrito")
+        }
+
+        else{
+            request.session.id_carrito = carrito.id_orden;
+        }
+
+        console.log("Id del Carrito" + request.session.id_carrito);
 
         // Agregar producto
         await detalle_ordenModel.agregarProductoAlCarrito(
-            carrito.id_orden,
+            request.session.id_carrito,
             request.body.id_producto,
             request.body.cantidad_ingresada
         );
@@ -66,23 +78,25 @@ exports.agregarItem = async (request, response, next) => {
 exports.actualizarItem = async (request, response, next) => {
     const { id_producto } = request.params;
     const { cantidad_ingresada } = request.body;
-    const carrito = await ordenModel.obtenerOrdenEnEstadoCarrito(35); // hardcoded user until auth
-    const id_carrito = carrito.id_orden;
     
     try {
         if (cantidad_ingresada == 0) {
-            await detalle_ordenModel.eliminarProducto(id_carrito, id_producto);
-            return response.json({ eliminado: true });
+            await detalle_ordenModel.eliminarProducto(request.session.id_carrito, id_producto);
+            return response.json({ 
+                eliminado: true ,
+                csrfToken: request.csrfToken()
+            });
         } else {
             await detalle_ordenModel.modificarCantidad(
-                id_carrito,
+                request.session.id_carrito,
                 id_producto,
                 cantidad_ingresada
             );
 
             return response.json({
                 eliminado: false,
-                nuevaCantidad: cantidad_ingresada
+                nuevaCantidad: cantidad_ingresada,
+                csrfToken: request.csrfToken()
             });
         }
     } catch (error) {
