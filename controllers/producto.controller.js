@@ -181,6 +181,7 @@ exports.getProductoCliente = async (request, response) => {
                 '/img/botePintura.png'
             ]
         };
+        console.log(producto.imagen)
 
         response.render('cliente/product', {
             usuario: request.session.usuario,

@@ -68,7 +68,7 @@
 
       <!-- Imagen -->
       <div class="w-28 h-28 flex-shrink-0 bg-white rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
-        <img src="<%= producto.url_imagen || '/img/botePintura.png' %>"
+        <img src="/uploads/<%= producto.url_imagen || '/img/botePintura.png' %>"
               alt="<%= producto.nombre %>"
               class="object-contain w-24 h-24" />
       </div>
@@ -116,7 +116,7 @@
       <p class="text-sm text-gray-500 mt-4 font-medium" id="qty-display">Cantidad de productos: 0</p>
     </div>
 
-    <form action="/orden/registrar/<%= id_carrito %>" method="POST">
+    <form action="/orden/registrar/<%= carrito %>" method="POST">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <button type="submit"
         class="w-full text-white font-bold text-base py-4 rounded-2xl hover:opacity-90 active:scale-95 transition-all duration-150 shadow-md"
@@ -131,7 +131,9 @@
   </div>
   
 </div>
- 
+
+<meta name="csrf-token" content="<%= csrfToken %>">
 <script src="/JavaScript/carrito.js"></script>
 </body>
 </html>
+

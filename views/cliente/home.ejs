@@ -54,7 +54,7 @@
             <% productos.forEach(producto => { %>
                 <a href="/cliente/product/<%= producto.id_producto %>" class="product-card">
                     <div class="product-img-wrap">
-                        <img src="<%= producto.url_imagen ? '/uploads/' + producto.url_imagen : '/img/botePintura.png' %>" alt="<%= producto.nombre %>" onerror="this.src='/img/botePintura.png'">
+                        <img src="/uploads/<%= producto.url_imagen || '/img/botePintura.png' %>" alt="<%= producto.nombre %>" onerror="this.src='/img/botePintura.png'">
                     </div>
                     <div class="product-name">
                         <%= producto.nombre %>
