@@ -4,7 +4,7 @@ module.exports = class Orden {
 
     static async obtenerOrdenEnEstadoCarrito(id_usuario) {
 
-        const { data: orden, error } = await supabase
+        const { data: carrito, error } = await supabase
             .from('orden')
             .select('*')
             .eq('estado', 'carrito')
@@ -13,28 +13,27 @@ module.exports = class Orden {
 
         if (error) throw error;
 
-        if (!orden) {
-            console.log("Se Creo el carrito")
-            const { data: nuevaOrden, error: insertError } = await supabase
-                .from('orden')
-                .insert([
-                    {
-                        estado: 'carrito',
-                        subtotal: 0,
-                        id_usuario: id_usuario,
-                        id_campania: 1,
-                        // los demás campos déjalos null o con default en DB
+        return carrito;
+    }
+
+    static async crearCarrito(id_usuario){
+        const { data: carrito, error } = await supabase
+        .from('orden')
+        .insert([
+            {
+                estado: 'carrito',
+                subtotal: 0,
+                id_usuario: id_usuario,
+                id_campania: 1,
+                // los demás campos déjalos null o con default en DB
                     }
                 ])
-                .select()
-                .single();
+        .select()
+        .single();
 
-            if (insertError) throw insertError;
+        if (error) throw error;
 
-            return nuevaOrden;
-        }
-
-        return orden;
+        return carrito;
     }
 
     static async registrarOrden(id_orden) {

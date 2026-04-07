@@ -16,6 +16,8 @@ module.exports = class Orden {
 
         cantidad_ingresada = parseInt(cantidad_ingresada)
 
+        console.log("Se va a agregar el producto " + id_producto)
+
         // Si existe 
         if (producto){
             const nuevaCantidad = producto.cantidad + cantidad_ingresada;
