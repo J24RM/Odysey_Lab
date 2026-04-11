@@ -1,0 +1,85 @@
+@startuml Registrar Orden
+Title "Registrar Orden"
+
+actor Navegador as nav
+boundary "orden.routes.js" as ruta
+boundary "carrito.ejs" as UI
+control "orden.controller.js" as ctrl
+entity "orden.model" as model1
+entity "orden_detalle.model" as model2
+entity "producto.model" as model3
+collections "Nodemailer" as mail
+database "Postgres (Supabase)" as DB
+
+activate nav
+nav -> ruta: POST /orden/registrar
+deactivate nav
+
+activate ruta
+ruta -> ctrl: registrarOrden(request)
+deactivate ruta
+
+activate ctrl
+
+ctrl ->> model1: obtenerOrdenEnEstadoCarrito(session.usuario)
+activate model1
+model1 ->> DB: SELECT orden WHERE estado = "carrito"
+DB --> model1: orden
+model1 -->> ctrl: orden
+deactivate model1
+
+alt No existe orden
+    ctrl ->> ctrl: session.error = "Error"
+else Orden encontrada
+
+    ctrl ->> ctrl: id_carrito = orden.id_orden
+
+    ctrl ->> model2: detalleOrden(id_carrito)
+    activate model2
+    model2 ->> DB: SELECT id_producto, cantidad
+    activate DB
+    DB -->> model2: productos
+    deactivate DB
+    model2 -->> ctrl: productos
+    deactivate model2
+
+    loop por cada producto
+        ctrl ->> model3: encontrarProductoPorId(id_producto)
+        activate model3
+        model3 ->> DB: SELECT *
+        activate DB
+        DB -->> model3: producto[]
+        deactivate DB
+        model3 -->> ctrl: producto[0]
+        deactivate model3
+
+        ctrl -> ctrl: subtotal += precio_unitario * cantidad
+        ctrl -> ctrl: construir detalleCorreo
+    end
+
+    ctrl -> ctrl: generarFolio()
+
+    ctrl ->> model1: registrarOrden(id_carrito, subtotal, folio, sucursal)
+    activate model1
+    model1 ->> DB: UPDATE orden
+    activate DB
+    DB -->> model1: OK
+    deactivate DB
+    model1 -->> ctrl: OK
+    deactivate model1
+
+    ctrl ->> mail: sendMail(mailOptions)
+    activate mail
+    mail -->> ctrl: OK
+    deactivate mail
+
+
+end
+
+ctrl -> UI: redirect("/cliente/mis-pedidos")
+
+
+deactivate ctrl
+activate UI
+
+@enduml
