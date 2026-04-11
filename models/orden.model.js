@@ -25,7 +25,7 @@ module.exports = class Orden {
                 subtotal: 0,
                 id_usuario: id_usuario,
                 id_campania: 1,
-                // los demás campos déjalos null o con default en DB
+                fecha_realizada: null,
                     }
                 ])
         .select()
@@ -43,7 +43,7 @@ module.exports = class Orden {
                 estado: 'confirmada', 
                 folio: folio,
                 subtotal: subtotal, 
-                fecha_realizada: new Date(),
+                fecha_realizada: new Date().toLocaleString(),
                 id_sucursal: sucursal
             })
             .eq('id_orden', id_orden);
