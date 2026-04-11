@@ -71,7 +71,7 @@ exports.agregarItem = async (request, response, next) => {
         response.redirect('/cart')
 
     } catch (err) {
-        response.redirect('/cart?error=' + encodeURIComponent(err.message));
+        response.redirect('/cart?error=' + encodeURIComponent("No se pudo agregar el producto al carrito"));
     }
 };
 

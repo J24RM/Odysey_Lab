@@ -8,7 +8,7 @@ router.get("/detalle/:id_orden", ordenesController.getDetalleOrden);
 router.get("/:id_orden", ordenesController.getOrdenes);
 
 // Registrar Orden
-router.post("/registrar/:id_orden", ordenesController.postRegistrarOrden);
+router.post("/registrar", ordenesController.registrarOrden);
 
 // Cancelar Orden
 router.post("/cancelar/:id_orden", ordenesController.postCancelarOrden);
