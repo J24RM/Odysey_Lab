@@ -1,6 +1,7 @@
 const ordenModel = require('../models/orden.model');
 const detalleModel = require("../models/detalle_orden.model");
 const productoModel = require("../models/producto.model");
+const configuracionModel = require("../models/configuracion.model")
 const transporter = require("../utils/nodemailer");
 const supabase = require('../utils/supabase');
 
@@ -110,7 +111,7 @@ exports.registrarOrden = async (req, res) => {
 
         console.log("Se envio el correo a " + correo)
 
-        return res.redirect('/cliente/mis-pedidos?success=' + encodeURIComponent("Se envió un correo con el detalle de tu orden confirmada"));
+        return res.redirect('/cliente/mis-pedidos?success=' + encodeURIComponent("Se envió un correo con el detalle de tu orden confirmada") + '&order=' + encodeURIComponent("Orden confirmada"));
 
     } catch (error) {
         return res.redirect('/cliente/mis-pedidos?error=' + encodeURIComponent("No se pudo realizar la orden"));
@@ -137,53 +138,73 @@ exports.registrarOrden = async (req, res) => {
 
 exports.postCancelarOrden = async (req, res) => {
     try {
-        const orden = await OrdenModel.ObtenerOrdenPorId(req.params.id_orden);
+        const orden = await ordenModel.ObtenerOrdenPorId(req.params.id_orden);
 
         const configuracion = await configuracionModel.ObtenerConfiguracionActiva();
-        console.log(configuracion)
 
         // Tiempo actual en México
         const ahora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
 
-        console.log(ahora)
-
 
         // Convertir fecha_realizada a Date 
-        const fechaOrden = new Date(orden[0].fecha_realizada.replace(" ", "T"));
+        const fechaOrden = new Date(orden.fecha_realizada.replace(" ", "T"));
 
-        console.log(fechaOrden)
 
         // Diferencia en minutos, le agregamos 20 segundos mas
         const diferenciaMinutos = (ahora.getTime() + 20000 - fechaOrden.getTime()) / (1000 * 60);
 
-        console.log(diferenciaMinutos)
 
         const esCancelable = diferenciaMinutos <= configuracion.tiempo_de_cancelacion;
 
-        console.log(esCancelable)
-
         if(esCancelable){
-            await OrdenModel.CancelarOrden(req.params.id_orden)
+            await ordenModel.CancelarOrden(req.params.id_orden)
         }
         else{
-            req.session.error = "No se puede cancelar"
+            return res.redirect('/cliente/mis-pedidos?error=' + encodeURIComponent("El tiempo de cancelacion expiro"));
         }
-        return res.redirect('/cliente/mis-pedidos')
+        return res.redirect('/cliente/mis-pedidos?success=' + encodeURIComponent(" ") + '&order=' + encodeURIComponent("Orden cancelada"));
 
     } catch (error) {
-        console.error("❌ Error:", error.message, error.stack);
-        return res.status(500).json({ ok: false, mensaje: error.message });
+        return res.redirect('/cliente/mis-pedidos?error=' + encodeURIComponent("No se pudo cancelar la orden"));
     }
 };
 
 exports.getDetalleOrden = async (req, res) => {
     try {
-        const { id_orden } = req.params;
-        const { data: orden, error } = await supabase
-            .from('orden').select('*').eq('id_orden', id_orden).single();
-        if (error) throw error;
+        const orden = await ordenModel.ObtenerOrdenPorId(req.params.id_orden);
 
-        const detalles = await ordenModel.obtenerDetalleOrden(id_orden);
+        if(orden.estado == "cancelada"){
+            orden.cancelar = false;
+        }
+
+        else{
+            const configuracion = await configuracionModel.ObtenerConfiguracionActiva();
+
+            // Tiempo actual en México
+            const ahora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
+
+
+            // Convertir fecha_realizada a Date 
+            const fechaOrden = new Date(orden.fecha_realizada.replace(" ", "T"));
+
+
+            // Diferencia en minutos
+            const diferenciaMinutos = (ahora - fechaOrden) / (1000 * 60);
+
+
+            const esCancelable = diferenciaMinutos <= configuracion.tiempo_de_cancelacion;
+
+            if(esCancelable){
+                orden.cancelar = true;
+            }
+            else{
+                orden.cancelar = false;
+            }
+        }
+
+        console.log(orden.cancelar)
+
+        const detalles = await ordenModel.obtenerDetalleOrden(req.params.id_orden);
         res.json({ orden, detalles });
     } catch (error) {
         console.error('Error al obtener detalle:', error);

@@ -79,7 +79,8 @@ module.exports = class Orden {
         const {data: orden, error} = await supabase
             .from('orden')
             .select('*')
-            .eq('id_orden', id_orden);
+            .eq('id_orden', id_orden)
+            .single();
 
         if (error) throw error;
         return orden;
