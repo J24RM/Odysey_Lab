@@ -35,6 +35,9 @@ exports.getDetalleOrden = async (req, res) => {
         if (error) throw error;
 
         const detalles = await Orden.obtenerDetalleOrden(id_orden);
+
+        orden.cancelar = true;
+        
         res.json({ orden, detalles });
     } catch (error) {
         console.error('Error al obtener detalle:', error);

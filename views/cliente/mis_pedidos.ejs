@@ -47,6 +47,8 @@
                         </p>
                     </div>
                 </div>
+                <!-- Boton de Cancelar -->
+                <div id="btn-cancelar" class="w-full flex justify-end mt-4"> </div>
             </div>
 
             <!-- Titulo y Exportar -->
@@ -237,6 +239,18 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
 
             document.getElementById('modal-subtotal').textContent = orden.subtotal ? 
                 Number(orden.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2 }) : '0.00';
+
+            const btnContainer = document.getElementById('btn-cancelar');
+            btnContainer.innerHTML = '';
+
+            if(orden.cancelar == true){
+                btnContainer.innerHTML = `
+                    <a href="/orden/cancelar/${orden.id_orden}" 
+                        class="inline-flex items-center justify-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-colors duration-200">
+                        Cancelar Orden
+                    </a>
+                `;
+            }
 
             // Fill products
             const container = document.getElementById('modal-productos');
