@@ -231,7 +231,7 @@ exports.getPdfOrden = async (req, res) => {
         if (ordenError) throw ordenError;
 
         // Obtener detalles (con SKU)
-        const detalles = await Orden.obtenerDetalleOrden(id_orden);
+        const detalles = await ordenModel.obtenerDetalleOrden(id_orden);
 
         // Obtener sucursal si existe
         let sucursal = null;
