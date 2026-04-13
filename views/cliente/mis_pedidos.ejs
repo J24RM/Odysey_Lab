@@ -72,6 +72,24 @@ window.perfilUsuario = {
     </div>
 </div>
 
+<!-- Modal Confirmación de Cancelación (Paso 6 del CU-19) -->
+<div id="modalConfirmarCancelacion" class="hidden fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full text-center mx-4">
+        <h2 class="text-xl font-bold text-gray-900 mb-2">¿Cancelar orden?</h2>
+        <p class="text-gray-600 text-sm mb-6">Esta acción no se puede deshacer. ¿Estás seguro de que deseas cancelar esta orden?</p>
+        <div class="flex gap-3 justify-center">
+            <button id="btnNoCancelar"
+                class="px-5 py-2 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                No, regresar
+            </button>
+            <button id="btnConfirmarCancelacion"
+                class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-colors">
+                Sí, cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
      <!-- Error -->
       <div id="error-container"
         class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50
@@ -145,11 +163,16 @@ window.perfilUsuario = {
         </div>
 
         <div class="pedidos-table-body">
+            <% if (pedidos.length === 0) { %>
+                <div class="py-16 text-center text-gray-500 font-medium">
+                    No tienes órdenes registradas aún.
+                </div>
+            <% } %>
             <% pedidos.forEach((pedido) => { %>
                 <% const fecha = pedido.fecha_realizada ? new Date(pedido.fecha_realizada).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Sin fecha'; %>
                 <% const estado = pedido.estado.charAt(0).toUpperCase() + pedido.estado.slice(1); %>
                 <div class="pedidos-row" data-id="<%= pedido.id_orden %>" data-fecha="<%= pedido.fecha_realizada || '' %>" style="cursor:pointer;">
-                    <span><%= pedido.folio || 'A' + String(pedido.id_orden).padStart(4, '0') %></span>
+                    <span>A<%= String(pedido.id_orden).padStart(4, '0') %></span>
                     <span><%= fecha %></span>
                     <span>Concesionario Jurica</span>
                     <span>$<%= pedido.subtotal ? pedido.subtotal.toLocaleString('es-MX', { minimumFractionDigits: 2 }) : '0.00' %></span>
@@ -170,6 +193,17 @@ window.perfilUsuario = {
 <meta name="csrf-token" content="<%= csrfToken %>">
 
 <script>
+// Paso 6.1: No cancelar — cerrar modal de confirmación y regresar al detalle
+document.getElementById('btnNoCancelar').addEventListener('click', () => {
+    document.getElementById('modalConfirmarCancelacion').classList.add('hidden');
+});
+
+// Paso 7: Confirmar cancelación — enviar el form
+document.getElementById('btnConfirmarCancelacion').addEventListener('click', () => {
+    const form = document.getElementById('formCancelarOrden');
+    if (form) form.submit();
+});
+
 // Búsqueda en historial
 document.querySelector('.pedidos-search input').addEventListener('input', function () {
     const query = this.value.trim().toLowerCase();
@@ -230,7 +264,7 @@ document.querySelector('.btn-exportar').addEventListener('click', async function
             if (!res.ok) throw new Error('Error al fetchear detalle');
             const { orden, detalles } = await res.json();
             
-            let folio = orden.folio || 'A' + String(orden.id_orden).padStart(4, '0');
+            let folio = 'A' + String(orden.id_orden).padStart(4, '0');
             
             let csvDetail = '"Producto","Unidades","Precio Unitario","Total"\n';
             detalles.forEach(d => {
@@ -265,15 +299,18 @@ document.querySelector('.btn-exportar').addEventListener('click', async function
 const modal = document.getElementById('modalDetalleOrden');
 const closeBtn = modal.querySelector('.btn-close-modal');
 
-closeBtn.addEventListener('click', () => {
+function cerrarModalDetalle() {
     modal.classList.add('hidden');
     modal.style.display = 'none';
-});
-modal.addEventListener('click', (e) => { 
-    if (e.target === modal) {
-        modal.classList.add('hidden');
-        modal.style.display = 'none';
+    if (window._contadorCancelacion) {
+        clearInterval(window._contadorCancelacion);
+        window._contadorCancelacion = null;
     }
+}
+
+closeBtn.addEventListener('click', cerrarModalDetalle);
+modal.addEventListener('click', (e) => {
+    if (e.target === modal) cerrarModalDetalle();
 });
 
 document.querySelectorAll('.pedidos-row').forEach(row => {
@@ -284,7 +321,7 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
             const { orden, detalles } = await res.json();
 
             // Fill summary
-            document.getElementById('modal-folio').textContent = orden.folio || 'A' + String(orden.id_orden).padStart(4, '0');
+            document.getElementById('modal-folio').textContent = 'A' + String(orden.id_orden).padStart(4, '0');
             const fecha = orden.fecha_realizada ? new Date(orden.fecha_realizada).toLocaleDateString('es-MX') : 'N/A';
             document.getElementById('modal-fecha').textContent = fecha;
             
@@ -305,18 +342,57 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
 
             // Boton de Cancelar
             const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-            console.log("csrf:", csrfToken); // Agrégalo temporalmente para verificar
+
+            // Limpiar contador anterior si existía
+            if (window._contadorCancelacion) {
+                clearInterval(window._contadorCancelacion);
+                window._contadorCancelacion = null;
+            }
 
             if(orden.cancelar == true){
                 btnContainer.innerHTML = `
-                    <form action="/orden/cancelar/${orden.id_orden}" method="POST">
-                        <input type="hidden" name="_csrf" value="${csrfToken}">
-                        <button type="submit"
-                            class="inline-flex items-center justify-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-colors duration-200">
-                            Cancelar Orden
-                        </button>
-                    </form>
+                    <div class="flex flex-col items-end gap-1">
+                        <form id="formCancelarOrden" action="/orden/cancelar/${orden.id_orden}" method="POST">
+                            <input type="hidden" name="_csrf" value="${csrfToken}">
+                            <button type="button" id="btnAbrirConfirmacion"
+                                class="inline-flex items-center justify-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-colors duration-200">
+                                Cancelar Orden
+                            </button>
+                        </form>
+                        <p class="text-xs text-gray-500">Tiempo restante para cancelar: <span id="contadorTiempo" class="font-semibold text-red-500"></span></p>
+                    </div>
                 `;
+
+                // Paso 6: abrir modal de confirmación en lugar de enviar directo
+                document.getElementById('btnAbrirConfirmacion').addEventListener('click', () => {
+                    document.getElementById('modalConfirmarCancelacion').classList.remove('hidden');
+                });
+
+                // Contador regresivo
+                let segundos = orden.segundosRestantes || 0;
+                const spanContador = document.getElementById('contadorTiempo');
+
+                function actualizarContador() {
+                    const m = String(Math.floor(segundos / 60)).padStart(2, '0');
+                    const s = String(segundos % 60).padStart(2, '0');
+                    spanContador.textContent = `${m}:${s}`;
+                }
+                actualizarContador();
+
+                window._contadorCancelacion = setInterval(() => {
+                    segundos--;
+                    if (segundos <= 0) {
+                        clearInterval(window._contadorCancelacion);
+                        window._contadorCancelacion = null;
+                        spanContador.textContent = '00:00';
+                        // Ocultar botón y mostrar mensaje de tiempo expirado
+                        document.getElementById('btnAbrirConfirmacion').disabled = true;
+                        document.getElementById('btnAbrirConfirmacion').classList.add('opacity-50', 'cursor-not-allowed');
+                        document.getElementById('btnAbrirConfirmacion').textContent = 'Tiempo expirado';
+                    } else {
+                        actualizarContador();
+                    }
+                }, 1000);
             }
 
             // Fill products

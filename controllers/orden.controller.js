@@ -198,13 +198,15 @@ exports.getDetalleOrden = async (req, res) => {
 
             if(esCancelable){
                 orden.cancelar = true;
+                const limiteMs = configuracion.tiempo_de_cancelacion * 60 * 1000;
+                const transcurridoMs = ahora - fechaOrden;
+                orden.segundosRestantes = Math.max(0, Math.floor((limiteMs - transcurridoMs) / 1000));
             }
             else{
                 orden.cancelar = false;
+                orden.segundosRestantes = 0;
             }
         }
-
-        console.log(orden.cancelar)
 
         const detalles = await ordenModel.obtenerDetalleOrden(req.params.id_orden);
         res.json({ orden, detalles });
