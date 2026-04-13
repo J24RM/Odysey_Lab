@@ -75,7 +75,7 @@
     <!-- Mensaje de confirmacion -->
     <div id="modal-success" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
         <div class="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full text-center mx-4">
-            <h2 class="text-xl font-bold text-gray-900 mb-2">¡Orden confirmada!</h2>
+            <h2 id="modal-order-msg" class="text-xl font-bold text-gray-900 mb-2"></h2>
             <p id="modal-success-msg" class="text-gray-600 text-sm"></p>
             <p class="text-gray-400 text-xs mt-4">Haz clic en cualquier lugar para cerrar</p>
         </div>
@@ -335,6 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (params.get('success')) {
         const modalSuccess = document.getElementById('modal-success');
         document.getElementById('modal-success-msg').textContent = decodeURIComponent(params.get('success'));
+        document.getElementById('modal-order-msg').textContent = decodeURIComponent(params.get('order'));
         modalSuccess.classList.remove('hidden');
         window.history.replaceState({}, '', '/cliente/mis-pedidos');
 

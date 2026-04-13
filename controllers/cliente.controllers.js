@@ -2,7 +2,7 @@ const Orden = require('../models/orden.model');
 
 exports.getMisPedidos = async (request, response) => {
     try {
-        const id_usuario = 35; // Hardcoded until auth sessions are implemented
+        const id_usuario = request.session.usuario;
         const pedidos = await Orden.obtenerOrdenesPorUsuario(id_usuario);
 
         response.render('cliente/mis_pedidos', { 
