@@ -6,7 +6,7 @@ const ordenesController = require("../controllers/orden.controller.js")
 router.get("/detalle/:id_orden", ordenesController.getDetalleOrden);
 
 // Registrar Orden
-router.post("/registrar/:id_orden", ordenesController.postRegistrarOrden);
+router.post("/registrar", ordenesController.registrarOrden);
 
 // Cancelar Orden
 router.post("/cancelar/:id_orden", ordenesController.postCancelarOrden);

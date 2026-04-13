@@ -51,6 +51,7 @@ async function cambiarCantidad(idProducto, delta) {
   actualizarSubtotal();
 }
 
+
 async function eliminarProducto(idProducto) {
   const res = await fetch('/cart/items/' + idProducto, {
     method: 'POST',
@@ -98,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     actualizarSubtotal();
     const params = new URLSearchParams(window.location.search);
     if (params.get('error')) {
-        mostrarError('No se pudo agregar el producto:');
+        mostrarError(decodeURIComponent(params.get('error')));
         window.history.replaceState({}, '', '/cart');
     }
 });
