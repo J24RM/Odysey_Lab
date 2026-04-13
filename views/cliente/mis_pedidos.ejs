@@ -47,6 +47,8 @@
                         </p>
                     </div>
                 </div>
+                <!-- Boton de Cancelar -->
+                <div id="btn-cancelar" class="w-full flex justify-end mt-4"> </div>
             </div>
 
             <!-- Titulo y Exportar -->
@@ -157,6 +159,9 @@
 
 <%- include('../includes/_footer') %>
 
+
+<meta name="csrf-token" content="<%= csrfToken %>">
+
 <script>
 document.querySelector('.btn-exportar').addEventListener('click', async function() {
     const btn = this;
@@ -255,6 +260,25 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
             document.getElementById('modal-subtotal').textContent = orden.subtotal ? 
                 Number(orden.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2 }) : '0.00';
 
+            const btnContainer = document.getElementById('btn-cancelar');
+            btnContainer.innerHTML = '';
+
+            // Boton de Cancelar
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+            console.log("csrf:", csrfToken); // Agrégalo temporalmente para verificar
+
+            if(orden.cancelar == true){
+                btnContainer.innerHTML = `
+                    <form action="/orden/cancelar/${orden.id_orden}" method="POST">
+                        <input type="hidden" name="_csrf" value="${csrfToken}">
+                        <button type="submit"
+                            class="inline-flex items-center justify-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow transition-colors duration-200">
+                            Cancelar Orden
+                        </button>
+                    </form>
+                `;
+            }
+
             // Fill products
             const container = document.getElementById('modal-productos');
             container.innerHTML = '';
@@ -321,6 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
+
 
 </body>
 </html>

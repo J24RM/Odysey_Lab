@@ -129,6 +129,13 @@ app.use((request, response, next) => {
     response.status(404).send("La ruta no existe");
 });
 
+app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+        return res.status(403).send('Token CSRF inválido');
+    }
+    next(err);
+});
+
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
