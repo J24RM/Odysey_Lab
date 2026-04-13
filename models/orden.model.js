@@ -25,7 +25,7 @@ module.exports = class Orden {
                 subtotal: 0,
                 id_usuario: id_usuario,
                 id_campania: 1,
-                // los demás campos déjalos null o con default en DB
+                fecha_realizada: null,
                     }
                 ])
         .select()
@@ -36,35 +36,20 @@ module.exports = class Orden {
         return carrito;
     }
 
-    static async registrarOrden(id_orden) {
-        console.log('[DEBUG registrarOrden] id_orden recibido:', id_orden);
-        // Obtener los detalles para calcular el subtotal
-        const { data: detalles, error: detError } = await supabase
-            .from('detalle_orden')
-            .select('cantidad, id_producto, producto(precio_unitario)')
+    static async registrarOrden(id_orden, subtotal, folio, sucursal) {
+        const { data: orden, error} = await supabase
+            .from('orden')
+            .update({
+                estado: 'confirmada',
+                folio: folio,
+                subtotal: subtotal,
+                fecha_realizada: new Date().toLocaleString(),
+                id_sucursal: sucursal
+            })
             .eq('id_orden', id_orden);
 
-        if (detError) throw detError;
-
-        // Calcular subtotal
-        let subtotal = 0;
-        detalles.forEach(d => {
-            subtotal += d.cantidad * d.producto.precio_unitario;
-        });
-
-        // Cambiar estado de 'carrito' a 'confirmada'
-        const { data: orden, error } = await supabase
-            .from('orden')
-            .update({ estado: 'confirmada', subtotal, fecha_realizada: new Date().toISOString() })
-            .eq('id_orden', id_orden)
-            .eq('estado', 'carrito')
-            .select()
-            .maybeSingle();
-
-        console.log('[DEBUG registrarOrden] resultado update:', orden, '| error:', error);
         if (error) throw error;
-        if (!orden) throw new Error('La orden ya fue registrada o no se encontró');
-        return orden;
+        return orden || [];
     }
 
     static async obtenerOrdenesPorUsuario(id_usuario) {
@@ -79,12 +64,22 @@ module.exports = class Orden {
         return ordenes || [];
     }
 
-    static async cancelarOrden(id_orden) {
+    static async CancelarOrden(id_orden) {
         const { data: orden, error } = await supabase
             .from('orden')
             .update({ estado: 'cancelada' })
             .eq('id_orden', id_orden)
-            .select()
+            .single();
+
+        if (error) throw error;
+        return orden;
+    }
+
+    static async ObtenerOrdenPorId(id_orden){
+        const {data: orden, error} = await supabase
+            .from('orden')
+            .select('*')
+            .eq('id_orden', id_orden)
             .single();
 
         if (error) throw error;

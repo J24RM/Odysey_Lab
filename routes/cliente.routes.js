@@ -20,6 +20,9 @@ router.get('/mis-pedidos', clienteController.getMisPedidos);
 //Ruta get para ver el perfil
 router.get('/profile', cuentaController.getProfile);
 
+//Ruta get para datos del perfil (AJAX)
+router.get('/perfil-datos', cuentaController.getProfileData);
+
 //Cambiar de cuenta
 router.post('/profile/cuenta-activa', clienteController.setCuentaActiva);
 

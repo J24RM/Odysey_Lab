@@ -8,6 +8,9 @@ const path = require("path");
 const multer = require('multer');
 const csrf = require('csurf');
 const csrfProtection = csrf();
+const { log } = require('./utils/logger');
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000;
 
 // Archivos de rutas
 const authRoutes = require('./routes/auth.routes');
@@ -46,21 +49,34 @@ const fileStorage = multer.diskStorage({
 });
 
 const fileFilter = (request, file, callback) => {
-    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
+    const imageTypes = ['image/png', 'image/jpg', 'image/jpeg'];
+    const csvTypes = [
+        'text/csv',
+        'application/csv',
+        'text/plain',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ];
+    if (imageTypes.includes(file.mimetype) || csvTypes.includes(file.mimetype)) {
         callback(null, true);
     } else {
         callback(null, false);
     }
 };
 
+app.use(multer({ storage: fileStorage, fileFilter }).fields([
+    { name: 'imagen', maxCount: 1 },
+    { name: 'imagenes', maxCount: 50 },
+    { name: 'archivoCSV', maxCount: 1 }
+]));
+
 app.use(csrfProtection);
 
-app.use((req, res, next) => {
-    res.locals.csrfToken = req.csrfToken();
+app.use((request, response, next) => {
+    response.locals.csrfToken = request.csrfToken();
+    response.locals.sucursal_activa = request.session.sucursal_activa || null;
     next();
 });
-
-app.use(multer({ storage: fileStorage, fileFilter }).single('imagen'));
 
 // Servir archivos estáticos de la carpeta uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -78,11 +94,34 @@ app.get('/', (request, response) => {
 // app.use(estadisticasRoutes);
 // ESAS LINEAS DAN FALLO
 
-//Middleware global de autenticacion
+//Middleware global de autenticacion e inactividad
 app.use((request, response, next) => {
     if (!request.session.usuario) {
         return response.redirect('/login');
     }
+
+    const now = Date.now();
+    if (request.session.lastActivity && (now - request.session.lastActivity) > INACTIVITY_TIMEOUT) {
+        return request.session.destroy(() => {
+            response.redirect('/login?motivo=inactividad');
+        });
+    }
+    request.session.lastActivity = now;
+    next();
+});
+
+// Evitar que el navegador cachee páginas protegidas (bloquea el botón regresar post-logout)
+app.use((request, response, next) => {
+    response.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    response.setHeader('Pragma', 'no-cache');
+    response.setHeader('Expires', '0');
+    next();
+});
+
+// Log de navegación entre rutas
+app.use((request, response, next) => {
+    const rol = request.session.id_rol === 2 ? 'ADMIN' : 'CLIENTE';
+    log(rol, 'NAV', `id: ${request.session.usuario} → ${request.method} ${request.path}`);
     next();
 });
 
@@ -128,6 +167,13 @@ app.use("/orden", requireCliente, ordenRoutes);
 
 app.use((request, response, next) => {
     response.status(404).send("La ruta no existe");
+});
+
+app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+        return res.status(403).send('Token CSRF inválido');
+    }
+    next(err);
 });
 
 app.listen(PORT, () => {
