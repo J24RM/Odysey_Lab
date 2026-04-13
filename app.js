@@ -60,7 +60,10 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(multer({ storage: fileStorage, fileFilter }).single('imagen'));
+app.use(multer({ storage: fileStorage, fileFilter }).fields([
+    { name: 'imagen', maxCount: 1 },
+    { name: 'imagenes', maxCount: 50 }
+]));
 
 // Servir archivos estáticos de la carpeta uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

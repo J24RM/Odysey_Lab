@@ -17,6 +17,8 @@ exports.getAgregarProducto = (request, response) => {
         usuario: request.session.usuario,
         formulario: null,
         mensaje: null,
+        mensajeBulk: null,
+        errorBulk: null,
         error: null
     });
 };
@@ -25,7 +27,7 @@ exports.getAgregarProducto = (request, response) => {
 exports.postAgregarProducto = async (request, response) => {
     try {
         const { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo } = request.body;
-        const imagen = request.file;
+        const imagen = request.files?.['imagen']?.[0];
 
         // Validar que todos los campos requeridos estén presentes
         if (!nombre || !descripcion || !clave || !unidad_venta || !unidad_medida || !peso || !precio_unitario || !imagen) {
@@ -33,6 +35,8 @@ exports.postAgregarProducto = async (request, response) => {
                 usuario: request.session.usuario,
                 formulario: { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo },
                 mensaje: null,
+                mensajeBulk: null,
+                errorBulk: null,
                 error: 'Todos los campos son obligatorios. Por favor, llena todos los campos.'
             });
         }
@@ -77,6 +81,8 @@ exports.postAgregarProducto = async (request, response) => {
                     tipo: 'exito',
                     activo: es_activo
                 },
+                mensajeBulk: null,
+                errorBulk: null,
                 error: null
             });
         } catch (dbError) {
@@ -97,6 +103,8 @@ exports.postAgregarProducto = async (request, response) => {
                     usuario: request.session.usuario,
                     formulario: { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo },
                     mensaje: null,
+                    mensajeBulk: null,
+                    errorBulk: null,
                     error: 'La clave del producto ya existe. Por favor, usa una clave diferente.'
                 });
             }
@@ -109,6 +117,8 @@ exports.postAgregarProducto = async (request, response) => {
             usuario: request.session.usuario,
             formulario: request.body,
             mensaje: null,
+            mensajeBulk: null,
+            errorBulk: null,
             error: 'Error al agregar el producto. Intenta de nuevo.'
         });
     }
@@ -254,12 +264,42 @@ exports.getFormEditarProducto = async (request, response) => {
     }
 };
 
+//Procesar carga masiva de imágenes
+exports.postCargarImagenes = (request, response) => {
+    const archivos = request.files?.['imagenes'] || [];
+
+    if (archivos.length === 0) {
+        return response.render('admin/home_agregarProducto', {
+            usuario: request.session.usuario,
+            formulario: null,
+            mensaje: null,
+            mensajeBulk: null,
+            errorBulk: 'No se recibió ninguna imagen. Asegúrate de seleccionar archivos PNG, JPG o JPEG.',
+            error: null
+        });
+    }
+
+    const nombresGuardados = archivos.map(f => f.filename);
+
+    return response.render('admin/home_agregarProducto', {
+        usuario: request.session.usuario,
+        formulario: null,
+        mensaje: null,
+        mensajeBulk: {
+            cantidad: archivos.length,
+            nombres: nombresGuardados
+        },
+        errorBulk: null,
+        error: null
+    });
+};
+
 //Procesar formulario de editar producto
 exports.postEditarProducto = async (request, response) => {
     try {
         const { id } = request.params;
         const { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo } = request.body;
-        const imagen = request.file;
+        const imagen = request.files?.['imagen']?.[0];
 
         // Validar campos obligatorios
         if (!nombre || !descripcion || !clave || !unidad_venta || !unidad_medida || !peso || !precio_unitario) {
