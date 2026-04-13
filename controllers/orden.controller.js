@@ -137,12 +137,42 @@ exports.registrarOrden = async (req, res) => {
 
 exports.postCancelarOrden = async (req, res) => {
     try {
-        const { id_orden } = req.params;
-        await ordenModel.cancelarOrden(id_orden);
-        res.redirect('/cliente/mis-pedidos');
+        const orden = await OrdenModel.ObtenerOrdenPorId(req.params.id_orden);
+
+        const configuracion = await configuracionModel.ObtenerConfiguracionActiva();
+        console.log(configuracion)
+
+        // Tiempo actual en México
+        const ahora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
+
+        console.log(ahora)
+
+
+        // Convertir fecha_realizada a Date 
+        const fechaOrden = new Date(orden[0].fecha_realizada.replace(" ", "T"));
+
+        console.log(fechaOrden)
+
+        // Diferencia en minutos, le agregamos 20 segundos mas
+        const diferenciaMinutos = (ahora.getTime() + 20000 - fechaOrden.getTime()) / (1000 * 60);
+
+        console.log(diferenciaMinutos)
+
+        const esCancelable = diferenciaMinutos <= configuracion.tiempo_de_cancelacion;
+
+        console.log(esCancelable)
+
+        if(esCancelable){
+            await OrdenModel.CancelarOrden(req.params.id_orden)
+        }
+        else{
+            req.session.error = "No se puede cancelar"
+        }
+        return res.redirect('/cliente/mis-pedidos')
+
     } catch (error) {
-        console.error('Error al cancelar orden:', error);
-        res.redirect('/cliente/mis-pedidos');
+        console.error("❌ Error:", error.message, error.stack);
+        return res.status(500).json({ ok: false, mensaje: error.message });
     }
 };
 
