@@ -65,6 +65,22 @@
     </div>
 </div>
 
+     <!-- Error -->
+      <div id="error-container"
+        class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50
+          bg-red-100 border border-red-400 text-red-700
+          px-6 py-3 rounded-xl shadow-md text-sm font-medium">
+        </div> 
+
+    <!-- Mensaje de confirmacion -->
+    <div id="modal-success" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full text-center mx-4">
+            <h2 class="text-xl font-bold text-gray-900 mb-2">¡Orden confirmada!</h2>
+            <p id="modal-success-msg" class="text-gray-600 text-sm"></p>
+            <p class="text-gray-400 text-xs mt-4">Haz clic en cualquier lugar para cerrar</p>
+        </div>
+    </div>
+
 <!-- Contenido principal -->
 <div class="pedidos-container flex-1">
     <h1 class="pedidos-titulo">Ordenes</h1>
@@ -79,6 +95,7 @@
                 </svg>
             </button>
         </div>
+
 
         <div class="pedidos-actions">
             <button class="btn-exportar" type="button">Exportar todo el historial</button>
@@ -299,6 +316,34 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
         }
     });
 });
+
+// Error
+function mostrarError(mensaje) {
+    const contenedor = document.getElementById('error-container');
+    contenedor.textContent = mensaje;
+    contenedor.classList.remove('hidden');
+    setTimeout(() => contenedor.classList.add('hidden'), 4000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error')) {
+        mostrarError(decodeURIComponent(params.get('error')));
+        window.history.replaceState({}, '', '/cliente/mis-pedidos');
+    }
+
+    if (params.get('success')) {
+        const modalSuccess = document.getElementById('modal-success');
+        document.getElementById('modal-success-msg').textContent = decodeURIComponent(params.get('success'));
+        modalSuccess.classList.remove('hidden');
+        window.history.replaceState({}, '', '/cliente/mis-pedidos');
+
+        modalSuccess.addEventListener('click', () => {
+            modalSuccess.classList.add('hidden');
+        });
+    }
+});
+
 </script>
 
 
