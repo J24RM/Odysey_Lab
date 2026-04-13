@@ -8,6 +8,9 @@ const path = require("path");
 const multer = require('multer');
 const csrf = require('csurf');
 const csrfProtection = csrf();
+const { log } = require('./utils/logger');
+
+const INACTIVITY_TIMEOUT = 30 * 60 * 1000;
 
 // Archivos de rutas
 const authRoutes = require('./routes/auth.routes');
@@ -90,11 +93,34 @@ app.get('/', (request, response) => {
 // app.use(estadisticasRoutes);
 // ESAS LINEAS DAN FALLO
 
-//Middleware global de autenticacion
+//Middleware global de autenticacion e inactividad
 app.use((request, response, next) => {
     if (!request.session.usuario) {
         return response.redirect('/login');
     }
+
+    const now = Date.now();
+    if (request.session.lastActivity && (now - request.session.lastActivity) > INACTIVITY_TIMEOUT) {
+        return request.session.destroy(() => {
+            response.redirect('/login?motivo=inactividad');
+        });
+    }
+    request.session.lastActivity = now;
+    next();
+});
+
+// Evitar que el navegador cachee páginas protegidas (bloquea el botón regresar post-logout)
+app.use((request, response, next) => {
+    response.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    response.setHeader('Pragma', 'no-cache');
+    response.setHeader('Expires', '0');
+    next();
+});
+
+// Log de navegación entre rutas
+app.use((request, response, next) => {
+    const rol = request.session.id_rol === 2 ? 'ADMIN' : 'CLIENTE';
+    log(rol, 'NAV', `id: ${request.session.usuario} → ${request.method} ${request.path}`);
     next();
 });
 

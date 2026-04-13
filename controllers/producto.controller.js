@@ -2,6 +2,7 @@ const Producto = require('../models/producto.model');
 const xlsx = require('xlsx');
 const path = require('path');
 const fs = require('fs');
+const { log } = require('../utils/logger');
 
 //Obtener todos los productos (admin)
 exports.getProductos = async (request, response) => {
@@ -77,6 +78,8 @@ exports.postAgregarProducto = async (request, response) => {
                 activo: es_activo,
                 clave
             });
+
+            log('ADMIN', 'PRODUCTO AGREGADO', `id_admin: ${request.session.usuario}, producto: "${nombre}" (clave: ${clave})`);
 
             // Mostrar el mensaje de éxito
             return response.render('admin/home_agregarProducto', {
@@ -618,6 +621,8 @@ exports.postEditarProducto = async (request, response) => {
                 activo: es_activo,
                 clave
             });
+
+            log('ADMIN', 'PRODUCTO EDITADO', `id_admin: ${request.session.usuario}, id_producto: ${id} (clave: ${clave})`);
 
             return response.render('admin/home_editarProducto', {
                 usuario: request.session.usuario,

@@ -1,10 +1,12 @@
 // Controllers
 const Usuario = require('../models/usuario.model');
 const Producto = require('../models/producto.model');
+const { log } = require('../utils/logger');
 
 //Muestra el Login
 exports.getLogin = (request, response) => {
-    response.render('login', { mensaje: "Ingresa tus credenciales para acceder" });
+    const motivo = request.query.motivo || null;
+    response.render('login', { mensaje: "Ingresa tus credenciales para acceder", motivo });
 };
 
 //Ingresa credenciales
@@ -23,26 +25,29 @@ exports.postLogin = async (request, response) => {
 
         // Validar que existe el usuario y la contraseña coincide
         if (!usuarioData || usuarioData.password_hash !== password) {
-            return response.render('login', { mensaje: "Usuario y/o contraseña incorrectos" });
+            return response.render('login', { mensaje: "Usuario y/o contraseña incorrectos", motivo: null });
         }
 
         // Guardar solo id_usuario en la sesión
         request.session.usuario = usuarioData.id_usuario;
         request.session.id_rol = usuarioData.id_rol;
+        request.session.lastActivity = Date.now();
 
         // Redirigir según id_rol (1 = cliente, 2 = admin)
         if (usuarioData.id_rol === 2) {
+            log('ADMIN', 'LOGIN', `id: ${usuarioData.id_usuario}`);
             return response.redirect('/admin/home');
         } else if (usuarioData.id_rol === 1) {
+            log('CLIENTE', 'LOGIN', `id: ${usuarioData.id_usuario}`);
             return response.redirect('/cliente/home');
         }
 
         // Si id_rol no es reconocido
-        response.render('login', { mensaje: "Usuario y/o contraseña incorrectos" });
+        response.render('login', { mensaje: "Usuario y/o contraseña incorrectos", motivo: null });
 
     } catch (error) {
         console.error('Error en login:', error);
-        response.render('login', { mensaje: "Error en el servidor. Intenta de nuevo." });
+        response.render('login', { mensaje: "Error en el servidor. Intenta de nuevo.", motivo: null });
     }
 };
 
@@ -139,8 +144,16 @@ exports.getClienteHome = async (request, response) => {
 
 //Se accede al dar clic en "Cerrar sesion"
 exports.logout = (request, response) => {
-    request.session.destroy(() => {
-        response.redirect('/login');
+    const usuario = request.session.usuario;
+    const rol = request.session.id_rol === 2 ? 'ADMIN' : 'CLIENTE';
+
+    request.session.destroy((err) => {
+        if (err) {
+            log(rol, 'LOGOUT ERROR', `id: ${usuario} — no se pudo destruir la sesión`);
+            return response.redirect('/login?motivo=error_logout');
+        }
+        log(rol, 'LOGOUT', `id: ${usuario}`);
+        response.redirect('/login?motivo=logout');
     });
 };
 

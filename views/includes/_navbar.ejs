@@ -1,3 +1,21 @@
+<!-- Timer de inactividad: 2 minutos sin actividad cierra la sesión -->
+<script>
+(function () {
+    const TIMEOUT = 30 * 60 * 1000;
+    let timer;
+    function resetTimer() {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            window.location.href = '/logout';
+        }, TIMEOUT);
+    }
+    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function (e) {
+        document.addEventListener(e, resetTimer, true);
+    });
+    resetTimer();
+})();
+</script>
+
 <nav class="w-full flex items-center justify-between px-6 py-3 border-b border-gray-200" style="background-color: rgba(0, 120, 169, 0.1);">
     <!-- Logo -->
     <a href="/cliente/home" class="flex-shrink-0">

@@ -4,6 +4,7 @@ const productoModel = require("../models/producto.model");
 const configuracionModel = require("../models/configuracion.model")
 const transporter = require("../utils/nodemailer");
 const supabase = require('../utils/supabase');
+const { log } = require('../utils/logger');
 
 exports.getOrdenes = async (req, res) => {
 
@@ -109,7 +110,7 @@ exports.registrarOrden = async (req, res) => {
 
         await transporter.sendMail(mailOptions);
 
-        console.log("Se envio el correo a " + correo)
+        log('CLIENTE', 'PEDIDO REALIZADO', `id_cliente: ${id_usuario}, folio: ${folio}, subtotal: $${subtotal.toFixed(2)}`);
 
         return res.redirect('/cliente/mis-pedidos?success=' + encodeURIComponent("Se envió un correo con el detalle de tu orden confirmada") + '&order=' + encodeURIComponent("Orden confirmada"));
 
@@ -157,7 +158,8 @@ exports.postCancelarOrden = async (req, res) => {
         const esCancelable = diferenciaMinutos <= configuracion.tiempo_de_cancelacion;
 
         if(esCancelable){
-            await ordenModel.CancelarOrden(req.params.id_orden)
+            await ordenModel.CancelarOrden(req.params.id_orden);
+            log('CLIENTE', 'PEDIDO CANCELADO', `id_cliente: ${req.session.usuario}, id_orden: ${req.params.id_orden}`);
         }
         else{
             return res.redirect('/cliente/mis-pedidos?error=' + encodeURIComponent("El tiempo de cancelacion expiro"));
