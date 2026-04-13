@@ -1,20 +1,25 @@
 const Orden = require('../models/orden.model');
+const Usuario = require('../models/usuario.model');
 
 exports.getMisPedidos = async (request, response) => {
     try {
         const id_usuario = request.session.usuario;
-        const pedidos = await Orden.obtenerOrdenesPorUsuario(id_usuario);
-
-        response.render('cliente/mis_pedidos', { 
+        const [pedidos, usuarioData] = await Promise.all([
+            Orden.obtenerOrdenesPorUsuario(id_usuario),
+            Usuario.obtenerClientePorId(id_usuario).catch(() => null)
+        ]);
+        response.render('cliente/mis_pedidos', {
             usuario: request.session.usuario,
             pedidos: pedidos,
+            usuarioData: usuarioData,
             error: request.session.error,
         });
     } catch (error) {
         console.error('Error fetching orders:', error);
-        response.render('cliente/mis_pedidos', { 
+        response.render('cliente/mis_pedidos', {
             usuario: request.session.usuario,
             pedidos: [],
+            usuarioData: null,
             error: request.session.error,
         });
     }

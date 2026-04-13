@@ -45,7 +45,7 @@
                     </div>
 
                     <!-- Table Body -->
-                    <div id="clientesBody" class="divide-y divide-gray-200">
+                    <div id="clientesBody" class="divide-y divide-gray-200 flex flex-col">
                         <% if (clientes.length === 0) { %>
                             <p class="px-6 py-8 text-center text-gray-400 text-sm">No hay clientes registrados.</p>
                         <% } %>
@@ -79,18 +79,95 @@
         const rows = document.querySelectorAll('.cliente-row');
         const noResults = document.getElementById('noResults');
 
+        // Banner que indica resultados aproximados
+        const fuzzyBanner = document.createElement('p');
+        fuzzyBanner.id = 'fuzzyBanner';
+        fuzzyBanner.className = 'hidden px-6 py-3 text-center text-blue-500 text-sm bg-blue-50 border-b border-blue-100';
+        fuzzyBanner.textContent = 'No se encontró una coincidencia exacta. Mostrando resultados similares:';
+        document.getElementById('clientesBody').before(fuzzyBanner);
+
+        /**
+         * Devuelve un puntaje de similitud entre 0 y 1.
+         * Combina dos criterios:
+         *   1. Subsecuencia: todos los caracteres del query aparecen en orden en el texto.
+         *   2. Frecuencia de caracteres coincidentes.
+         */
+        function fuzzyScore(text, query) {
+            // Subsecuencia
+            let qi = 0;
+            for (let i = 0; i < text.length && qi < query.length; i++) {
+                if (text[i] === query[qi]) qi++;
+            }
+            if (qi === query.length) return 1;
+
+            // Frecuencia de caracteres
+            const textChars = text.split('');
+            let matches = 0;
+            for (const ch of query) {
+                const idx = textChars.indexOf(ch);
+                if (idx !== -1) {
+                    matches++;
+                    textChars.splice(idx, 1);
+                }
+            }
+            return matches / query.length;
+        }
+
+        const FUZZY_THRESHOLD = 0.45;
+
         searchInput.addEventListener('input', function () {
             const query = this.value.toLowerCase().trim();
-            let visibleCount = 0;
 
+            // Resetear estado
+            rows.forEach(row => {
+                row.style.display = '';
+                row.style.order = '';
+            });
+            noResults.classList.add('hidden');
+            fuzzyBanner.classList.add('hidden');
+
+            if (query === '') return;
+
+            // 1. Búsqueda exacta (substring)
+            let exactCount = 0;
             rows.forEach(row => {
                 const text = row.dataset.search.toLowerCase();
-                const matches = text.includes(query);
-                row.style.display = matches ? '' : 'none';
-                if (matches) visibleCount++;
+                if (text.includes(query)) {
+                    exactCount++;
+                } else {
+                    row.style.display = 'none';
+                }
             });
 
-            noResults.classList.toggle('hidden', visibleCount > 0 || query === '');
+            if (exactCount > 0) return;
+
+            // 2. Sin resultados exactos → búsqueda aproximada
+            const scored = [];
+            rows.forEach(row => {
+                const text = row.dataset.search.toLowerCase();
+                const score = fuzzyScore(text, query);
+                scored.push({ row, score });
+            });
+
+            // Ordenar por puntaje descendente
+            scored.sort((a, b) => b.score - a.score);
+
+            const hasApprox = scored[0].score >= FUZZY_THRESHOLD;
+
+            scored.forEach(({ row, score }, idx) => {
+                if (score >= FUZZY_THRESHOLD) {
+                    row.style.display = '';
+                    row.style.order = idx; // preservar orden de relevancia
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (hasApprox) {
+                fuzzyBanner.classList.remove('hidden');
+            } else {
+                noResults.classList.remove('hidden');
+            }
         });
     </script>
 

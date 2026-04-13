@@ -20,13 +20,15 @@ document.getElementById("btnPerfil").addEventListener("click", () => {
 
     title.textContent = "PERFIL"
 
+    const perfil = window.perfilUsuario || { nombre: 'Jose Nava', email: 'joseNava@gmail.com', telefono: '442 891 2133' };
+
     body.innerHTML = `
     <div style="display: flex; align-items: flex-start; gap: 24px; padding: 8px 0;">
         <!-- Avatar y nombre -->
         <div style="display: flex; flex-direction: column; align-items: center; min-width: 100px;">
             <img src="/img/iconoPerfil.png" alt="Perfil"
                  style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd; margin-bottom: 8px;">
-            <span style="font-weight: 600; font-size: 14px; text-align: center;">Jose Nava</span>
+            <span style="font-weight: 600; font-size: 14px; text-align: center;">${perfil.nombre}</span>
         </div>
 
         <!-- Info de contacto -->
@@ -35,11 +37,11 @@ document.getElementById("btnPerfil").addEventListener("click", () => {
             <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
                 <tr>
                     <td style="border: 1px solid #dee2e6; padding: 8px 12px; font-weight: 600;">Número telefónico:</td>
-                    <td style="border: 1px solid #dee2e6; padding: 8px 12px; text-align: right;">442 891 2133</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px 12px; text-align: right;">${perfil.telefono}</td>
                 </tr>
                 <tr>
                     <td style="border: 1px solid #dee2e6; padding: 8px 12px; font-weight: 600;">Correo electrónico:</td>
-                    <td style="border: 1px solid #dee2e6; padding: 8px 12px; text-align: right;">joseNava@gmail.com</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px 12px; text-align: right;">${perfil.email}</td>
                 </tr>
             </table>
 
@@ -63,7 +65,7 @@ document.getElementById("btnPerfil").addEventListener("click", () => {
 // Modal toggling logic for Tailwind CSS custom modals
 document.addEventListener("DOMContentLoaded", () => {
     const modals = document.querySelectorAll('.tw-modal');
-    
+
     // Open modals
     document.querySelectorAll('[data-bs-toggle="modal"]').forEach(trigger => {
         trigger.addEventListener('click', (e) => {

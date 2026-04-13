@@ -37,12 +37,12 @@ module.exports = class Orden {
     }
 
     static async registrarOrden(id_orden, subtotal, folio, sucursal) {
-        const { data: orden, error} = await supabase 
+        const { data: orden, error} = await supabase
             .from('orden')
             .update({
-                estado: 'confirmada', 
+                estado: 'confirmada',
                 folio: folio,
-                subtotal: subtotal, 
+                subtotal: subtotal,
                 fecha_realizada: new Date().toLocaleString(),
                 id_sucursal: sucursal
             })
