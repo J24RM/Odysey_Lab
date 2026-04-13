@@ -279,10 +279,10 @@ document.querySelector('.btn-exportar').addEventListener('click', async function
             
             let csvDetail = '"Producto","Unidades","Precio Unitario","Total"\n';
             detalles.forEach(d => {
-                const nombre = d.producto.nombre.replace(/"/g, '""'); // Escape comillas dobles en CSV
-                const precio = d.producto.precio_unitario;
+                const nombre = (d.producto && d.producto.nombre) ? d.producto.nombre.replace(/"/g, '""') : 'Producto Desconocido'; 
+                const precio = d.producto ? parseFloat(d.producto.precio_unitario || 0) : 0;
                 const total = precio * d.cantidad;
-                csvDetail += `"${nombre}","${d.cantidad}","$${precio}","$${total}"\n`;
+                csvDetail += `"${nombre}","${d.cantidad}","$${precio.toFixed(2)}","$${total.toFixed(2)}"\n`;
             });
             
             detallesFolder.file(`detalle_${folio}.csv`, "\uFEFF" + csvDetail);

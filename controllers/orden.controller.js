@@ -151,15 +151,16 @@ exports.postCancelarOrden = async (req, res) => {
         const ahora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
 
 
-        // Convertir fecha_realizada a Date 
-        const fechaOrden = new Date(orden.fecha_realizada.replace(" ", "T"));
+        let esCancelable = false;
+        if (orden && orden.fecha_realizada) {
+            // Convertir fecha_realizada a Date 
+            const fechaOrden = new Date(orden.fecha_realizada.replace(" ", "T"));
 
+            // Diferencia en minutos, le agregamos 20 segundos mas
+            const diferenciaMinutos = (ahora.getTime() + 20000 - fechaOrden.getTime()) / (1000 * 60);
 
-        // Diferencia en minutos, le agregamos 20 segundos mas
-        const diferenciaMinutos = (ahora.getTime() + 20000 - fechaOrden.getTime()) / (1000 * 60);
-
-
-        const esCancelable = diferenciaMinutos <= configuracion.tiempo_de_cancelacion;
+            esCancelable = diferenciaMinutos <= configuracion.tiempo_de_cancelacion;
+        }
 
         if(esCancelable){
             await ordenModel.CancelarOrden(req.params.id_orden);
@@ -190,20 +191,24 @@ exports.getDetalleOrden = async (req, res) => {
             const ahora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
 
 
-            // Convertir fecha_realizada a Date 
-            const fechaOrden = new Date(orden.fecha_realizada.replace(" ", "T"));
+            let esCancelable = false;
+            let transcurridoMs = 0;
+            let limiteMs = configuracion.tiempo_de_cancelacion * 60 * 1000;
+            let fechaOrden = null;
 
+            if (orden && orden.fecha_realizada) {
+                // Convertir fecha_realizada a Date 
+                fechaOrden = new Date(orden.fecha_realizada.replace(" ", "T"));
 
-            // Diferencia en minutos
-            const diferenciaMinutos = (ahora - fechaOrden) / (1000 * 60);
+                // Diferencia en minutos
+                const diferenciaMinutos = (ahora - fechaOrden) / (1000 * 60);
 
+                esCancelable = diferenciaMinutos <= configuracion.tiempo_de_cancelacion;
+                transcurridoMs = ahora - fechaOrden;
+            }
 
-            const esCancelable = diferenciaMinutos <= configuracion.tiempo_de_cancelacion;
-
-            if(esCancelable){
+            if(esCancelable && fechaOrden){
                 orden.cancelar = true;
-                const limiteMs = configuracion.tiempo_de_cancelacion * 60 * 1000;
-                const transcurridoMs = ahora - fechaOrden;
                 orden.segundosRestantes = Math.max(0, Math.floor((limiteMs - transcurridoMs) / 1000));
             }
             else{
@@ -355,7 +360,7 @@ exports.getPdfOrden = async (req, res) => {
 
         for (let i = 0; i < detalles.length; i++) {
             const d = detalles[i];
-            const prod = d.producto;
+            const prod = d.producto || { nombre: 'Producto Desconocido', clave: 'N/A', precio_unitario: 0 };
             const precioUnitario = parseFloat(prod.precio_unitario) || 0;
             const subtotalProd = parseFloat((precioUnitario * d.cantidad).toFixed(2));
 
