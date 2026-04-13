@@ -14,6 +14,13 @@
 // pedidos viene del controlador
 %>
 
+<script>
+window.perfilUsuario = {
+    nombre:   "<%= usuarioData && usuarioData.nombre   ? usuarioData.nombre   : (usuarioData && usuarioData.email ? usuarioData.email : 'Usuario') %>",
+    email:    "<%= usuarioData && usuarioData.email    ? usuarioData.email    : '' %>",
+    telefono: "<%= usuarioData && usuarioData.telefono ? usuarioData.telefono : 'N/A' %>"
+};
+</script>
 <%- include('../includes/_navbar') %>
 
 
@@ -122,7 +129,7 @@
             <% pedidos.forEach((pedido) => { %>
                 <% const fecha = pedido.fecha_realizada ? new Date(pedido.fecha_realizada).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Sin fecha'; %>
                 <% const estado = pedido.estado.charAt(0).toUpperCase() + pedido.estado.slice(1); %>
-                <div class="pedidos-row" data-id="<%= pedido.id_orden %>" style="cursor:pointer;">
+                <div class="pedidos-row" data-id="<%= pedido.id_orden %>" data-fecha="<%= pedido.fecha_realizada || '' %>" style="cursor:pointer;">
                     <span><%= pedido.folio || 'A' + String(pedido.id_orden).padStart(4, '0') %></span>
                     <span><%= fecha %></span>
                     <span>Concesionario Jurica</span>
@@ -141,6 +148,39 @@
 <%- include('../includes/_footer') %>
 
 <script>
+// Búsqueda en historial
+document.querySelector('.pedidos-search input').addEventListener('input', function () {
+    const query = this.value.trim().toLowerCase();
+    document.querySelectorAll('.pedidos-row').forEach(row => {
+        const texto = row.innerText.toLowerCase();
+        row.style.display = texto.includes(query) ? '' : 'none';
+    });
+});
+
+// Filtro por periodo de tiempo
+document.querySelector('.select-filter').addEventListener('change', function () {
+    const valor = this.value;
+    const ahora = new Date();
+    let diasAtras = null;
+
+    if (valor === '7 días')       diasAtras = 7;
+    else if (valor === '30 días') diasAtras = 30;
+    else if (valor === '90 días') diasAtras = 90;
+    else if (valor === 'Último año') diasAtras = 365;
+
+    document.querySelectorAll('.pedidos-row').forEach(row => {
+        const fechaISO = row.dataset.fecha;
+        if (!diasAtras || !fechaISO) {
+            row.style.display = '';
+            return;
+        }
+        const fechaPedido = new Date(fechaISO);
+        const limite = new Date(ahora);
+        limite.setDate(ahora.getDate() - diasAtras);
+        row.style.display = fechaPedido >= limite ? '' : 'none';
+    });
+});
+
 document.querySelector('.btn-exportar').addEventListener('click', async function() {
     const btn = this;
     const originalText = btn.innerText;

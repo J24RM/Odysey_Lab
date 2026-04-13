@@ -86,6 +86,7 @@ app.use((request, response, next) => {
     next();
 });
 
+
 //Middleware de autorizacion para rutas admin
 const requireAdmin = (request, response, next) => {
     if (request.session.id_rol !== 2) {

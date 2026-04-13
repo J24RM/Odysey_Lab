@@ -37,6 +37,7 @@ module.exports = class Orden {
     }
 
     static async registrarOrden(id_orden) {
+        console.log('[DEBUG registrarOrden] id_orden recibido:', id_orden);
         // Obtener los detalles para calcular el subtotal
         const { data: detalles, error: detError } = await supabase
             .from('detalle_orden')
@@ -54,12 +55,13 @@ module.exports = class Orden {
         // Cambiar estado de 'carrito' a 'confirmada'
         const { data: orden, error } = await supabase
             .from('orden')
-            .update({ estado: 'confirmada', subtotal })
+            .update({ estado: 'confirmada', subtotal, fecha_realizada: new Date().toISOString() })
             .eq('id_orden', id_orden)
             .eq('estado', 'carrito')
             .select()
             .maybeSingle();
 
+        console.log('[DEBUG registrarOrden] resultado update:', orden, '| error:', error);
         if (error) throw error;
         if (!orden) throw new Error('La orden ya fue registrada o no se encontró');
         return orden;
