@@ -13,6 +13,17 @@ module.exports = class Calificacion {
         return data || null;
     }
 
+    static async obtenerPorProducto(id_producto) {
+        const { data, error } = await supabase
+            .from('calificacion')
+            .select('rating, descripcion, fecha, usuario(email)')
+            .eq('id_producto', id_producto)
+            .order('fecha', { ascending: false });
+
+        if (error) throw error;
+        return data || [];
+    }
+
     static async insertar({ id_producto, id_usuario, rating, descripcion }) {
         const { data, error } = await supabase
             .from('calificacion')

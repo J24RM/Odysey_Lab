@@ -200,13 +200,17 @@ exports.getProductoCliente = async (request, response) => {
                 '/img/botePintura.png'
             ]
         };
-        const calificacionExistente = await Calificacion.buscarPorUsuarioYProducto(request.session.usuario, id);
+        const [calificacionExistente, resenas] = await Promise.all([
+            Calificacion.buscarPorUsuarioYProducto(request.session.usuario, id),
+            Calificacion.obtenerPorProducto(id)
+        ]);
 
         response.render('cliente/product', {
             usuario: request.session.usuario,
             productoId: id,
             producto,
-            calificacion: calificacionExistente
+            calificacion: calificacionExistente,
+            resenas
         });
     } catch (error) {
         console.error('Error in getProductoCliente:', error);
