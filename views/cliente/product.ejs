@@ -154,14 +154,14 @@
         <p class="text-sm text-gray-500 mb-4">¿Qué te pareció el producto? Comparte tu experiencia.</p>
         <div class="flex items-center gap-2">
           <span class="text-sm font-semibold text-gray-700 mr-1">Tu calificación:</span>
-          <div class="flex gap-1">
-            <img src="/img/estrellita.png" alt="1 estrella" class="w-8 h-8 cursor-pointer opacity-30 hover:opacity-100 transition"/>
-            <img src="/img/estrellita.png" alt="2 estrellas" class="w-8 h-8 cursor-pointer opacity-30 hover:opacity-100 transition"/>
-            <img src="/img/estrellita.png" alt="3 estrellas" class="w-8 h-8 cursor-pointer opacity-100 transition"/>
-            <img src="/img/estrellita.png" alt="4 estrellas" class="w-8 h-8 cursor-pointer opacity-30 hover:opacity-100 transition"/>
-            <img src="/img/estrellita.png" alt="5 estrellas" class="w-8 h-8 cursor-pointer opacity-30 hover:opacity-100 transition"/>
+          <div class="flex gap-1" id="estrellas">
+            <img src="/img/estrellita.png" data-valor="1" alt="1 estrella" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
+            <img src="/img/estrellita.png" data-valor="2" alt="2 estrellas" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
+            <img src="/img/estrellita.png" data-valor="3" alt="3 estrellas" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
+            <img src="/img/estrellita.png" data-valor="4" alt="4 estrellas" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
+            <img src="/img/estrellita.png" data-valor="5" alt="5 estrellas" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
           </div>
-          <span class="text-sm text-gray-400 ml-1">(3 de 5)</span>
+          <span class="text-sm text-gray-400 ml-1" id="label-estrellas">Selecciona una calificación</span>
         </div>
       </div>
 
@@ -172,15 +172,16 @@
       <div class="flex-1 flex flex-col gap-3">
         <label class="text-sm font-semibold text-gray-700">Comentario <span class="font-normal text-gray-400">(opcional)</span></label>
         <textarea
+          id="comentario-calificacion"
           rows="2"
           placeholder="Escribe aquí tu opinión sobre el producto..."
-          class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-700 resize-none focus:outline-none"
-          disabled
+          class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-700 resize-none focus:outline-none focus:border-gray-400"
         ></textarea>
         <div class="flex justify-end">
           <button
+            id="btn-enviar-calificacion"
             disabled
-            class="px-6 py-2.5 text-sm font-semibold text-white rounded-lg opacity-60 cursor-not-allowed"
+            class="px-6 py-2.5 text-sm font-semibold text-white rounded-lg opacity-40 cursor-not-allowed transition"
             style="background-color: #002736;"
           >
             Enviar calificación
@@ -204,6 +205,42 @@
 
     </div>
   </section>
+
+  <script>
+    const estrellas = document.querySelectorAll('.estrella');
+    const labelEstrellas = document.getElementById('label-estrellas');
+    const btnEnviar = document.getElementById('btn-enviar-calificacion');
+    const labels = ['', 'Muy malo', 'Malo', 'Regular', 'Bueno', '¡Excelente!'];
+    let calificacionSeleccionada = 0;
+
+    function pintarEstrellas(cantidad) {
+      estrellas.forEach((e, i) => {
+        e.classList.toggle('opacity-100', i < cantidad);
+        e.classList.toggle('opacity-30', i >= cantidad);
+      });
+    }
+
+    estrellas.forEach(estrella => {
+      estrella.addEventListener('mouseenter', () => {
+        pintarEstrellas(parseInt(estrella.dataset.valor));
+      });
+
+      estrella.addEventListener('mouseleave', () => {
+        pintarEstrellas(calificacionSeleccionada);
+      });
+
+      estrella.addEventListener('click', () => {
+        calificacionSeleccionada = parseInt(estrella.dataset.valor);
+        pintarEstrellas(calificacionSeleccionada);
+        labelEstrellas.textContent = labels[calificacionSeleccionada];
+        labelEstrellas.classList.remove('text-gray-400');
+        labelEstrellas.classList.add('text-gray-700', 'font-semibold');
+        btnEnviar.disabled = false;
+        btnEnviar.classList.remove('opacity-40', 'cursor-not-allowed');
+        btnEnviar.classList.add('hover:opacity-90', 'cursor-pointer');
+      });
+    });
+  </script>
 
 </body>
 </html>
