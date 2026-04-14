@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const path = require("path");
@@ -26,11 +26,24 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
+const pgSession = require('connect-pg-simple')(session);
+
 app.use(session({
-    secret: 'mi string secreto que debe ser un string aleatorio muy largo, no como éste',
-    resave: false, // La sesión no se guardará en cada petición, sino sólo se guardará si algo cambió
-    saveUninitialized: false, // Asegura que no se guarde una sesión para una petición que no lo necesita
+    store: new pgSession({
+        conString: process.env.DATABASE_URL,
+        tableName: 'session',
+        ssl: { rejectUnauthorized: false }
+    }),
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 60 * 1000
+    }
 }));
+
+
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
