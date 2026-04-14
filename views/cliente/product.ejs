@@ -59,12 +59,20 @@
         </h1>
 
         <!-- Estrellas -->
-        <div class="flex items-center gap-1 mb-4">
-          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
-          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
-          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
-          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
-          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
+        <%
+          const promedioDetalle = resenas.length
+            ? Math.round(resenas.reduce((s, r) => s + r.rating, 0) / resenas.length * 10) / 10
+            : 0;
+        %>
+        <div class="flex items-center gap-1 mb-1">
+          <% for (let i = 1; i <= 5; i++) { %>
+            <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6 <%= i <= Math.round(promedioDetalle) ? 'opacity-100' : 'opacity-20' %>"/>
+          <% } %>
+          <% if (resenas.length > 0) { %>
+            <span class="text-sm text-gray-500 ml-1"><%= promedioDetalle %> (<%= resenas.length %> <%= resenas.length === 1 ? 'reseña' : 'reseñas' %>)</span>
+          <% } else { %>
+            <span class="text-sm text-gray-400 ml-1">Sin calificaciones aún</span>
+          <% } %>
         </div>
 
         <hr class="border-gray-200 mb-4"/>

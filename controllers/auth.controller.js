@@ -1,6 +1,7 @@
 // Controllers
 const Usuario = require('../models/usuario.model');
 const Producto = require('../models/producto.model');
+const Calificacion = require('../models/calificacion.model');
 
 //Muestra el Login
 exports.getLogin = (request, response) => {
@@ -121,10 +122,16 @@ exports.getClienteHome = async (request, response) => {
         }
 
         const totalPages = searchQuery ? 1 : Math.ceil(total / limit);
+        const promedios = await Calificacion.obtenerPromediosTodos();
+
+        productos = productos.map(p => ({
+            ...p,
+            promedio: promedios[p.id_producto] || 0
+        }));
 
         response.render('cliente/home', {
             usuario: request.session.usuario,
-            productos: productos,
+            productos,
             searchQuery: searchQuery,
             total: total,
             page: page,

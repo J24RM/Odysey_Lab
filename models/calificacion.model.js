@@ -13,6 +13,27 @@ module.exports = class Calificacion {
         return data || null;
     }
 
+    static async obtenerPromediosTodos() {
+        const { data, error } = await supabase
+            .from('calificacion')
+            .select('id_producto, rating');
+
+        if (error) throw error;
+
+        const mapa = {};
+        for (const { id_producto, rating } of data) {
+            if (!mapa[id_producto]) mapa[id_producto] = { suma: 0, cantidad: 0 };
+            mapa[id_producto].suma += rating;
+            mapa[id_producto].cantidad += 1;
+        }
+
+        const resultado = {};
+        for (const [id, { suma, cantidad }] of Object.entries(mapa)) {
+            resultado[id] = Math.round((suma / cantidad) * 10) / 10;
+        }
+        return resultado;
+    }
+
     static async obtenerPorProducto(id_producto) {
         const { data, error } = await supabase
             .from('calificacion')
