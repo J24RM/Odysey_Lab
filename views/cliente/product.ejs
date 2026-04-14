@@ -206,10 +206,37 @@
     </div>
   </section>
 
+  <!-- MODAL CALIFICACIÓN ENVIADA -->
+  <div id="modal-calificacion" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+    <!-- Fondo oscuro -->
+    <div class="absolute inset-0 bg-black opacity-40"></div>
+    <!-- Contenido -->
+    <div class="relative bg-white rounded-2xl shadow-xl px-10 py-8 flex flex-col items-center gap-4 max-w-sm w-full mx-4">
+      <!-- Ícono check -->
+      <div class="w-16 h-16 rounded-full flex items-center justify-center" style="background-color: #e6f4ea;">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h3 class="text-xl font-bold text-gray-900">¡Gracias por tu opinión!</h3>
+      <p class="text-sm text-gray-500 text-center">Tu calificación fue enviada con éxito. Tu comentario nos ayuda a mejorar.</p>
+      <button
+        id="btn-cerrar-modal"
+        class="mt-2 px-8 py-2.5 text-sm font-semibold text-white rounded-lg"
+        style="background-color: #002736;"
+      >
+        Cerrar
+      </button>
+    </div>
+  </div>
+
   <script>
     const estrellas = document.querySelectorAll('.estrella');
     const labelEstrellas = document.getElementById('label-estrellas');
     const btnEnviar = document.getElementById('btn-enviar-calificacion');
+    const comentarioInput = document.getElementById('comentario-calificacion');
+    const modal = document.getElementById('modal-calificacion');
+    document.getElementById('btn-cerrar-modal').addEventListener('click', () => modal.classList.add('hidden'));
     const labels = ['', 'Muy malo', 'Malo', 'Regular', 'Bueno', '¡Excelente!'];
     let calificacionSeleccionada = 0;
 
@@ -239,6 +266,45 @@
         btnEnviar.classList.remove('opacity-40', 'cursor-not-allowed');
         btnEnviar.classList.add('hover:opacity-90', 'cursor-pointer');
       });
+    });
+
+    btnEnviar.addEventListener('click', async () => {
+      if (!calificacionSeleccionada) return;
+
+      btnEnviar.disabled = true;
+      btnEnviar.textContent = 'Enviando...';
+
+      try {
+        const res = await fetch('/cliente/product/<%= productoId %>/calificacion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'CSRF-Token': '<%= csrfToken %>'
+          },
+          body: JSON.stringify({
+            rating: calificacionSeleccionada,
+            descripcion: comentarioInput.value.trim()
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.ok) {
+          btnEnviar.textContent = '¡Calificación enviada!';
+          btnEnviar.style.backgroundColor = '#16a34a';
+          estrellas.forEach(e => e.style.pointerEvents = 'none');
+          comentarioInput.disabled = true;
+          modal.classList.remove('hidden');
+        } else {
+          btnEnviar.textContent = data.error || 'Error al enviar';
+          btnEnviar.style.backgroundColor = '#dc2626';
+          btnEnviar.disabled = false;
+        }
+      } catch (err) {
+        btnEnviar.textContent = 'Error de conexión';
+        btnEnviar.style.backgroundColor = '#dc2626';
+        btnEnviar.disabled = false;
+      }
     });
   </script>
 
