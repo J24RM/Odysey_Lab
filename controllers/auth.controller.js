@@ -1,8 +1,10 @@
 // Controllers
 const Usuario = require('../models/usuario.model');
 const Producto = require('../models/producto.model');
-const { log } = require('../utils/logger');
 const Calificacion = require('../models/calificacion.model');
+const bcrypt = require('bcrypt');
+const { generateToken } = require('../utils/jwt');
+const { log } = require('../utils/logger');
 
 //Muestra el Login
 exports.getLogin = (request, response) => {
@@ -10,31 +12,47 @@ exports.getLogin = (request, response) => {
     response.render('login', { mensaje: "Ingresa tus credenciales para acceder", motivo });
 };
 
-//Ingresa credenciales
 exports.postLogin = async (request, response) => {
     try {
         const { usuario, password } = request.body;
 
-        // Buscar usuario por email en la BD
         let usuarioData;
+
         try {
             usuarioData = await Usuario.encontrarPorEmail(usuario);
         } catch (error) {
-            // Si no encuentra el usuario, tratarlo como credenciales incorrectas
             usuarioData = null;
         }
 
-        // Validar que existe el usuario y la contraseña coincide
-        if (!usuarioData || usuarioData.password_hash !== password) {
-            return response.render('login', { mensaje: "Usuario y/o contraseña incorrectos", motivo: null });
+        // Validar existencia
+        if (!usuarioData) {
+            return response.render('login', { 
+                mensaje: "Usuario y/o contraseña incorrectos", 
+                motivo: null 
+            });
         }
 
-        // Guardar solo id_usuario en la sesión
-        request.session.usuario = usuarioData.id_usuario;
-        request.session.id_rol = usuarioData.id_rol;
-        request.session.lastActivity = Date.now();
+        const match = await bcrypt.compare(password, usuarioData.password_hash);
 
-        // Redirigir según id_rol (1 = cliente, 2 = admin)
+        if (!match) {
+            return response.render('login', { 
+                mensaje: "Usuario y/o contraseña incorrectos", 
+                motivo: null 
+            });
+        }
+
+        const token = generateToken({
+            id: usuarioData.id_usuario,
+            id_rol: usuarioData.id_rol,
+            id_cuenta: usuarioData.id_cuenta
+        });
+
+        response.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax'
+        });
+
         if (usuarioData.id_rol === 2) {
             log('ADMIN', 'LOGIN', `id: ${usuarioData.id_usuario}`);
             return response.redirect('/admin/home');
@@ -43,12 +61,17 @@ exports.postLogin = async (request, response) => {
             return response.redirect('/cliente/home');
         }
 
-        // Si id_rol no es reconocido
-        response.render('login', { mensaje: "Usuario y/o contraseña incorrectos", motivo: null });
+        return response.render('login', { 
+            mensaje: "Usuario y/o contraseña incorrectos", 
+            motivo: null 
+        });
 
     } catch (error) {
         console.error('Error en login:', error);
-        response.render('login', { mensaje: "Error en el servidor. Intenta de nuevo.", motivo: null });
+        return response.render('login', { 
+            mensaje: "Error en el servidor. Intenta de nuevo.", 
+            motivo: null 
+        });
     }
 };
 

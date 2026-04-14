@@ -1,10 +1,11 @@
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config();
+}
 const express = require('express');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const bodyParser = require('body-parser');
-const session = require('express-session');
-const path = require("path");
+const jwt = require('jsonwebtoken'); 
 const multer = require('multer');
 const csrf = require('csurf');
 const csrfProtection = csrf();
@@ -27,7 +28,7 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 app.use(session({
-    secret: 'mi string secreto que debe ser un string aleatorio muy largo, no como éste',
+    secret: process.env.SESSION_SECRET,
     resave: false, // La sesión no se guardará en cada petición, sino sólo se guardará si algo cambió
     saveUninitialized: false, // Asegura que no se guarde una sesión para una petición que no lo necesita
 }));
@@ -47,6 +48,9 @@ const fileStorage = multer.diskStorage({
         callback(null, `${timestamp}_${name}${ext}`);
     },
 });
+
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
 const fileFilter = (request, file, callback) => {
     const imageTypes = ['image/png', 'image/jpg', 'image/jpeg'];
@@ -96,9 +100,9 @@ app.get('/', (request, response) => {
 
 //Middleware global de autenticacion e inactividad
 app.use((request, response, next) => {
-    if (!request.session.usuario) {
-        return response.redirect('/login');
-    }
+    const authMiddleware = require('./middlewares/auth.middleware');
+
+    app.use(authMiddleware);
 
     const now = Date.now();
     if (request.session.lastActivity && (now - request.session.lastActivity) > INACTIVITY_TIMEOUT) {
@@ -177,5 +181,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+    console.log(`Servidor corriendo en puerto ${PORT}`);
 });
