@@ -148,18 +148,23 @@ window.perfilUsuario = {
     </div>
 
     <!-- Resumen estadísticas -->
+    <%
+        const hoy = new Date().toDateString();
+        const ordenesDe_hoy = pedidos.filter(p => p.fecha_realizada && new Date(p.fecha_realizada).toDateString() === hoy).length;
+        const ordenesConfirmadas = pedidos.filter(p => p.estado === 'confirmada').length;
+    %>
     <div class="pedidos-stats">
         <div class="stat-item">
             <span class="stat-label">Hoy</span>
-            <span class="stat-value">0</span>
+            <span class="stat-value"><%= ordenesDe_hoy %></span>
         </div>
         <div class="stat-item">
             <span class="stat-label">Ordenes Totales</span>
-            <span class="stat-value">32</span>
+            <span class="stat-value"><%= pedidos.length %></span>
         </div>
         <div class="stat-item">
             <span class="stat-label">Ordenes confirmadas</span>
-            <span class="stat-value">32</span>
+            <span class="stat-value"><%= ordenesConfirmadas %></span>
         </div>
     </div>
 
@@ -256,10 +261,14 @@ document.querySelector('.btn-exportar').addEventListener('click', async function
 
     try {
         const zip = new JSZip();
-        
+        const fechaExport = new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
         // Generar CSV general
         const rows = document.querySelectorAll('.pedidos-row');
-        let csvMain = '"Orden","Fecha","Cliente","Total","Estatus"\n';
+        let csvMain = '"HISTORIAL DE PEDIDOS - PPG Industries"\n';
+        csvMain += `"Exportado el:","${fechaExport}"\n`;
+        csvMain += `"Total de órdenes:","${rows.length}"\n\n`;
+        csvMain += '"Orden","Fecha","Cliente","Total","Estatus"\n';
         rows.forEach(row => {
             const data = Array.from(row.querySelectorAll('span')).map(s => s.innerText.trim());
             csvMain += `"${data[0]}","${data[1]}","${data[2]}","${data[3]}","${data[4]}"\n`;
@@ -274,17 +283,29 @@ document.querySelector('.btn-exportar').addEventListener('click', async function
             const res = await fetch(`/orden/detalle/${idOrden}`);
             if (!res.ok) throw new Error('Error al fetchear detalle');
             const { orden, detalles } = await res.json();
-            
-            let folio = 'A' + String(orden.id_orden).padStart(4, '0');
-            
-            let csvDetail = '"Producto","Unidades","Precio Unitario","Total"\n';
+
+            const folio = 'A' + String(orden.id_orden).padStart(4, '0');
+            const fechaOrden = orden.fecha_realizada
+                ? new Date(orden.fecha_realizada).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })
+                : 'Sin fecha';
+            const subtotalOrden = orden.subtotal
+                ? parseFloat(orden.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2 })
+                : '0.00';
+
+            let csvDetail = `"DETALLE DE ORDEN - PPG Industries"\n`;
+            csvDetail += `"Folio:","${folio}"\n`;
+            csvDetail += `"Fecha:","${fechaOrden}"\n`;
+            csvDetail += `"Subtotal:","$${subtotalOrden}"\n`;
+            csvDetail += `"Exportado el:","${fechaExport}"\n\n`;
+            csvDetail += '"Producto","SKU","Unidades","Precio Unitario","Subtotal"\n';
             detalles.forEach(d => {
-                const nombre = (d.producto && d.producto.nombre) ? d.producto.nombre.replace(/"/g, '""') : 'Producto Desconocido'; 
+                const nombre = (d.producto && d.producto.nombre) ? d.producto.nombre.replace(/"/g, '""') : 'Producto Desconocido';
+                const sku = (d.producto && d.producto.clave) ? d.producto.clave : 'N/A';
                 const precio = d.producto ? parseFloat(d.producto.precio_unitario || 0) : 0;
                 const total = precio * d.cantidad;
-                csvDetail += `"${nombre}","${d.cantidad}","$${precio.toFixed(2)}","$${total.toFixed(2)}"\n`;
+                csvDetail += `"${nombre}","${sku}","${d.cantidad}","$${precio.toFixed(2)}","$${total.toFixed(2)}"\n`;
             });
-            
+
             detallesFolder.file(`detalle_${folio}.csv`, "\uFEFF" + csvDetail);
         });
 
@@ -439,6 +460,30 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
             // Enlace de descarga PDF
             document.getElementById('btn-descargar-pdf').href = `/orden/pdf/${idOrden}`;
 
+            // Exportar detalle de esta orden como CSV
+            modal.querySelector('.btn-exportar-small').onclick = () => {
+                const folioModal = document.getElementById('modal-folio').textContent;
+                const fechaModal = document.getElementById('modal-fecha').textContent;
+                const subtotalModal = document.getElementById('modal-subtotal').textContent;
+                let csv = `"DETALLE DE ORDEN - PPG Industries"\n`;
+                csv += `"Folio:","${folioModal}"\n`;
+                csv += `"Fecha:","${fechaModal}"\n`;
+                csv += `"Subtotal:","$${subtotalModal}"\n\n`;
+                csv += '"Producto","SKU","Unidades","Precio Unitario","Subtotal"\n';
+                detalles.forEach(d => {
+                    const nombre = (d.producto && d.producto.nombre) ? d.producto.nombre.replace(/"/g, '""') : 'Producto Desconocido';
+                    const sku = (d.producto && d.producto.clave) ? d.producto.clave : 'N/A';
+                    const precio = d.producto ? parseFloat(d.producto.precio_unitario || 0) : 0;
+                    const totalProd = precio * d.cantidad;
+                    csv += `"${nombre}","${sku}","${d.cantidad}","$${precio.toFixed(2)}","$${totalProd.toFixed(2)}"\n`;
+                });
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `detalle_${folioModal}.csv`;
+                link.click();
+            };
+
             modal.classList.remove('hidden');
             modal.style.display = 'flex';
         } catch (err) {
@@ -456,6 +501,9 @@ function mostrarError(mensaje) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Aplicar filtro por defecto al cargar
+    document.querySelector('.select-filter').dispatchEvent(new Event('change'));
+
     const params = new URLSearchParams(window.location.search);
     if (params.get('error')) {
         mostrarError(decodeURIComponent(params.get('error')));

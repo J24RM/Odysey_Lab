@@ -160,7 +160,22 @@ body {
 .pedidos-table-card {
     background: #fff;
     border-radius: 0;
-    overflow: hidden;
+    max-height: 560px;
+    overflow-y: auto;
+}
+
+.pedidos-table-card::-webkit-scrollbar {
+    width: 6px;
+}
+.pedidos-table-card::-webkit-scrollbar-track {
+    background: transparent;
+}
+.pedidos-table-card::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+.pedidos-table-card::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
 }
 
 .pedidos-table-head,
@@ -184,25 +199,9 @@ body {
     font-weight: 600;
     font-size: 14px;
     color: #000;
-}
-
-.pedidos-table-body {
-    max-height: 500px;
-    overflow-y: auto;
-}
-
-.pedidos-table-body::-webkit-scrollbar {
-    width: 6px;
-}
-.pedidos-table-body::-webkit-scrollbar-track {
-    background: transparent;
-}
-.pedidos-table-body::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-}
-.pedidos-table-body::-webkit-scrollbar-thumb:hover {
-    background: #aaa;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 .pedidos-row {
