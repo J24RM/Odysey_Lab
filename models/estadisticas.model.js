@@ -186,4 +186,16 @@ module.exports = class Estadisticas {
 
         return result;
     }
+
+    static async getStatsProductos(inicio, fin) {
+        const { data, error } = await supabase.rpc('stats_productos', {
+            fecha_inicio: inicio.toISOString().split('T')[0],
+            fecha_fin: fin.toISOString().split('T')[0]
+        });
+
+        if (error) throw error;
+
+        return data;
+    }
+
 };

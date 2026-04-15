@@ -1,0 +1,60 @@
+@startuml Estadisticas de Productos
+Title "Estadísticas de Productos - Comparación de Periodos"
+
+actor Navegador as nav
+boundary "stats_productos.ejs" as UI
+boundary "admin.routes.js" as ruta
+control "adminEstadisticasController.js" as ctrl
+entity "stats.model.js" as model
+database "Postgres (Supabase)" as DB
+
+activate nav
+nav -> ruta: GET /stats/productos?periodo=mes
+deactivate nav
+activate ruta
+ruta -> ctrl: getEstadisticasProductos(req, res)
+deactivate ruta
+
+activate ctrl
+
+ctrl -> ctrl: obtenerRangoFechas(periodo)
+
+ctrl -> ctrl: obtenerPeriodoAnterior(inicio, fin)
+
+ctrl ->> model: getStatsProductos(inicio, fin)
+activate model
+model ->> DB: supabase.rpc('stats_productos', {fecha_inicio, fecha_fin})
+activate DB
+note right of DB: Llamar al stored Procedure
+DB -->> model: data (actual)
+deactivate DB
+model -->> ctrl: actual (array productos)
+deactivate model
+
+ctrl ->> model: getStatsProductos(inicioAnterior, finAnterior)
+activate model
+model ->> DB: supabase.rpc('stats_productos', {fecha_inicio, fecha_fin})
+activate DB
+DB -->> model: data (anterior)
+deactivate DB
+model -->> ctrl: anterior (array productos)
+deactivate model
+
+ctrl -> ctrl: calcularComparacion(actual, anterior)
+
+loop Por cada producto en anterior
+    ctrl -> ctrl: mapaAnterior.set(id_producto, producto)
+end
+
+loop Por cada producto en actual
+    ctrl -> ctrl: Obtener prev del mapa\nCalcular % cantidad y ventas
+end
+
+ctrl --> UI: res.render('admin/stats_productos', {usuario, productos})
+deactivate ctrl
+activate UI
+UI --> nav: Vista con estadísticas
+deactivate UI
+activate nav
+
+@enduml

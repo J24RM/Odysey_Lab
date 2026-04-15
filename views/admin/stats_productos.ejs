@@ -29,11 +29,106 @@
         <a href="/admin/stats/productos" class="tab-link px-5 py-2.5 text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors border-b-2 border-transparent -mb-[2px]" data-tab="/admin/stats/productos">Productos</a>
     </div>
 
-    <!-- Placeholder -->
-    <div class="flex flex-col items-center justify-center py-24 text-center">
-        <div class="text-6xl mb-4">🏗️</div>
-        <h2 class="text-2xl font-bold text-gray-700 mb-2">Próximamente</h2>
-        <p class="text-gray-400 text-sm">Las estadísticas por producto estarán disponibles pronto.</p>
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Estadísticas de productos</h1>
+        <!-- BARRA BUSCADORA-->
+        <form method="GET" class="flex">
+            <input 
+                type="text" 
+                name="busqueda"
+                value="<%= busqueda %>"
+                placeholder="Buscar producto..."
+                class="border rounded-l-lg px-4 py-2 text-sm w-64 focus:outline-none"
+            />
+
+            <input type="hidden" name="periodo" value="<%= periodo %>">
+
+            <button class="bg-gray-200 px-4 rounded-r-lg text-sm hover:bg-gray-300">
+                🔍
+            </button>
+        </form>
+
+        <div class="flex gap-3">
+
+            <!-- FILTRO -->
+            <form method="GET">
+                <input type="hidden" name="busqueda" value="<%= busqueda %>">
+
+                <select 
+                    name="periodo"
+                    onchange="this.form.submit()"
+                    class="border rounded-lg px-3 py-2 text-sm"
+                >
+                    <option value="mes" <%= periodo === 'mes' ? 'selected' : '' %>>Último Mes</option>
+                    <option value="3meses" <%= periodo === '3meses' ? 'selected' : '' %>>Últimos 3 Meses</option>
+                    <option value="anio" <%= periodo === 'anio' ? 'selected' : '' %>>Este Año</option>
+                </select>
+            </form>
+
+            <button class="border px-4 py-2 rounded-lg text-sm hover:bg-gray-100">
+                Exportar
+            </button>
+
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-100 text-gray-600">
+                <tr>
+                    <th class="text-left px-6 py-4">Producto</th>
+                    <th class="text-center px-6 py-4">Cantidad Ordenada</th>
+                    <th class="text-center px-6 py-4">Ventas</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <% productos.forEach(p => { %>
+                    <tr onclick="window.location='/admin/stats/productos/<%= p.id_producto %>'"
+                        class="cursor-pointer border-t hover:bg-gray-50 transition">
+
+                        <!-- Producto -->
+                        <td class="px-6 py-4 flex items-center gap-4">
+                            <img src="/uploads/<%= p.url_imagen %>" class="w-12 h-12 object-cover rounded">
+                            <span class="font-semibold"><%= p.nombre %></span>
+                        </td>
+
+                        <!-- Cantidad -->
+                        <td class="px-6 py-4 text-center">
+                            <div class="font-bold text-lg"><%= p.cantidad %></div>
+
+                            <div class="text-sm font-medium
+                                <%= p.porcentajeCantidad >= 0 ? 'text-green-600' : 'text-red-500' %>">
+                                
+                                <% if (p.porcentajeCantidad >= 0) { %>
+                                    ▲ <%= Math.round(p.porcentajeCantidad) %>%
+                                <% } else { %>
+                                    ▼ <%= Math.abs(Math.round(p.porcentajeCantidad)) %>%
+                                <% } %>
+                            </div>
+                        </td>
+
+                        <!-- Ventas -->
+                        <td class="px-6 py-4 text-center">
+                            <div class="font-bold text-lg">
+                                $<%= p.ventas.toLocaleString() %>
+                            </div>
+
+                            <div class="text-sm font-medium
+                                <%= p.porcentajeVentas >= 0 ? 'text-green-600' : 'text-red-500' %>">
+                                
+                                <% if (p.porcentajeVentas >= 0) { %>
+                                    ▲ <%= Math.round(p.porcentajeVentas) %>%
+                                <% } else { %>
+                                    ▼ <%= Math.abs(Math.round(p.porcentajeVentas)) %>%
+                                <% } %>
+                            </div>
+                        </td>
+
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
     </div>
 
 </main>
