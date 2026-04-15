@@ -14,6 +14,7 @@ function actualizarSubtotal() {
     totalQty += qty;
   }
 
+
   document.getElementById('subtotal-display').textContent =
     '$ ' + subtotal.toLocaleString('es-MX');
 

@@ -29,24 +29,24 @@
 
   <%- include('../includes/_navbar') %>
 
+  
 
   <!-- SECCIÓN PRINCIPAL DEL PRODUCTO -->
   <section class="max-w-6xl mx-auto px-6 py-10 flex-1">
     <div class="flex flex-col lg:flex-row gap-10 items-start">
+
+      <!-- Error -->
+      <div id="error-container"
+        class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50
+          bg-red-100 border border-red-400 text-red-700
+          px-6 py-3 rounded-xl shadow-md text-sm font-medium">
+        </div> 
 
       <!-- Columna izquierda: imágenes -->
       <div class="flex flex-col gap-4 items-center lg:w-[340px] shrink-0">
         <!-- Imagen principal -->
         <div class="w-full flex justify-center">
           <img src="/uploads/<%= producto.imagen %>" alt="<%= producto.nombre %>" class="w-64 h-64 object-contain" />
-        </div>
-        <!-- Miniaturas -->
-        <div class="flex gap-3 justify-center">
-          <% for (let i = 0; i < producto.similars.length; i++) { %>
-          <div class="w-16 h-16 border border-gray-200 rounded overflow-hidden flex items-center justify-center bg-gray-50 cursor-pointer hover:border-yellow-400 transition">
-            <img src="<%= producto.similars[i] %>" alt="thumb<%= i+1 %>" class="w-full h-full object-contain p-1"/>
-          </div>
-          <% } %>
         </div>
       </div>
 
@@ -59,6 +59,7 @@
 
         <!-- Estrellas -->
         <%
+
           const promedioDetalle = resenas.length
             ? Math.round(resenas.reduce((s, r) => s + r.rating, 0) / resenas.length * 10) / 10
             : 0;
@@ -375,6 +376,22 @@
         btnEnviar.disabled = false;
       }
     });
+
+    function mostrarError(mensaje) {
+    const contenedor = document.getElementById('error-container');
+    contenedor.textContent = mensaje;
+    contenedor.classList.remove('hidden');
+    setTimeout(() => contenedor.classList.add('hidden'), 4000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error')) {
+        mostrarError(decodeURIComponent(params.get('error')));
+        window.history.replaceState({}, '', `/cliente/product/${request.body.id_producto}`);
+    }
+});
+
   </script>
 
 </body>
