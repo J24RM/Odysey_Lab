@@ -56,7 +56,7 @@ exports.registrarOrden = async (req, res) => {
 
         subtotal = parseFloat(subtotal.toFixed(2));
 
-        const folio = generarFolio();
+        const folio = 'A' + String(orden.id_orden).padStart(4, '0');
         let id_sucursal = req.session.id_sucursal || 2;
 
         await ordenModel.registrarOrden(id_carrito, subtotal, folio, id_sucursal);
@@ -121,25 +121,8 @@ exports.registrarOrden = async (req, res) => {
     } catch (error) {
         return res.redirect('/cliente/mis-pedidos?error=' + encodeURIComponent("No se pudo realizar la orden"));
     }
-
-    function generarFolio() {
-        const now = new Date();
-
-        const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-        const mes = letras[now.getMonth()];
-        const dia = letras[now.getDay()];
-
-        const hora = String(now.getHours()).padStart(2, "0");
-        const min = String(now.getMinutes()).padStart(2, "0");
-        const seg = String(now.getSeconds()).padStart(2, "0");
-        const year = now.getFullYear();
-
-        const random = Math.floor(Math.random() * 90 + 10); // 2 dígitos extra
-
-        return `F${mes}${dia}${hora}${min}${seg}${year}${random}`;
-        }
 };
+
 
 exports.postCancelarOrden = async (req, res) => {
     try {
