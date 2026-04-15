@@ -33,17 +33,27 @@ exports.getEstadisticasSucursales = (request, response) => {
 
 exports.getEstadisticasProductos = async (request, response) => {
     try {
+        const { periodo = "mes", busqueda = "" } = request.query;
+
         const { inicio, fin } = obtenerRangoFechas(request.query.periodo);
         const { inicioAnterior, finAnterior } = obtenerPeriodoAnterior(inicio, fin);
 
         const actual = await Estadisticas.getStatsProductos(inicio, fin);
         const anterior = await Estadisticas.getStatsProductos(inicioAnterior, finAnterior);
 
-        const productos = calcularComparacion(actual, anterior);
+        let productos = calcularComparacion(actual, anterior);
+
+        if (busqueda) {
+                productos = productos.filter(p =>
+                p.nombre.toLowerCase().includes(busqueda.toLowerCase())
+            );
+        }
 
         response.render('admin/stats_productos', {
             usuario: request.session.usuario,
-            productos
+            productos,
+            periodo,
+            busqueda
         });
     } catch (error) {
         console.error(error);
@@ -58,6 +68,15 @@ function obtenerRangoFechas(periodo = "mes") {
     if (periodo === "mes") {
         inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
         fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+    }
+    if (periodo === "3meses") {
+    inicio = new Date(hoy.getFullYear(), hoy.getMonth() - 2, 1);
+    fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+    }
+
+    if (periodo === "anio") {
+        inicio = new Date(hoy.getFullYear(), 0, 1);
+        fin = new Date(hoy.getFullYear(), 11, 31);
     }
     return { inicio, fin };
 }
