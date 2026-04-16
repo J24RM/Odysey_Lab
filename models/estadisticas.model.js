@@ -200,9 +200,9 @@ module.exports = class Estadisticas {
 
     static async getStatsProductoById(id, inicio, fin) {
         const { data, error } = await supabase.rpc('stats_producto_by_id', {
-            p_id_producto: id,
             fecha_inicio: inicio.toISOString().split('T')[0],
-            fecha_fin: fin.toISOString().split('T')[0]
+            fecha_fin: fin.toISOString().split('T')[0],
+            p_id_producto: id,
         });
 
         if (error) throw error;

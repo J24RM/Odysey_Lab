@@ -35,21 +35,23 @@ exports.getEstadisticasSucursales = (request, response) => {
 
 exports.getEstadisticasDetalleProducto = async (request, response) => {
     try {
-        const { id } = request.params;
+        console.log(request.params.id_producto)
+        const  id  = request.params.id_producto;
+        console.log(id)
         const { periodo = "mes" } = request.query;
 
         const { inicio, fin } = obtenerRangoFechas(periodo);
         const { inicioAnterior, finAnterior } = obtenerPeriodoAnterior(inicio, fin);
 
-        const actual = await statsModel.getStatsProductoById(id, inicio, fin);
-        const anterior = await statsModel.getStatsProductoById(id, inicioAnterior, finAnterior);
+        const actual = await Estadisticas.getStatsProductoById(id, inicio, fin);
+        const anterior = await Estadisticas.getStatsProductoById(id, inicioAnterior, finAnterior);
 
         const resumen = calcularComparacionProducto(actual, anterior);
 
-        const ordenesPorDia = await statsModel.getOrdenesPorDia(id, inicio, fin);
-        const ordenesPorDiaAnterior = await statsModel.getOrdenesPorDia(id, inicioAnterior, finAnterior);
+        const ordenesPorDia = await Estadisticas.getOrdenesPorDia(id, inicio, fin);
+        const ordenesPorDiaAnterior = await Estadisticas.getOrdenesPorDia(id, inicioAnterior, finAnterior);
 
-        const sucursales = await statsModel.getSucursalesProducto(id, inicio, fin);
+        const sucursales = await Estadisticas.getSucursalesProducto(id, inicio, fin);
 
         response.render('admin/stats_producto_detalle', {
         usuario: request.session.usuario,
