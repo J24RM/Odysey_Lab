@@ -209,11 +209,22 @@ module.exports = class Estadisticas {
         return data;
     }
 
-    static async getOrdenesPorDia(id, inicio, fin) {
-        const { data, error } = await supabase.rpc('ordenes_por_dia', {
-            p_id_producto: id,
+    static async getOrdenesMes(id, inicio, fin) {
+        const { data, error } = await supabase.rpc('ordenes_por_dia_mes', {
             fecha_inicio: inicio.toISOString().split('T')[0],
-            fecha_fin: fin.toISOString().split('T')[0]
+            fecha_fin: fin.toISOString().split('T')[0],
+            p_id_producto: id
+        });
+
+        if (error) throw error;
+        return data;
+    }
+
+    static async getOrdenesSemana(id, inicio, fin) {
+        const { data, error } = await supabase.rpc('ordenes_por_dia_semana', {
+            fecha_inicio: inicio.toISOString().split('T')[0],
+            fecha_fin: fin.toISOString().split('T')[0],
+            p_id_producto: id
         });
 
         if (error) throw error;

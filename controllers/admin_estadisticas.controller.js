@@ -35,21 +35,29 @@ exports.getEstadisticasSucursales = (request, response) => {
 
 exports.getEstadisticasDetalleProducto = async (request, response) => {
     try {
-        console.log(request.params.id_producto)
         const  id  = request.params.id_producto;
-        console.log(id)
-        const { periodo = "mes" } = request.query;
+        const { periodo = "semana" } = request.query;
 
         const { inicio, fin } = obtenerRangoFechas(periodo);
-        const { inicioAnterior, finAnterior } = obtenerPeriodoAnterior(inicio, fin);
+        const { inicioAnterior, finAnterior } = obtenerPeriodoAnterior(inicio, fin, periodo);
 
         const actual = await Estadisticas.getStatsProductoById(id, inicio, fin);
         const anterior = await Estadisticas.getStatsProductoById(id, inicioAnterior, finAnterior);
 
         const resumen = calcularComparacionProducto(actual, anterior);
 
-        const ordenesPorDia = await Estadisticas.getOrdenesPorDia(id, inicio, fin);
-        const ordenesPorDiaAnterior = await Estadisticas.getOrdenesPorDia(id, inicioAnterior, finAnterior);
+        let ordenesPorDia;
+        let ordenesPorDiaAnterior;
+
+        if (periodo === 'semana') {
+            ordenesPorDia = await Estadisticas.getOrdenesSemana(id, inicio, fin);
+            ordenesPorDiaAnterior = await Estadisticas.getOrdenesSemana(id, inicioAnterior, finAnterior);
+
+        } else {
+            ordenesPorDia = await Estadisticas.getOrdenesMes(id, inicio, fin);
+            ordenesPorDiaAnterior = await Estadisticas.getOrdenesMes(id, inicioAnterior, finAnterior, periodo);
+        }
+
 
         const sucursales = await Estadisticas.getSucursalesProducto(id, inicio, fin);
 
@@ -89,10 +97,11 @@ function calcularComparacionProducto(actual, anterior) {
 
 exports.getEstadisticasProductos = async (request, response) => {
     try {
-        const { periodo = "mes", busqueda = "" } = request.query;
+        const periodo = request.query.periodo || "semana";
+        const { busqueda = "" } = request.query;
 
-        const { inicio, fin } = obtenerRangoFechas(request.query.periodo);
-        const { inicioAnterior, finAnterior } = obtenerPeriodoAnterior(inicio, fin);
+        const { inicio, fin } = obtenerRangoFechas(periodo);
+        const { inicioAnterior, finAnterior } = obtenerPeriodoAnterior(inicio, fin, periodo);
 
         const actual = await Estadisticas.getStatsProductos(inicio, fin);
         const anterior = await Estadisticas.getStatsProductos(inicioAnterior, finAnterior);
@@ -108,6 +117,8 @@ exports.getEstadisticasProductos = async (request, response) => {
         response.render('admin/stats_productos', {
             usuario: request.session.usuario,
             productos,
+            actual,
+            anterior,
             periodo,
             busqueda
         });
@@ -125,23 +136,38 @@ function obtenerRangoFechas(periodo = "mes") {
         inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
         fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
     }
+
     if (periodo === "3meses") {
-    inicio = new Date(hoy.getFullYear(), hoy.getMonth() - 2, 1);
-    fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
+        inicio = new Date(hoy.getFullYear(), hoy.getMonth() - 2, 1);
+        fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
     }
 
-    if (periodo === "anio") {
-        inicio = new Date(hoy.getFullYear(), 0, 1);
-        fin = new Date(hoy.getFullYear(), 11, 31);
+    if (periodo === "semana") {
+        const dia = hoy.getDay(); 
+
+        inicio = new Date(hoy);
+        inicio.setDate(hoy.getDate() - dia); 
+
+        fin = new Date(inicio);
+        fin.setDate(inicio.getDate() + 6); 
     }
+
     return { inicio, fin };
 }
 
-function obtenerPeriodoAnterior(inicio, fin) {
+function obtenerPeriodoAnterior(inicio, fin, periodo) {
     const inicioAnterior = new Date(inicio);
     const finAnterior = new Date(fin);
-    inicioAnterior.setMonth(inicioAnterior.getMonth() - 1);
-    finAnterior.setMonth(finAnterior.getMonth() - 1);
+
+    if (periodo === "semana") {
+        inicioAnterior.setDate(inicioAnterior.getDate() - 7);
+        finAnterior.setDate(finAnterior.getDate() - 7);
+    } 
+    else if (periodo === "mes" || periodo === "3meses") {
+        inicioAnterior.setMonth(inicioAnterior.getMonth() - 1);
+        finAnterior.setMonth(finAnterior.getMonth() - 1);
+    }
+
     return { inicioAnterior, finAnterior };
 }
 

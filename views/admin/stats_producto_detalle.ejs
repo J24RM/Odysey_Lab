@@ -43,14 +43,11 @@
                 <input type="hidden" name="id" value="<%= producto.id_producto %>">
                 <select name="periodo" onchange="this.form.submit()"
                     class="border rounded-lg px-3 py-2 text-sm">
+                    <option value="semana" <%= periodo === 'semana' ? 'selected' : '' %>>Esta Semana</option>
                     <option value="mes" <%= periodo === 'mes' ? 'selected' : '' %>>Último Mes</option>
-                    <option value="anio" <%= periodo === 'anio' ? 'selected' : '' %>>Este Año</option>
                 </select>
 
             </form>
-            <button class="border px-4 py-2 rounded-lg text-sm hover:bg-gray-100">
-                Exportar
-            </button>
         </div>
     </div>
     <div class="grid grid-cols-2 gap-6 mb-8">

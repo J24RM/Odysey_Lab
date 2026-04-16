@@ -59,9 +59,8 @@
                     onchange="this.form.submit()"
                     class="border rounded-lg px-3 py-2 text-sm"
                 >
+                    <option value="semana" <%= periodo === 'semana' ? 'selected' : '' %>>Esta Semana</option>
                     <option value="mes" <%= periodo === 'mes' ? 'selected' : '' %>>Último Mes</option>
-                    <option value="3meses" <%= periodo === '3meses' ? 'selected' : '' %>>Últimos 3 Meses</option>
-                    <option value="anio" <%= periodo === 'anio' ? 'selected' : '' %>>Este Año</option>
                 </select>
             </form>
 
