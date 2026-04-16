@@ -32,14 +32,18 @@ exports.getEstadisticasSucursales = async (request, response) => {
         usuario: request.session.usuario,
         sucursales: [],
         total: 0,
+        frecuencias: [],
         dbConnected: false
     };
 
     try {
-        const stats = await Estadisticas.getEstadisticasSucursales();
-        if (stats) {
-            pageData = { ...pageData, ...stats, dbConnected: true };
-        }
+        const [statsVolumen, statsFrecuencia] = await Promise.all([
+            Estadisticas.getEstadisticasSucursales(),
+            Estadisticas.getFrequenciaSucursales()
+        ]);
+
+        if (statsVolumen)   pageData = { ...pageData, ...statsVolumen,   dbConnected: true };
+        if (statsFrecuencia) pageData = { ...pageData, ...statsFrecuencia };
     } catch (error) {
         console.error('Error fetching estadísticas de sucursales:', error);
     }

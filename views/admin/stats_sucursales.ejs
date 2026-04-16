@@ -65,6 +65,39 @@
         <% } %>
     </div>
 
+    <!-- Frecuencia de pedidos por sucursal -->
+    <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)] mt-6">
+        <p class="text-[13px] font-bold text-gray-400 tracking-wide mb-1 uppercase">Frecuencia de pedidos por sucursal</p>
+        <p class="text-sm text-gray-400 mb-6">Basado en los últimos <span class="font-semibold text-gray-700">30 días</span></p>
+
+        <% if (frecuencias && frecuencias.length > 0) { %>
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="border-b-2 border-gray-100">
+                        <th class="text-left text-[11px] font-bold text-gray-400 tracking-wide uppercase pb-3">Sucursal</th>
+                        <th class="text-center text-[11px] font-bold text-gray-400 tracking-wide uppercase pb-3">Pedidos en 30 días</th>
+                        <th class="text-right text-[11px] font-bold text-gray-400 tracking-wide uppercase pb-3">Frecuencia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% frecuencias.forEach((fre, index) => { %>
+                        <tr class="border-b border-gray-50">
+                            <td class="py-3 text-sm font-semibold text-gray-700"><%= fre.nombre %></td>
+                            <td class="py-3 text-sm text-gray-500 text-center"><%= fre.totalMes %> pedidos</td>
+                            <td class="py-3 text-right">
+                                <span class="inline-block text-xs font-semibold py-1 px-3 rounded-full <%= index === 0 ? 'bg-blue-100 text-blue-700' : 'bg-violet-100 text-violet-700' %>">
+                                    <%= fre.pedidosPorSemana %> / semana
+                                </span>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p class="text-sm text-gray-400 py-8 text-center">No hay pedidos en los últimos 30 días.</p>
+        <% } %>
+    </div>
+
 </main>
 
 <%- include('partials/footer.ejs') %>
