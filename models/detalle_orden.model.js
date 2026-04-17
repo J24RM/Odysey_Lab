@@ -16,6 +16,8 @@ module.exports = class Orden {
 
         cantidad_ingresada = parseInt(cantidad_ingresada)
 
+        console.log("Se va a agregar el producto " + id_producto)
+
         // Si existe 
         if (producto){
             const nuevaCantidad = producto.cantidad + cantidad_ingresada;
@@ -72,14 +74,13 @@ module.exports = class Orden {
 
 
     static async detalleOrden(id_orden){
-        console.log("Se obtuvo carrito")
-        const{data: productosCarrito, error} = await supabase
+        const{data: productos, error} = await supabase
             .from('detalle_orden')
             .select('id_producto, cantidad')
             .eq('id_orden', id_orden)
 
         if (error) throw error;
 
-        return productosCarrito;
+        return productos;
     }
 }

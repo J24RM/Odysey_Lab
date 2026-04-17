@@ -2,34 +2,41 @@ const ordenModel = require('../../models/orden.model')
 const detalle_ordenModel = require('../../models/detalle_orden.model');
 const productoModel = require('../../models/producto.model')
 const { compile } = require('ejs');
+const { log } = require('../../utils/logger');
 
 exports.getCarrito = async (request, response, next) => {
     try {
-        const id_carrito = 6 // request.session.id_carrito;
+        const carrito = await ordenModel.obtenerOrdenEnEstadoCarrito(request.session.usuario); 
+
+        if(!carrito){
+            request.session.id_carrito = null;
+        }
+        else{
+            request.session.id_carrito = carrito.id_orden;
+        }
         let productosCarrito = null;
         let detalleProductos = null;
-        let sucursal = "Apaseo";
+        sucursal_activa = request.session.sucursal_activa || "";
 
-        if (id_carrito != null) {
-            productosCarrito = await detalle_ordenModel.detalleOrden(id_carrito);
+        if (request.session.id_carrito != null) {
+            productosCarrito = await detalle_ordenModel.detalleOrden(request.session.id_carrito);
 
             // detalleOrden regresa un array, hay que iterar cada producto
-            console.log([productosCarrito])
             detalleProductos = await Promise.all(
                 productosCarrito.map(item =>
                     productoModel.encontrarProductoPorId(item.id_producto)
                 )
             );
-            console.log(productosCarrito)
         }
 
         response.render('cliente/cart', {
-            // csrfToken: request.csrfToken(),
-            username: request.session.username || '',
+            csrfToken: request.csrfToken(),
+            usuario: request.session.usuario,
             error: null,
             productosCarrito: productosCarrito,
             detalleProductos: detalleProductos,
-            sucursal: sucursal,
+            sucursal_activa: sucursal_activa,
+            carrito: request.session.id_carrito,
         });
 
     } catch (err) {
@@ -39,45 +46,59 @@ exports.getCarrito = async (request, response, next) => {
 
 exports.agregarItem = async (request, response, next) => {
     try {
-        // const id_usuario = request.session.id_usuario;
 
-        // Obtener o crear carrito
-        const carrito = await ordenModel.obtenerOrdenEnEstadoCarrito(request.body.id_usuario);
-        request.session.id_carrito = carrito.id_orden;
+        // Obtener carrito
+        const carrito = await ordenModel.obtenerOrdenEnEstadoCarrito(request.session.usuario);
+        if(!carrito){
+            const carrito = await ordenModel.crearCarrito(request.session.usuario);
+            request.session.id_carrito = carrito.id_orden;
+        }
+
+        else{
+            request.session.id_carrito = carrito.id_orden;
+        }
+
 
         // Agregar producto
         await detalle_ordenModel.agregarProductoAlCarrito(
-            carrito.id_orden,
+            request.session.id_carrito,
             request.body.id_producto,
             request.body.cantidad_ingresada
         );
 
-        response.redirect('/cart')
+        log('CLIENTE', 'CARRITO: PRODUCTO AGREGADO', `id_cliente: ${request.session.usuario}, id_producto: ${request.body.id_producto}, cantidad: ${request.body.cantidad_ingresada}`);
+
+        response.redirect('/cliente/home?info=' + encodeURIComponent("Se agrego el producto al carrito"))
 
     } catch (err) {
-        response.redirect('/cart?error=' + encodeURIComponent(err.message));
+        response.redirect(`/cliente/product/${request.body.id_producto}?error=` + encodeURIComponent("No se pudo agregar el producto al carrito"));
     }
 };
 
 exports.actualizarItem = async (request, response, next) => {
     const { id_producto } = request.params;
     const { cantidad_ingresada } = request.body;
-    const id_carrito = 6 // request.session.id_carrito;
     
     try {
         if (cantidad_ingresada == 0) {
-            await detalle_ordenModel.eliminarProducto(id_carrito, id_producto);
-            return response.json({ eliminado: true });
+            await detalle_ordenModel.eliminarProducto(request.session.id_carrito, id_producto);
+            log('CLIENTE', 'CARRITO: PRODUCTO ELIMINADO', `id_cliente: ${request.session.usuario}, id_producto: ${id_producto}`);
+            return response.json({
+                eliminado: true ,
+                csrfToken: request.csrfToken()
+            });
         } else {
             await detalle_ordenModel.modificarCantidad(
-                id_carrito,
+                request.session.id_carrito,
                 id_producto,
                 cantidad_ingresada
             );
+            log('CLIENTE', 'CARRITO: CANTIDAD ACTUALIZADA', `id_cliente: ${request.session.usuario}, id_producto: ${id_producto}, nueva_cantidad: ${cantidad_ingresada}`);
 
             return response.json({
                 eliminado: false,
-                nuevaCantidad: cantidad_ingresada
+                nuevaCantidad: cantidad_ingresada,
+                csrfToken: request.csrfToken()
             });
         }
     } catch (error) {

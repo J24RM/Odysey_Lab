@@ -1,3 +1,21 @@
+<!-- Timer de inactividad: 2 minutos sin actividad cierra la sesión -->
+<script>
+(function () {
+    const TIMEOUT = 30 * 60 * 1000;
+    let timer;
+    function resetTimer() {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            window.location.href = '/logout';
+        }, TIMEOUT);
+    }
+    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function (e) {
+        document.addEventListener(e, resetTimer, true);
+    });
+    resetTimer();
+})();
+</script>
+
 <!-- Header -->
 <header class="sticky top-0 z-50 bg-blue-50 border-b border-blue-100 shadow-sm">
     <div class="flex items-center justify-between px-7 h-[60px]">

@@ -1,3 +1,5 @@
+let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
 function actualizarSubtotal() {
   const filas = document.getElementsByClassName('product-row');
   let subtotal = 0;
@@ -5,31 +7,68 @@ function actualizarSubtotal() {
 
   for (let i = 0; i < filas.length; i++) {
     const precio = parseFloat(filas[i].dataset.precio);
-    const qty = parseInt(document.getElementById('qty-' + filas[i].dataset.id).textContent);
+    const input = document.getElementById('qty-' + filas[i].dataset.id);
+    const qty = parseInt(input.value) || 0;
+
     subtotal += precio * qty;
     totalQty += qty;
   }
 
-  document.getElementById('subtotal-display').textContent = '$ ' + subtotal.toLocaleString('es-MX');
-  document.getElementById('qty-display').textContent = 'Cantidad de productos: ' + totalQty;
+
+  document.getElementById('subtotal-display').textContent =
+    '$ ' + subtotal.toLocaleString('es-MX');
+
+  let total = subtotal * 1.16;
+
+  document.getElementById('total-display').textContent =
+    '$ ' + total.toLocaleString('es-MX');
+
+
+  document.getElementById('qty-display').textContent =
+    'Cantidad de productos: ' + totalQty;
 }
 
+// Boton
 async function cambiarCantidad(idProducto, delta) {
-  const qtySpan = document.getElementById('qty-' + idProducto);
-  const nuevaCantidad = parseInt(qtySpan.textContent) + delta;
+  const input = document.getElementById('qty-' + idProducto);
+  let cantidadActual = parseInt(input.value) || 1;
+
+  const nuevaCantidad = cantidadActual + delta;
+  if (nuevaCantidad < 1) return;
+
+  await enviarCantidad(idProducto, nuevaCantidad);
+}
+
+// Texto
+async function inputCantidad(idProducto) {
+  const input = document.getElementById('qty-' + idProducto);
+  let cantidad = parseInt(input.value);
+
+  if (!cantidad || cantidad < 1) cantidad = 1;
+
+  await enviarCantidad(idProducto, cantidad);
+}
+
+async function enviarCantidad(idProducto, cantidad) {
+  const input = document.getElementById('qty-' + idProducto);
 
   const res = await fetch('/cart/items/' + idProducto, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ cantidad_ingresada: nuevaCantidad })
+    headers: { 
+      'Content-Type': 'application/json',
+      'csrf-token': csrfToken
+    },
+    body: JSON.stringify({ cantidad_ingresada: cantidad }),
   });
 
   const data = await res.json();
 
+  if (data.csrfToken) csrfToken = data.csrfToken;
+
   if (!res.ok) {
-        mostrarError('No se pudo actualizar el producto ');
-        return;
-    }
+    mostrarError('No se pudo actualizar el producto');
+    return;
+  }
 
   if (data.eliminado) {
     const nombre = document.getElementById('nombre-' + idProducto).textContent;
@@ -37,8 +76,11 @@ async function cambiarCantidad(idProducto, delta) {
     document.getElementById('row-' + idProducto).remove();
   } else {
     const precio = parseFloat(document.getElementById('row-' + idProducto).dataset.precio);
-    qtySpan.textContent = data.nuevaCantidad;
-    document.getElementById('price-' + idProducto).textContent = '$ ' + (precio * data.nuevaCantidad).toLocaleString('es-MX');
+
+    input.value = data.nuevaCantidad;
+
+    document.getElementById('price-' + idProducto).textContent =
+      '$ ' + (precio * data.nuevaCantidad).toLocaleString('es-MX');
   }
 
   actualizarSubtotal();
@@ -47,11 +89,16 @@ async function cambiarCantidad(idProducto, delta) {
 async function eliminarProducto(idProducto) {
   const res = await fetch('/cart/items/' + idProducto, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ cantidad_ingresada: 0 })
+    headers: { 
+      'Content-Type': 'application/json',
+      'csrf-token': csrfToken
+      },
+    body: JSON.stringify({ cantidad_ingresada: 0 }),
   });
 
   const data = await res.json();
+
+  if (data.csrfToken) csrfToken = data.csrfToken;
 
   if (!res.ok) {
             mostrarError('No se pudo eliminar el producto');
@@ -69,7 +116,7 @@ function mostrarEliminado(nombre, idProducto) {
   const aviso = document.createElement('div');
   aviso.id = 'aviso-' + idProducto;
   aviso.className = 'text-sm text-gray-600 py-3 px-4 bg-white rounded-xl border border-gray-200 mb-2';
-  aviso.innerHTML = `<a href='/producto/${idProducto}' class='text-blue-500 underline'> ${nombre}</a>  fue eliminado del carrito.`;
+  aviso.innerHTML = `<a href='cliente/product/${idProducto}' class='text-blue-500 underline'> ${nombre}</a>  fue eliminado del carrito.`;
 
   document.getElementById('row-' + idProducto).replaceWith(aviso);
 }
@@ -86,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     actualizarSubtotal();
     const params = new URLSearchParams(window.location.search);
     if (params.get('error')) {
-        mostrarError('No se pudo agregar el producto:');
+        mostrarError(decodeURIComponent(params.get('error')));
         window.history.replaceState({}, '', '/cart');
     }
 });

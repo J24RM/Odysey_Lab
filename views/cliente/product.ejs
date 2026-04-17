@@ -29,24 +29,24 @@
 
   <%- include('../includes/_navbar') %>
 
+  
 
   <!-- SECCIÓN PRINCIPAL DEL PRODUCTO -->
   <section class="max-w-6xl mx-auto px-6 py-10 flex-1">
     <div class="flex flex-col lg:flex-row gap-10 items-start">
 
+      <!-- Error -->
+      <div id="error-container"
+        class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50
+          bg-red-100 border border-red-400 text-red-700
+          px-6 py-3 rounded-xl shadow-md text-sm font-medium">
+        </div> 
+
       <!-- Columna izquierda: imágenes -->
       <div class="flex flex-col gap-4 items-center lg:w-[340px] shrink-0">
         <!-- Imagen principal -->
         <div class="w-full flex justify-center">
-          <img src="<%= producto.imagen %>" alt="<%= producto.nombre %>" class="w-64 h-64 object-contain" />
-        </div>
-        <!-- Miniaturas -->
-        <div class="flex gap-3 justify-center">
-          <% for (let i = 0; i < producto.similars.length; i++) { %>
-          <div class="w-16 h-16 border border-gray-200 rounded overflow-hidden flex items-center justify-center bg-gray-50 cursor-pointer hover:border-yellow-400 transition">
-            <img src="<%= producto.similars[i] %>" alt="thumb<%= i+1 %>" class="w-full h-full object-contain p-1"/>
-          </div>
-          <% } %>
+          <img src="/uploads/<%= producto.imagen %>" alt="<%= producto.nombre %>" class="w-64 h-64 object-contain" />
         </div>
       </div>
 
@@ -58,12 +58,21 @@
         </h1>
 
         <!-- Estrellas -->
-        <div class="flex items-center gap-1 mb-4">
-          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
-          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
-          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
-          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
-          <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6"/>
+        <%
+
+          const promedioDetalle = resenas.length
+            ? Math.round(resenas.reduce((s, r) => s + r.rating, 0) / resenas.length * 10) / 10
+            : 0;
+        %>
+        <div class="flex items-center gap-1 mb-1">
+          <% for (let i = 1; i <= 5; i++) { %>
+            <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6 <%= i <= Math.round(promedioDetalle) ? 'opacity-100' : 'opacity-20' %>"/>
+          <% } %>
+          <% if (resenas.length > 0) { %>
+            <span class="text-sm text-gray-500 ml-1"><%= promedioDetalle %> (<%= resenas.length %> <%= resenas.length === 1 ? 'reseña' : 'reseñas' %>)</span>
+          <% } else { %>
+            <span class="text-sm text-gray-400 ml-1">Sin calificaciones aún</span>
+          <% } %>
         </div>
 
         <hr class="border-gray-200 mb-4"/>
@@ -102,36 +111,159 @@
         <p class="text-sm font-semibold" style="color: #0078A9;">Sucursal: Galerias</p>
 
         <!-- Cantidad -->
-        <div class="border border-gray-400 rounded-md px-4 py-2 text-sm font-semibold text-gray-800 bg-white">
-          Cantidad: 5
-        </div>
-          <!-- Botón agregar al carrito -->
-          <form action="/cart/items" method="POST">
-            <input type="hidden" name="cantidad_ingresada" value=5/>
-            <input type="hidden" name="id_producto" value="<%= productoId %>"/>
-            <input type="hidden" name="id_usuario" value="35"/>
-            <button type="submit" style="background-color: #002736;" 
-            class="w-full text-white text-sm font-semibold rounded-md py-3">
-              Agregar al carrito
-            </button>
-          </form>
-
-
-        <!-- Botón calificar producto -->
-        <button
-          class="w-full text-white text-sm font-semibold rounded-md py-3 hover:opacity-90 transition"
-          style="background-color: #8FBADE;"
-
-        >
-          Calificar producto
-        </button>
+      <div class="flex items-center border border-gray-400 rounded-md px-4 py-2 bg-white gap-2">
+        <label class="text-sm font-semibold text-gray-800">Cantidad:</label>
+        <input
+          id="cantidad-visible"
+          type="text"
+          value="1"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="3"
+          oninput="this.value = this.value.replace(/[^0-9]/g, ''); document.getElementById('cantidad-input').value = this.value || 1;"
+          onblur="if(!this.value) this.value = 1; document.getElementById('cantidad-input').value = this.value;"
+          class="w-16 text-sm font-semibold text-gray-800 outline-none text-right"
+        />
       </div>
+
+      <!-- Botón agregar al carrito -->
+      <form action="/cart/items" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="cantidad_ingresada" id="cantidad-input" value="1"/>
+        <input type="hidden" name="id_producto" value="<%= productoId %>"/>
+        <button type="submit" style="background-color: #002736;"
+          class="w-full text-white text-sm font-semibold rounded-md py-3">
+          Agregar al carrito
+        </button>
+      </form>
 
     </div>
   </section>
 
+  <!-- SECCIÓN CALIFICAR PRODUCTO -->
+  <section class="w-full px-10 mb-10">
+    <div class="bg-white rounded-2xl py-8 px-10 flex flex-col lg:flex-row lg:items-center gap-6" style="box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
+
+      <% if (calificacion) { %>
+
+        <!-- Ya calificado: lado izquierdo -->
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-1">
+            <div class="w-7 h-7 rounded-full flex items-center justify-center" style="background-color: #e6f4ea;">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-900">Ya calificaste este producto</h2>
+          </div>
+          <p class="text-sm text-gray-500 mb-4">Esta fue tu calificación:</p>
+          <div class="flex items-center gap-1">
+            <% for (let i = 1; i <= 5; i++) { %>
+              <img src="/img/estrellita.png" alt="estrella" class="w-8 h-8 <%= i <= calificacion.rating ? 'opacity-100' : 'opacity-25' %>"/>
+            <% } %>
+            <span class="text-sm font-semibold text-gray-700 ml-2"><%= calificacion.rating %> de 5</span>
+          </div>
+        </div>
+
+        <!-- Separador vertical -->
+        <div class="hidden lg:block w-px bg-gray-200 self-stretch"></div>
+
+        <!-- Ya calificado: lado derecho -->
+        <div class="flex-1 flex flex-col gap-2">
+          <p class="text-sm font-semibold text-gray-700">Tu comentario:</p>
+          <% if (calificacion.descripcion) { %>
+            <p class="text-sm text-gray-600 bg-gray-50 rounded-lg px-4 py-3 border border-gray-200"><%= calificacion.descripcion %></p>
+          <% } else { %>
+            <p class="text-sm text-gray-400 italic">No dejaste un comentario.</p>
+          <% } %>
+        </div>
+
+      <% } else { %>
+
+        <!-- Formulario: lado izquierdo -->
+        <div class="flex-1">
+          <h2 class="text-xl font-bold text-gray-900 mb-1">Califica este producto</h2>
+          <p class="text-sm text-gray-500 mb-4">¿Qué te pareció el producto? Comparte tu experiencia.</p>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-semibold text-gray-700 mr-1">Tu calificación:</span>
+            <div class="flex gap-1" id="estrellas">
+              <img src="/img/estrellita.png" data-valor="1" alt="1 estrella" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
+              <img src="/img/estrellita.png" data-valor="2" alt="2 estrellas" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
+              <img src="/img/estrellita.png" data-valor="3" alt="3 estrellas" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
+              <img src="/img/estrellita.png" data-valor="4" alt="4 estrellas" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
+              <img src="/img/estrellita.png" data-valor="5" alt="5 estrellas" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
+            </div>
+            <span class="text-sm text-gray-400 ml-1" id="label-estrellas">Selecciona una calificación</span>
+          </div>
+        </div>
+
+        <!-- Separador vertical -->
+        <div class="hidden lg:block w-px bg-gray-200 self-stretch"></div>
+
+        <!-- Formulario: lado derecho -->
+        <div class="flex-1 flex flex-col gap-3">
+          <label class="text-sm font-semibold text-gray-700">Comentario <span class="font-normal text-gray-400">(opcional)</span></label>
+          <textarea
+            id="comentario-calificacion"
+            rows="2"
+            placeholder="Escribe aquí tu opinión sobre el producto..."
+            class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-700 resize-none focus:outline-none focus:border-gray-400"
+          ></textarea>
+          <div class="flex justify-end">
+            <button
+              id="btn-enviar-calificacion"
+              disabled
+              class="px-6 py-2.5 text-sm font-semibold text-white rounded-lg opacity-40 cursor-not-allowed transition"
+              style="background-color: #002736;"
+            >
+              Enviar calificación
+            </button>
+          </div>
+        </div>
+
+      <% } %>
+
+    </div>
+  </section>
+
+  <!-- SECCIÓN RESEÑAS -->
+  <section class="w-full px-10 mb-10">
+    <h2 class="text-xl font-bold text-gray-900 mb-4">
+      Reseñas del producto
+      <span class="text-sm font-normal text-gray-400 ml-2">(<%= resenas.length %> <%= resenas.length === 1 ? 'reseña' : 'reseñas' %>)</span>
+    </h2>
+
+    <% if (resenas.length === 0) { %>
+      <p class="text-sm text-gray-400 italic">Aún no hay reseñas para este producto. ¡Sé el primero en opinar!</p>
+    <% } else { %>
+      <div class="flex flex-col gap-4">
+        <% for (let r of resenas) { %>
+          <div class="bg-white rounded-2xl px-6 py-5 flex flex-col gap-2" style="box-shadow: 0 4px 24px rgba(0,0,0,0.07);">
+            <!-- Encabezado: email + fecha -->
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-semibold text-gray-800"><%= r.usuario?.email || 'Usuario' %></span>
+              <span class="text-xs text-gray-400"><%= new Date(r.fecha).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+            </div>
+            <!-- Estrellas -->
+            <div class="flex gap-0.5">
+              <% for (let i = 1; i <= 5; i++) { %>
+                <img src="/img/estrellita.png" alt="estrella" class="w-5 h-5 <%= i <= r.rating ? 'opacity-100' : 'opacity-20' %>"/>
+              <% } %>
+            </div>
+            <!-- Comentario -->
+            <% if (r.descripcion) { %>
+              <p class="text-sm text-gray-600"><%= r.descripcion %></p>
+            <% } else { %>
+              <p class="text-xs text-gray-400 italic">Sin comentario.</p>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+  </section>
+
   <!-- SECCIÓN PRODUCTOS SIMILARES -->
-  <section class="max-w-6xl mx-auto px-6 pb-10">
+  <section class="max-w-6xl mx-auto px-6 pb-10 mt-8">
     <h2 class="text-xl font-bold text-gray-900 mb-4">Productos similares</h2>
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <% for (let i = 0; i < 4; i++) { %>
@@ -144,6 +276,123 @@
     </div>
   </section>
 
+  <!-- MODAL CALIFICACIÓN ENVIADA -->
+  <div id="modal-calificacion" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+    <!-- Fondo oscuro -->
+    <div class="absolute inset-0 bg-black opacity-40"></div>
+    <!-- Contenido -->
+    <div class="relative bg-white rounded-2xl shadow-xl px-10 py-8 flex flex-col items-center gap-4 max-w-sm w-full mx-4">
+      <!-- Ícono check -->
+      <div class="w-16 h-16 rounded-full flex items-center justify-center" style="background-color: #e6f4ea;">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h3 class="text-xl font-bold text-gray-900">¡Gracias por tu opinión!</h3>
+      <p class="text-sm text-gray-500 text-center">Tu calificación fue enviada con éxito. Tu comentario nos ayuda a mejorar.</p>
+      <button
+        id="btn-cerrar-modal"
+        class="mt-2 px-8 py-2.5 text-sm font-semibold text-white rounded-lg"
+        style="background-color: #002736;"
+      >
+        Cerrar
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const estrellas = document.querySelectorAll('.estrella');
+    const labelEstrellas = document.getElementById('label-estrellas');
+    const btnEnviar = document.getElementById('btn-enviar-calificacion');
+    const comentarioInput = document.getElementById('comentario-calificacion');
+    const modal = document.getElementById('modal-calificacion');
+    document.getElementById('btn-cerrar-modal').addEventListener('click', () => modal.classList.add('hidden'));
+    const labels = ['', 'Muy malo', 'Malo', 'Regular', 'Bueno', '¡Excelente!'];
+    let calificacionSeleccionada = 0;
+
+    function pintarEstrellas(cantidad) {
+      estrellas.forEach((e, i) => {
+        e.classList.toggle('opacity-100', i < cantidad);
+        e.classList.toggle('opacity-30', i >= cantidad);
+      });
+    }
+
+    estrellas.forEach(estrella => {
+      estrella.addEventListener('mouseenter', () => {
+        pintarEstrellas(parseInt(estrella.dataset.valor));
+      });
+
+      estrella.addEventListener('mouseleave', () => {
+        pintarEstrellas(calificacionSeleccionada);
+      });
+
+      estrella.addEventListener('click', () => {
+        calificacionSeleccionada = parseInt(estrella.dataset.valor);
+        pintarEstrellas(calificacionSeleccionada);
+        labelEstrellas.textContent = labels[calificacionSeleccionada];
+        labelEstrellas.classList.remove('text-gray-400');
+        labelEstrellas.classList.add('text-gray-700', 'font-semibold');
+        btnEnviar.disabled = false;
+        btnEnviar.classList.remove('opacity-40', 'cursor-not-allowed');
+        btnEnviar.classList.add('hover:opacity-90', 'cursor-pointer');
+      });
+    });
+
+    btnEnviar.addEventListener('click', async () => {
+      if (!calificacionSeleccionada) return;
+
+      btnEnviar.disabled = true;
+      btnEnviar.textContent = 'Enviando...';
+
+      try {
+        const res = await fetch('/cliente/product/<%= productoId %>/calificacion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'CSRF-Token': '<%= csrfToken %>'
+          },
+          body: JSON.stringify({
+            rating: calificacionSeleccionada,
+            descripcion: comentarioInput.value.trim()
+          })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.ok) {
+          btnEnviar.textContent = '¡Calificación enviada!';
+          btnEnviar.style.backgroundColor = '#16a34a';
+          estrellas.forEach(e => e.style.pointerEvents = 'none');
+          comentarioInput.disabled = true;
+          modal.classList.remove('hidden');
+        } else {
+          btnEnviar.textContent = data.error || 'Error al enviar';
+          btnEnviar.style.backgroundColor = '#dc2626';
+          btnEnviar.disabled = false;
+        }
+      } catch (err) {
+        btnEnviar.textContent = 'Error de conexión';
+        btnEnviar.style.backgroundColor = '#dc2626';
+        btnEnviar.disabled = false;
+      }
+    });
+
+    function mostrarError(mensaje) {
+    const contenedor = document.getElementById('error-container');
+    contenedor.textContent = mensaje;
+    contenedor.classList.remove('hidden');
+    setTimeout(() => contenedor.classList.add('hidden'), 4000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error')) {
+        mostrarError(decodeURIComponent(params.get('error')));
+        window.history.replaceState({}, '', `/cliente/product/${request.body.id_producto}`);
+    }
+});
+
+  </script>
 
 </body>
 </html>

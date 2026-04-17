@@ -52,10 +52,12 @@ alt data.eliminado = true
     
     JS -> UI: mostrarEliminado(nombre, idProducto)\nrow.remove()
     activate UI
+    UI --> JS: Se elimina la fila
     deactivate UI
 else data.eliminado = false
     JS -> UI: qtySpan.textContent = data.nuevaCantidad\nprice.textContent = precio × nuevaCantidad
     activate UI
+    UI --> JS: Se actualiza la cantidad
     deactivate UI
 end
 JS -> UI: actualizarSubtotal()

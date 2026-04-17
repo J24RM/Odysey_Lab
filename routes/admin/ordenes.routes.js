@@ -6,6 +6,9 @@ const adminHistorialController = require('../../controllers/admin_hist_ordenes.c
 // Ruta /admin/orders
 router.get('/orders', adminHistorialController.getHistorialOrdenes);
 
+// Ruta JSON para modal de detalle 
+router.get('/orders/detalle/:id', adminHistorialController.getDetalleOrdenJSON);
+
 // Ruta /admin/orders/:id
 router.get('/orders/:id', adminHistorialController.getDetalleOrden);
 

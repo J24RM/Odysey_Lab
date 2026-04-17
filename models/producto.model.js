@@ -1,5 +1,15 @@
 const supabase = require('../utils/supabase');
 
+// Decodifica strings con encoding roto (bytes UTF-8 leídos como Latin-1)
+function dec(s) {
+    if (!s || (!s.includes('Ã') && !s.includes('Â'))) return s;
+    try { return Buffer.from(s, 'latin1').toString('utf8'); } catch (_) { return s; }
+}
+function fixProducto(p) {
+    if (!p) return p;
+    return { ...p, nombre: dec(p.nombre), descripcion: dec(p.descripcion) };
+}
+
 module.exports = class Producto {
     static async fetchAll() {
         const { data: productos, error } = await supabase
@@ -7,9 +17,9 @@ module.exports = class Producto {
             .select('*')
             .eq('activo', true)
             .order('nombre', { ascending: true });
-        
+
         if (error) throw error;
-        return productos;
+        return productos.map(fixProducto);
     }
 
     static async findById(id_producto) {
@@ -18,9 +28,18 @@ module.exports = class Producto {
             .select('*')
             .eq('id_producto', id_producto)
             .single();
-        
+
         if (error) throw error;
-        return producto;
+        return fixProducto(producto);
+    }
+
+    static async encontrarProductosPorIds(ids) {
+    const { data, error } = await supabase
+        .from('producto')
+        .select('*')
+        .in('id_producto', ids);
+    if (error) throw error;
+    return data || [];
     }
 
     static async encontrarProductoPorId(id_producto){
@@ -30,7 +49,7 @@ module.exports = class Producto {
             .eq('id_producto', id_producto)
         if (error) throw error;
 
-        return detalleProducto;
+        return detalleProducto.map(fixProducto);
     }
 
     static async search(query) {
@@ -40,9 +59,9 @@ module.exports = class Producto {
             .eq('activo', true)
             .ilike('nombre', `%${query}%`)
             .order('nombre', { ascending: true });
-        
+
         if (error) throw error;
-        return productos;
+        return productos.map(fixProducto);
     }
 
     static async crearProducto({ nombre, descripcion, url_imagen, unidad_venta, unidad_medida, peso, precio_unitario, activo, clave }) {
@@ -77,7 +96,7 @@ module.exports = class Producto {
             .limit(limit);
 
         if (error) throw error;
-        return productos;
+        return productos.map(fixProducto);
     }
 
     static async searchByNameClaveId(query) {
@@ -87,7 +106,7 @@ module.exports = class Producto {
             .or(`nombre.ilike.%${query}%,clave.ilike.%${query}%,id_producto.eq.${isNaN(query) ? -1 : parseInt(query)}`);
 
         if (error) throw error;
-        return productos;
+        return productos.map(fixProducto);
     }
 
     static async actualizarProducto(id_producto, { nombre, descripcion, url_imagen, unidad_venta, unidad_medida, peso, precio_unitario, activo, clave }) {
@@ -110,5 +129,30 @@ module.exports = class Producto {
 
         if (error) throw error;
         return data;
+    }
+
+    static async fetchPaginated(page = 1, limit = 20) {
+        const offset = (page - 1) * limit;
+        const { data, count, error } = await supabase
+            .from('producto')
+            .select('*', { count: 'exact' })
+            .eq('activo', true)
+            .order('nombre', { ascending: true })
+            .range(offset, offset + limit - 1);
+
+        if (error) throw error;
+        return { productos: data.map(fixProducto), total: count };
+    }
+
+    static async fetchAllPaginated(page = 1, limit = 20) {
+        const offset = (page - 1) * limit;
+        const { data, count, error } = await supabase
+            .from('producto')
+            .select('*', { count: 'exact' })
+            .order('nombre', { ascending: true })
+            .range(offset, offset + limit - 1);
+
+        if (error) throw error;
+        return { productos: data.map(fixProducto), total: count };
     }
 }

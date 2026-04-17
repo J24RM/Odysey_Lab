@@ -1,10 +1,13 @@
 @startuml Agregar producto al carrito
 Title "Agregar un producto al carrito"
 actor Navegador as nav
+control "carrito.js" as JS
+boundary "carrito.ejs" as UI
 boundary "carrito.routes.js" as ruta
 control "carrito.controller.js" as ctrl
 entity "orden.model.js" as model
 entity "detalle_orden.model.js" as model2
+entity "producto.model.js" as model3
 database "Postgres (Supabase)" as DB
 
 activate nav
@@ -15,6 +18,8 @@ activate ruta
 ruta -> ctrl:  agregarItem(request, response)
 deactivate ruta
 
+alt request.session.id_carrito == null
+
 activate ctrl
 ctrl ->> model: obtenerOrdenEnEstadoCarrito(id_usuario)
 activate model
@@ -22,17 +27,25 @@ activate model
 
 model ->> DB: .from('orden') .select('*') .eq('estado', 'carrito') .eq('id_usuario', id_usuario)
 activate DB
-DB -->> model: orden/null
+DB -->> model: carrito/null
 deactivate DB
+model -->> ctrl: carrito/null
+deactivate model
+
+
 
 alt Carrito no existente
+    ctrl ->> model: crearCarrito(id_usuario)
+    activate model
     model ->> DB: Insert orden ([{estado = "Carrito" ,id_usuario: id_usuario,}])
 activate DB
-DB -->> model : nuevaOrden
+DB -->> model : carrito
 deactivate DB
-end
 
-model -->> ctrl: orden
+model -->> ctrl: carrito
+
+end
+end
 deactivate model
 ctrl ->> model2: agregarProductoAlCarrito(orden.id_orden, id_producto, cantidad_ingresada)
 activate model2
@@ -56,9 +69,66 @@ end
 model2 -->> ctrl: Se actualizo el carrito
 deactivate model2
 
-ctrl --> nav :response.redirect('/cart')
+ctrl --> ruta :response.redirect('/cart')
 deactivate ctrl
 
+activate ruta
+
+
+ruta -> ctrl: getCarrito()
+deactivate ruta
+activate ctrl
+
+ctrl ->> model: carrito = await ordenModel.obtenerOrdenEnEstadoCarrito(request.session.usuario); 
+
+activate model
+
+model ->> DB: .from('orden') .select('*') .eq('estado', 'carrito') .eq('id_usuario', id_usuario) .maybeSingle();
+activate DB
+DB -->> model: Carrito
+deactivate DB
+model -->> ctrl: Carrito
+deactivate model
+
+alt (!carrito)
+ctrl -> ctrl: request.session.id_carrito = null;
+else
+ctrl -> ctrl: request.session.id_carrito = carrito.id_orden;
+
+end
+
+ctrl -> ctrl: let sucursal = request.session.sucursal;
+
+ctrl ->> model2: productosCarrito = await detalle_ordenModel.detalleOrden(request.session.id_carrito);
+activate model2
+model2 ->> DB: .from('detalle_orden') .select('id_producto, cantidad') .eq('id_orden', id_orden)
+activate DB
+DB -->> model2: detalle_orden
+deactivate DB
+model2 -->> ctrl: detalle_orden
+deactivate model2
+
+loop por cada item en productosCarrito
+    par
+        ctrl ->> model3: encontrarProductoPorId(id_producto)
+        activate model3
+        model3 -->> ctrl: productos 
+        deactivate model3
+    end
+end
+
+
+ctrl --> UI: response.render('cliente/carrito', {productosCarrito: productosCarrito, detalleProductos: detalleProductos, sucursal: sucursal,})
+deactivate ctrl
+activate UI
+UI --> nav: Vista
+deactivate UI
 activate nav
+nav -> JS: actualizarSubtotal()
+activate JS
+JS --> nav: Se actualizo el subtotal
+deactivate JS
+
+deactivate UI
 
 @enduml

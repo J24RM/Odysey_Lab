@@ -1,0 +1,148 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.calificacion (
+  id_calificacion integer NOT NULL DEFAULT nextval('calificacion_id_calificacion_seq'::regclass),
+  id_producto integer NOT NULL,
+  id_usuario integer NOT NULL,
+  rating real NOT NULL CHECK (rating >= 1::numeric::double precision AND rating <= 5::numeric::double precision),
+  fecha timestamp without time zone DEFAULT now(),
+  descripcion text,
+  CONSTRAINT calificacion_pkey PRIMARY KEY (id_calificacion),
+  CONSTRAINT calificacion_id_producto_fkey FOREIGN KEY (id_producto) REFERENCES public.producto(id_producto),
+  CONSTRAINT calificacion_id_usuario_fkey FOREIGN KEY (id_usuario) REFERENCES public.usuario(id_usuario)
+);
+CREATE TABLE public.campania (
+  id_campania integer NOT NULL DEFAULT nextval('campania_id_campania_seq'::regclass),
+  fecha_de_inicio timestamp without time zone DEFAULT now(),
+  fecha_de_fin timestamp without time zone,
+  nombre character varying NOT NULL,
+  activo boolean,
+  CONSTRAINT campania_pkey PRIMARY KEY (id_campania)
+);
+CREATE TABLE public.configuraciones (
+  id_configuraciones integer NOT NULL DEFAULT nextval('configuraciones_id_configuraciones_seq'::regclass),
+  tiempo_de_cancelacion integer,
+  banner_url character varying,
+  activo boolean,
+  nombre character varying,
+  CONSTRAINT configuraciones_pkey PRIMARY KEY (id_configuraciones)
+);
+CREATE TABLE public.cuenta (
+  id_cuenta integer NOT NULL DEFAULT nextval('cuenta_id_cuenta_seq'::regclass),
+  nombre_dueno character varying NOT NULL,
+  telefono character varying,
+  rfc character varying NOT NULL UNIQUE,
+  region character varying NOT NULL,
+  direccion character varying NOT NULL,
+  CONSTRAINT cuenta_pkey PRIMARY KEY (id_cuenta)
+);
+CREATE TABLE public.detalle_orden (
+  id_orden integer NOT NULL,
+  id_producto integer NOT NULL,
+  cantidad integer NOT NULL CHECK (cantidad > 0),
+  CONSTRAINT detalle_orden_pkey PRIMARY KEY (id_orden, id_producto),
+  CONSTRAINT detalle_orden_id_producto_fkey FOREIGN KEY (id_producto) REFERENCES public.producto(id_producto),
+  CONSTRAINT detalle_orden_id_orden_fkey FOREIGN KEY (id_orden) REFERENCES public.orden(id_orden)
+);
+CREATE TABLE public.logs (
+  id_log integer NOT NULL DEFAULT nextval('logs_id_log_seq'::regclass),
+  accion character varying NOT NULL,
+  fecha timestamp without time zone DEFAULT now(),
+  id_usuario integer NOT NULL,
+  CONSTRAINT logs_pkey PRIMARY KEY (id_log),
+  CONSTRAINT logs_id_usuario_fkey FOREIGN KEY (id_usuario) REFERENCES public.usuario(id_usuario)
+);
+CREATE TABLE public.orden (
+  id_orden integer NOT NULL DEFAULT nextval('orden_id_orden_seq'::regclass),
+  folio character varying UNIQUE,
+  subtotal numeric NOT NULL CHECK (subtotal >= 0::numeric),
+  fecha_realizada timestamp without time zone DEFAULT now(),
+  estado character varying NOT NULL CHECK (estado::text = ANY (ARRAY['carrito'::character varying::text, 'confirmada'::character varying::text, 'cancelada'::character varying::text])),
+  id_sucursal integer,
+  id_usuario integer NOT NULL,
+  id_campania integer,
+  CONSTRAINT orden_pkey PRIMARY KEY (id_orden),
+  CONSTRAINT orden_id_sucursal_fkey FOREIGN KEY (id_sucursal) REFERENCES public.sucursal(id_sucursal),
+  CONSTRAINT orden_id_usuario_fkey FOREIGN KEY (id_usuario) REFERENCES public.usuario(id_usuario),
+  CONSTRAINT orden_id_campania_fkey FOREIGN KEY (id_campania) REFERENCES public.campania(id_campania)
+);
+CREATE TABLE public.privilegio (
+  id_privilegio integer NOT NULL DEFAULT nextval('privilegio_id_privilegio_seq'::regclass),
+  nombre_privilegio character varying NOT NULL UNIQUE,
+  CONSTRAINT privilegio_pkey PRIMARY KEY (id_privilegio)
+);
+CREATE TABLE public.producto (
+  id_producto integer NOT NULL DEFAULT nextval('producto_id_producto_seq'::regclass),
+  nombre character varying NOT NULL,
+  descripcion text,
+  url_imagen text,
+  unidad_venta character varying,
+  unidad_medida character varying,
+  peso character varying,
+  precio_unitario numeric NOT NULL CHECK (precio_unitario > 0::numeric),
+  activo boolean,
+  clave character varying UNIQUE CHECK (length(clave::text) <= 7),
+  CONSTRAINT producto_pkey PRIMARY KEY (id_producto)
+);
+CREATE TABLE public.producto_campania (
+  id_campania integer NOT NULL,
+  id_producto integer NOT NULL,
+  fecha_de_registro timestamp without time zone DEFAULT now(),
+  CONSTRAINT producto_campania_pkey PRIMARY KEY (id_campania, id_producto),
+  CONSTRAINT producto_campania_id_producto_fkey FOREIGN KEY (id_producto) REFERENCES public.producto(id_producto),
+  CONSTRAINT producto_campania_id_campania_fkey FOREIGN KEY (id_campania) REFERENCES public.campania(id_campania)
+);
+CREATE TABLE public.rol (
+  id_rol integer NOT NULL DEFAULT nextval('rol_id_rol_seq'::regclass),
+  nombre_rol character varying NOT NULL UNIQUE,
+  CONSTRAINT rol_pkey PRIMARY KEY (id_rol)
+);
+CREATE TABLE public.rol_privilegio (
+  id_rol integer NOT NULL,
+  id_privilegio integer NOT NULL,
+  CONSTRAINT rol_privilegio_pkey PRIMARY KEY (id_rol, id_privilegio),
+  CONSTRAINT rol_privilegio_id_rol_fkey FOREIGN KEY (id_rol) REFERENCES public.rol(id_rol),
+  CONSTRAINT rol_privilegio_id_privilegio_fkey FOREIGN KEY (id_privilegio) REFERENCES public.privilegio(id_privilegio)
+);
+CREATE TABLE public.session (
+  sid character varying NOT NULL,
+  sess json NOT NULL,
+  expire timestamp without time zone NOT NULL,
+  CONSTRAINT session_pkey PRIMARY KEY (sid)
+);
+CREATE TABLE public.sucursal (
+  id_sucursal integer NOT NULL DEFAULT nextval('sucursal_id_sucursal_seq'::regclass),
+  nombre_sucursal character varying NOT NULL,
+  edo character varying NOT NULL,
+  num_colonia character varying,
+  deleg_municipio character varying,
+  calle_1 character varying,
+  calle_2 character varying,
+  CONSTRAINT sucursal_pkey PRIMARY KEY (id_sucursal)
+);
+CREATE TABLE public.sucursal_cuenta (
+  id_sucursal integer NOT NULL,
+  id_cuenta integer NOT NULL,
+  CONSTRAINT sucursal_cuenta_pkey PRIMARY KEY (id_sucursal, id_cuenta),
+  CONSTRAINT sucursal_cuenta_id_sucursal_fkey FOREIGN KEY (id_sucursal) REFERENCES public.sucursal(id_sucursal),
+  CONSTRAINT sucursal_cuenta_id_cuenta_fkey FOREIGN KEY (id_cuenta) REFERENCES public.cuenta(id_cuenta)
+);
+CREATE TABLE public.usuario (
+  id_usuario integer NOT NULL,
+  email character varying,
+  password_hash text NOT NULL,
+  perfil character varying,
+  tipo character varying,
+  id_rol integer NOT NULL,
+  Nombre_usuario text,
+  CONSTRAINT usuario_pkey PRIMARY KEY (id_usuario),
+  CONSTRAINT usuario_id_rol_fkey FOREIGN KEY (id_rol) REFERENCES public.rol(id_rol)
+);
+CREATE TABLE public.usuario_cuenta (
+  id_cuenta integer NOT NULL,
+  id_usuario integer NOT NULL,
+  CONSTRAINT usuario_cuenta_pkey PRIMARY KEY (id_cuenta, id_usuario),
+  CONSTRAINT usuario_cuenta_id_cuenta_fkey FOREIGN KEY (id_cuenta) REFERENCES public.cuenta(id_cuenta),
+  CONSTRAINT usuario_cuenta_id_usuario_fkey FOREIGN KEY (id_usuario) REFERENCES public.usuario(id_usuario)
+);

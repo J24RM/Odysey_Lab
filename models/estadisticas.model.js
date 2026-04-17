@@ -186,4 +186,60 @@ module.exports = class Estadisticas {
 
         return result;
     }
+
+    static async getStatsProductos(inicio, fin) {
+        const { data, error } = await supabase.rpc('stats_productos', {
+            fecha_inicio: inicio.toISOString().split('T')[0],
+            fecha_fin: fin.toISOString().split('T')[0]
+        });
+
+        if (error) throw error;
+
+        return data;
+    }
+
+    static async getStatsProductoById(id, inicio, fin) {
+        const { data, error } = await supabase.rpc('stats_producto_by_id', {
+            fecha_inicio: inicio.toISOString().split('T')[0],
+            fecha_fin: fin.toISOString().split('T')[0],
+            p_id_producto: id,
+        });
+
+        if (error) throw error;
+        return data;
+    }
+
+    static async getOrdenesMes(id, inicio, fin) {
+        const { data, error } = await supabase.rpc('ordenes_por_dia_mes', {
+            fecha_inicio: inicio.toISOString().split('T')[0],
+            fecha_fin: fin.toISOString().split('T')[0],
+            p_id_producto: id
+        });
+
+        if (error) throw error;
+        return data;
+    }
+
+    static async getOrdenesSemana(id, inicio, fin) {
+        const { data, error } = await supabase.rpc('ordenes_por_dia_semana', {
+            fecha_inicio: inicio.toISOString().split('T')[0],
+            fecha_fin: fin.toISOString().split('T')[0],
+            p_id_producto: id
+        });
+
+        if (error) throw error;
+        return data;
+    }
+
+    static async getSucursalesProducto(id, inicio, fin) {
+        const { data, error } = await supabase.rpc('sucursales_producto', {
+            p_id_producto: id,
+            fecha_inicio: inicio.toISOString().split('T')[0],
+            fecha_fin: fin.toISOString().split('T')[0]
+        });
+
+        if (error) throw error;
+        return data;
+    }
+
 };

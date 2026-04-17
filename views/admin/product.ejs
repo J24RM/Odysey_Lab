@@ -37,7 +37,7 @@
                     <div class="col-span-2 space-y-6">
                         <!-- Image -->
                         <div class="bg-white rounded-2xl p-8 shadow-md flex items-center justify-center min-h-96">
-                            <img src="<%= producto.imagen %>" alt="<%= producto.nombre %>" class="max-w-full max-h-full object-contain">
+                            <img src="/uploads/<%= producto.imagen %>" alt="<%= producto.nombre %>" class="max-w-full max-h-full object-contain" onerror="this.src='/img/botePintura.png'">
                         </div>
 
                         <!-- Product Details -->
@@ -76,9 +76,6 @@
                             </a>
                             <a href="/admin/stats" class="block w-full py-3 px-4 bg-gray-100 text-gray-900 font-bold text-center rounded-lg hover:bg-gray-200 transition-colors">
                                 Ver estadísticas del producto
-                            </a>
-                            <a href="/admin/home_eliminarProducto" class="block w-full py-3 px-4 bg-red-500 text-white font-bold text-center rounded-lg hover:bg-red-600 transition-colors">
-                                Eliminar producto
                             </a>
                         </div>
                     </aside>

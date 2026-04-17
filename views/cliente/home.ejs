@@ -12,6 +12,14 @@
 
 <!-- Contenido principal aqui -->
 <main class="client-main flex-1">
+    <!-- Mensaje de que se agrego producto al carrito -->
+    <div id="success-container"
+        class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-50
+          bg-blue-100 border border-blue-400 text-gray-900 mb-2
+          px-6 py-3 rounded-xl shadow-md text-sm font-medium">
+    </div> 
+
+
     <section class="banner">
         <div class="banner-text">
             <h2>Preventa Activa: Productos Exclusivos <span>Mundial 2026</span></h2>
@@ -52,21 +60,31 @@
     <div class="product-grid">
         <% if (productos && productos.length > 0) { %>
             <% productos.forEach(producto => { %>
-                <a href="/cliente/product/<%= producto.id_producto %>" class="product-card">
-                    <div class="product-img-wrap">
-                        <img src="<%= producto.url_imagen || '/img/botePintura.png' %>" alt="<%= producto.nombre %>" onerror="this.src='/img/botePintura.png'">
-                    </div>
-                    <div class="product-name">
-                        <%= producto.nombre %>
-                    </div>
-                    <div class="product-rating">
-                        ★★★★★
-                    </div>
-                    <div class="product-price">
-                        $ <%= producto.precio_unitario %>
-                    </div>
-                    <button class="btn-add-cart">agregar al carrito</button>
-                </a>
+                <div class="product-card">
+                    <a href="/cliente/product/<%= producto.id_producto %>" class="product-link">
+                        <div class="product-img-wrap">
+                            <img src="/uploads/<%= producto.url_imagen || '/img/botePintura.png' %>" alt="<%= producto.nombre %>" onerror="this.src='/img/botePintura.png'">
+                        </div>
+                        <div class="product-name">
+                            <%= producto.nombre %>
+                        </div>
+                        <div class="product-rating">
+                            <% for (let i = 1; i <= 5; i++) { %>
+                                <img src="/img/estrellita.png" alt="estrella"
+                                    style="width:18px;height:18px;display:inline-block;opacity:<%= i <= Math.round(producto.promedio) ? '1' : '0.2' %>"/>
+                            <% } %>
+                        </div>
+                        <div class="product-price">
+                            $ <%= producto.precio_unitario %>
+                        </div>
+                    </a>
+                    <form action="/cart/items" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="hidden" name="cantidad_ingresada" value="1">
+                        <input type="hidden" name="id_producto" value="<%= producto.id_producto %>">
+                        <button type="submit" class="btn-add-cart">Agregar al carrito</button>
+                    </form>
+                </div>
             <% }) %>
         <% } else { %>
             <div class="col-span-full py-10 text-center text-gray-500">
@@ -75,20 +93,34 @@
         <% } %>
     </div>
 
+    <% if (!searchQuery && totalPages > 1) { %>
     <div class="pagination-container">
-        <a href="#" class="page-link">&lt; Anterior</a>
-        <a href="#" class="page-link active">1</a>
-        <a href="#" class="page-link">2</a>
-        <a href="#" class="page-link">3</a>
-        <span style="color:var(--text-muted); font-size: 14px; margin: 0 4px;">...</span>
-        <a href="#" class="page-link">20</a>
-        <a href="#" class="page-link">Siguiente &gt;</a>
+        <% if (page > 1) { %>
+            <a href="/cliente/home?page=<%= page - 1 %>" class="page-link">&lt; Anterior</a>
+        <% } %>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <% if (i === page) { %>
+                <a href="/cliente/home?page=<%= i %>" class="page-link active"><%= i %></a>
+            <% } else if (i <= 3 || i > totalPages - 3 || (i > page - 2 && i < page + 2)) { %>
+                <a href="/cliente/home?page=<%= i %>" class="page-link"><%= i %></a>
+            <% } else if (i === 4 || i === totalPages - 3) { %>
+                <span style="color:var(--text-muted); font-size: 14px; margin: 0 4px;">...</span>
+            <% } %>
+        <% } %>
+
+        <% if (page < totalPages) { %>
+            <a href="/cliente/home?page=<%= page + 1 %>" class="page-link">Siguiente &gt;</a>
+        <% } %>
     </div>
+    <% } %>
     
     <hr style="border: 0; height: 1.5px; background: #c0d1e1; margin: 40px 0;">
 </main>
 
 <%- include('../includes/_footer') %>
+<script src="/JavaScript/home.js"></script>
+
 
 </body>
 </html>
