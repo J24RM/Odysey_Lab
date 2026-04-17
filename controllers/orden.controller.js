@@ -2,27 +2,26 @@ const ordenModel = require('../models/orden.model');
 const detalleModel = require("../models/detalle_orden.model");
 const productoModel = require("../models/producto.model");
 const configuracionModel = require("../models/configuracion.model")
-const transporter = require("../utils/nodemailer");
 const supabase = require('../utils/supabase');
 const PDFDocument = require('pdfkit');
 const SVGtoPDF = require('svg-to-pdfkit');
 const path = require('path');
 const fs = require('fs');
 const { log } = require('../utils/logger');
+const { Resend } = require('resend');
 
 exports.getOrdenes = async (req, res) => {
 
 };
 
+
 exports.registrarOrden = async (req, res) => {
     try {
         const id_usuario = req.session.usuario;
-        const correo = req.session.correo || "a01713550@tec.mx";
+        const correo = req.session.correo || "rodriguezmendozajesus8@gmail.com";
 
         const orden = await ordenModel.registrarOrden(id_usuario);
-
         const { folio, subtotal, productos } = orden;
-
 
         let detalleHTML = "";
         productos.forEach(p => {
@@ -36,8 +35,10 @@ exports.registrarOrden = async (req, res) => {
             `;
         });
 
-        const mailOptions = {
-            from: process.env.MAIL_USER,
+        const resend = new Resend(process.env.RESEND_API_KEY);
+
+        resend.emails.send({
+            from: 'onboarding@resend.dev', 
             to: correo,
             subject: `Confirmación de Orden ${folio}`,
             html: `
@@ -54,18 +55,20 @@ exports.registrarOrden = async (req, res) => {
                 </table>
                 <h3>Subtotal: $${parseFloat(subtotal).toFixed(2)}</h3>
             `
-        };
-
-        transporter.sendMail(mailOptions)
-            .catch(err => console.error("Error correo:", err));
+        })
+        .catch(err => {
+            console.error("Error correo:", err);
+        });
 
         return res.redirect('/cliente/mis-pedidos?success=' + encodeURIComponent("Se envió un correo con el detalle de tu orden confirmada") + '&order=' + encodeURIComponent("Orden confirmada"));
 
     } catch (error) {
-        
+
         if (error.message.includes('No hay carrito') || error.message.includes('Carrito vacío')) {
             return res.redirect('/cart?error=' + encodeURIComponent("No hay productos en el carrito"));
         }
+
+        console.error(error);
         return res.redirect('/cliente/mis-pedidos?error=' + encodeURIComponent("No se pudo realizar la orden"));
     }
 };
