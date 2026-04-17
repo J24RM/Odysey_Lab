@@ -89,5 +89,20 @@ module.exports = class Orden {
         if (error) throw error;
         return detalles || [];
     }
-    
+
+    static async obtenerTodasLasOrdenes(page = 1, perPage = 20) {
+        const from = (page - 1) * perPage;
+        const to = from + perPage - 1;
+
+        const { data: ordenes, error, count } = await supabase
+            .from('orden')
+            .select('id_orden, estado, folio, subtotal, fecha_realizada, usuario(email)', { count: 'exact' })
+            .neq('estado', 'carrito')
+            .order('fecha_realizada', { ascending: false, nullsFirst: false })
+            .range(from, to);
+
+        if (error) throw error;
+        return { ordenes: ordenes || [], total: count || 0 };
+    }
+
 }
