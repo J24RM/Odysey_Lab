@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8" />
+<title>Estadísticas por Producto</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    * {
+        font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+</style>
+</head>
+
+<body class="bg-gray-50">
+
+<%- include('partials/header.ejs') %>
+
+<%- include('partials/sidebar.ejs') %>
+
+<main class="ml-48 pt-2 px-10 pb-9 flex-1 min-h-[calc(100vh-70px)]">
+
+    <div class="flex justify-between items-center mb-6">
+
+        <div class="flex items-center gap-4">
+
+            <a href="/admin/stats/productos"
+                class="text-2xl hover:text-gray-700 transition class="flex items-center gap-4">
+                ←
+            </a>
+
+            <img src="/uploads/<%= producto.url_imagen %>" class="w-14 h-14 rounded">
+
+            <h1 class="text-2xl font-bold">
+                <%= producto.nombre %>
+            </h1>
+        </div>
+
+        <div class="flex gap-3">
+            <form method="GET" class="flex items-center gap-3">
+                <input type="hidden" name="id" value="<%= producto.id_producto %>">
+                <select name="periodo" onchange="this.form.submit()"
+                    class="border rounded-lg px-3 py-2 text-sm">
+                    <option value="semana" <%= periodo === 'semana' ? 'selected' : '' %>>Esta Semana</option>
+                    <option value="mes" <%= periodo === 'mes' ? 'selected' : '' %>>Último Mes</option>
+                </select>
+
+            </form>
+        </div>
+    </div>
+    <div class="grid grid-cols-2 gap-6 mb-8">
+
+    <!-- Cantidad -->
+    <div class="bg-white p-6 rounded-xl shadow">
+        <h2 class="text-xl font-bold mb-4">Cantidad Ordenada</h2>
+
+        <div class="flex items-center gap-4">
+            <span class="text-4xl font-bold"><%= producto.cantidad %></span>
+
+            <span class="text-lg font-semibold
+                <%= producto.porcentajeCantidad >= 0 ? 'text-green-600' : 'text-red-500' %>">
+
+                <% if (producto.porcentajeCantidad >= 0) { %>
+                    ▲ <%= Math.round(producto.porcentajeCantidad) %>%
+                <% } else { %>
+                    ▼ <%= Math.abs(Math.round(producto.porcentajeCantidad)) %>%
+                <% } %>
+            </span>
+        </div>
+    </div>
+
+    <!-- Ventas -->
+    <div class="bg-white p-6 rounded-xl shadow">
+        <h2 class="text-xl font-bold mb-4">Ventas</h2>
+
+            <div class="flex items-center gap-4">
+                <span class="text-4xl font-bold">
+                    $<%= producto.ventas.toLocaleString() %>
+                </span>
+
+                <span class="text-lg font-semibold
+                    <%= producto.porcentajeVentas >= 0 ? 'text-green-600' : 'text-red-500' %>">
+
+                    <% if (producto.porcentajeVentas >= 0) { %>
+                        ▲ <%= Math.round(producto.porcentajeVentas) %>%
+                    <% } else { %>
+                        ▼ <%= Math.abs(Math.round(producto.porcentajeVentas)) %>%
+                    <% } %>
+                </span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid grid-cols-3 gap-6">
+
+    <!-- GRÁFICA -->
+    <div class="col-span-2 bg-white p-6 rounded-xl shadow">
+
+        <h2 class="font-bold mb-4">Comparación</h2>
+
+        <canvas id="chart"></canvas>
+    </div>
+
+    <!-- SUCURSALES -->
+    <div class="bg-white p-6 rounded-xl shadow">
+
+        <h2 class="font-bold mb-4">Sucursales</h2>
+
+        <% sucursales.forEach(s => { %>
+            <div class="flex justify-between border-b py-2">
+                <span><%= s.sucursal %></span>
+                <span><%= s.cantidad %></span>
+            </div>
+        <% }) %>
+        </div>
+</main>
+
+
+
+<%- include('partials/footer.ejs') %>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const actual = <%- JSON.stringify(ordenesPorDia) %>;
+    const anterior = <%- JSON.stringify(ordenesPorDiaAnterior) %>;
+
+    const labels = actual.map(d => d.dia);
+
+    const dataActual = actual.map(d => d.cantidad);
+    const dataAnterior = anterior.map(d => d.cantidad);
+
+    const ctx = document.getElementById('chart');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Periodo Actual',
+                    data: dataActual,
+                    tension: 0.4
+                },
+                {
+                    label: 'Periodo Anterior',
+                    data: dataAnterior,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+
+</html>
