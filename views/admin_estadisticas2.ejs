@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Estadísticas de Pedidos</title>
+  <link rel="stylesheet" href="/style_admin_estadisticas2.css" />
+</head>
+
+<body>
+
+  <!-- TOP NAV -->
+  <header>
+    <img src="/img/ppg-logo.svg" alt="Logo" class="logo-header">
+    <div></div>
+
+    <!-- BUSCADOR -->
+    <div class="search-bar">
+      <select onchange="window.location.href = this.value">
+        <option value="/admin_estadisticas">Estadísticas generales</option>
+        <option value="/admin_estadisticas2" selected>Estadísticas de pedidos</option>
+      </select>
+    </div>
+
+    <!-- CERRAR SESIÓN -->
+    <div class="header-user">
+      <a href="/logout" class="btn-logout">Cerrar sesión</a>
+      <div class="user-icon">
+        <img src="/img/iconoPerfil.png" alt="Usuario">
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <ul class="menu">
+      <li><a href="/admin_home">Inicio</a></li>
+      <li><a href="/admin_estadisticas">Estadísticas</a></li>
+      <li><a href="/admin_historial">Historial de Pedidos</a></li>
+      <li><a href="/admin_clientes">Clientes</a></li>
+    </ul>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <h1 class="page-title">ESTADÍSTICAS DE PEDIDOS</h1>
+
+    <% if (!dbConnected) { %>
+      <div
+        style="background-color: #fef08a; border-left: 4px solid #eab308; color: #a16207; padding: 16px; margin-bottom: 24px;">
+        <p style="font-weight: bold; margin: 0 0 5px 0;">Aviso</p>
+        <p style="margin: 0;">No se ha conectado Supabase. Mostrando datos vacíos. Configura tu `.env` para ver datos
+          reales.</p>
+      </div>
+      <% } %>
+
+        <!-- FILTER ROW -->
+        <div class="filter-row">
+          <select class="filter-select">
+            <option>Estadísticas de pedidos</option>
+          </select>
+          <select class="filter-select">
+            <option>Semanales</option>
+            <option>Mensuales</option>
+          </select>
+        </div>
+
+        <!-- ====== WEEKLY ORDERS CARD ====== -->
+        <div class="card">
+          <p class="card__label">ORDENES SEMANALES:</p>
+          <div class="orders-chart">
+            <!-- Bar Chart -->
+            <% const maxVal=Math.max(...diasSemana, 1); %> <!-- Prevenir div 0 -->
+              <div class="chart-area">
+                <div class="bar-group">
+                  <div class="bar"
+                    style="height: <%= Math.round((diasSemana[0] / maxVal) * 160) %>px; min-height: 10px;"></div>
+                  <span class="bar-label">Lunes</span>
+                </div>
+                <div class="bar-group">
+                  <div class="bar"
+                    style="height: <%= Math.round((diasSemana[1] / maxVal) * 160) %>px; min-height: 10px;"></div>
+                  <span class="bar-label">Martes</span>
+                </div>
+                <div class="bar-group">
+                  <div class="bar"
+                    style="height: <%= Math.round((diasSemana[2] / maxVal) * 160) %>px; min-height: 10px;"></div>
+                  <span class="bar-label">Miércoles</span>
+                </div>
+                <div class="bar-group">
+                  <div class="bar"
+                    style="height: <%= Math.round((diasSemana[3] / maxVal) * 160) %>px; min-height: 10px;"></div>
+                  <span class="bar-label">Jueves</span>
+                </div>
+                <div class="bar-group">
+                  <div class="bar"
+                    style="height: <%= Math.round((diasSemana[4] / maxVal) * 160) %>px; min-height: 10px;"></div>
+                  <span class="bar-label">Viernes</span>
+                </div>
+              </div>
+
+              <!-- Data Table -->
+              <table class="data-table">
+                <tbody>
+                  <tr>
+                    <td>LUNES</td>
+                    <td>
+                      <%= diasSemana[0] %> pedidos
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>MARTES</td>
+                    <td>
+                      <%= diasSemana[1] %> pedidos
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>MIÉRCOLES</td>
+                    <td>
+                      <%= diasSemana[2] %> pedidos
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>JUEVES</td>
+                    <td>
+                      <%= diasSemana[3] %> pedidos
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>VIERNES</td>
+                    <td>
+                      <%= diasSemana[4] %> pedidos
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+          </div>
+        </div>
+
+        <!-- ====== PRODUCTS MOST ORDERED ====== -->
+        <div class="card">
+          <p class="card__label">PRODUCTOS MÁS PEDIDOS SEMANALMENTE:</p>
+
+          <% if (productosSemana && productosSemana.length> 0) { %>
+            <% productosSemana.forEach(producto=> { %>
+              <div class="product-row">
+                <div class="product-img">
+                  <% if (producto.img) { %>
+                    <img src="<%= producto.img %>" alt="<%= producto.nombre %>" />
+                    <% } else { %>
+                      <div style="font-size: 32px;">📦</div>
+                      <% } %>
+                </div>
+                <div class="product-info">
+                  <h4>
+                    <%= producto.nombre %> &nbsp; <%= producto.desc %>
+                  </h4>
+                </div>
+                <div class="product-price">
+                  <p class="price-main">
+                    <%= producto.precio ? '$ ' + producto.precio : 'N/A' %>
+                  </p>
+                </div>
+              </div>
+              <% }); %>
+                <% } else { %>
+                  <p style="color: #6b7280; font-size: 14px;">No hay productos pedidos esta semana.</p>
+                  <% } %>
+
+        </div>
+
+  </main>
+
+</body>
+
+</html>
