@@ -8,6 +8,41 @@
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
     * { font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .chart-tooltip {
+        position: absolute;
+        pointer-events: none;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(4px);
+        color: white;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        z-index: 100;
+        display: none;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        min-width: 140px;
+    }
+    .tooltip-header {
+        font-weight: 800;
+        font-size: 13px;
+        margin-bottom: 6px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: #f8fafc;
+    }
+    .tooltip-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 4px;
+    }
+    .tooltip-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+    }
+    .hover-trigger { cursor: crosshair; }
 </style>
 </head>
 
@@ -225,8 +260,32 @@
             <text x="<%= LC + 20 %>" y="<%= BC + 40 %>" font-size="11" fill="#374151">Mes Actual</text>
             <rect x="<%= LC + 120 %>" y="<%= BC + 35 %>" width="14" height="4" rx="2" fill="#f87171" opacity="0.6"/>
             <text x="<%= LC + 140 %>" y="<%= BC + 40 %>" font-size="11" fill="#374151">Mes Anterior</text>
+
+            <!-- Hover trigger zones -->
+            <% ptsActual.forEach((p, i) => { 
+                const w = LW / (diasMes - 1 || 1);
+                const yAnt = ptsAnterior[i] ? ptsAnterior[i].y : BC;
+            %>
+                <rect x="<%= p.x - w/2 %>" y="<%= TC %>" width="<%= w %>" height="<%= BC - TC %>"
+                      fill="transparent" class="hover-trigger"
+                      data-day="<%= p.day %>"
+                      data-actual="<%= p.val %>"
+                      data-anterior="<%= anteriorArr[i] || 0 %>"
+                      data-x="<%= p.x %>"
+                      data-y-act="<%= p.y %>"
+                      data-y-ant="<%= yAnt %>"
+                />
+            <% }) %>
+
+            <!-- Vertical indicator line and highlight dots -->
+            <line id="hover-line" x1="0" y1="<%= TC %>" x2="0" y2="<%= BC %>" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 4" style="display:none;" />
+            <circle id="hover-dot-act" r="5" fill="#3b82f6" stroke="#fff" stroke-width="2" style="display:none;" />
+            <circle id="hover-dot-ant" r="4" fill="#f87171" stroke="#fff" stroke-width="1.5" style="display:none;" />
         </svg>
     </div>
+
+    <!-- Tooltip Element -->
+    <div id="chart-tooltip" class="chart-tooltip"></div>
 
     <!-- Weekly branches table -->
     <div class="bg-white rounded-[14px] shadow-[0_4px_16px_rgba(0,0,0,0.07)] overflow-hidden">
@@ -288,6 +347,67 @@
             tab.classList.add('border-blue-600', 'text-blue-600');
             tab.classList.remove('text-gray-500');
         }
+    });
+
+    // Tooltip Logic
+    const tooltip = document.getElementById('chart-tooltip');
+    const hoverLine = document.getElementById('hover-line');
+    const dotAct = document.getElementById('hover-dot-act');
+    const dotAnt = document.getElementById('hover-dot-ant');
+    const triggers = document.querySelectorAll('.hover-trigger');
+
+    triggers.forEach(trigger => {
+        trigger.addEventListener('mouseenter', (e) => {
+            const { day, actual, anterior, x, yAct, yAnt } = trigger.dataset;
+
+            tooltip.innerHTML = `
+                <div class="tooltip-header">${day}</div>
+                <div class="tooltip-row">
+                    <div class="tooltip-dot bg-blue-500"></div>
+                    <span>Periodo Actual: <b>${actual}</b></span>
+                </div>
+                <div class="tooltip-row">
+                    <div class="tooltip-dot bg-red-400 opacity-60"></div>
+                    <span>Periodo Anterior: <b>${anterior}</b></span>
+                </div>
+            `;
+            tooltip.style.display = 'block';
+            
+            // Show guide line and dots
+            hoverLine.setAttribute('x1', x);
+            hoverLine.setAttribute('x2', x);
+            hoverLine.style.display = 'block';
+
+            dotAct.setAttribute('cx', x);
+            dotAct.setAttribute('cy', yAct);
+            dotAct.style.display = 'block';
+
+            dotAnt.setAttribute('cx', x);
+            dotAnt.setAttribute('cy', yAnt);
+            dotAnt.style.display = 'block';
+        });
+
+        trigger.addEventListener('mousemove', (e) => {
+            // Position tooltip
+            const offset = 15;
+            let left = e.pageX + offset;
+            let top = e.pageY - 40;
+
+            // Simple collision detection for right edge
+            if (left + 160 > window.innerWidth) {
+                left = e.pageX - 160 - offset;
+            }
+
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + 'px';
+        });
+
+        trigger.addEventListener('mouseleave', () => {
+            tooltip.style.display = 'none';
+            hoverLine.style.display = 'none';
+            dotAct.style.display = 'none';
+            dotAnt.style.display = 'none';
+        });
     });
 </script>
 
