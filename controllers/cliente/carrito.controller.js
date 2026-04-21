@@ -66,9 +66,8 @@ exports.agregarItem = async (request, response, next) => {
             request.body.cantidad_ingresada
         );
 
-        log('CLIENTE', 'CARRITO: PRODUCTO AGREGADO', `id_cliente: ${request.session.usuario}, id_producto: ${request.body.id_producto}, cantidad: ${request.body.cantidad_ingresada}`);
 
-        response.redirect('/cliente/home?info=' + encodeURIComponent("Se agrego el producto al carrito"))
+        response.redirect('/cliente/home')
 
     } catch (err) {
         response.redirect(`/cliente/product/${request.body.id_producto}?error=` + encodeURIComponent("No se pudo agregar el producto al carrito"));

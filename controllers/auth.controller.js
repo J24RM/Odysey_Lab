@@ -149,6 +149,7 @@ exports.getClienteHome = async (request, response) => {
     }
 };
 
+
 //Se accede al dar clic en "Cerrar sesion"
 exports.logout = (request, response) => {
     const usuario = request.session.usuario;
