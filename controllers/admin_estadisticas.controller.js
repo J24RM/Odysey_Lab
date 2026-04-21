@@ -11,15 +11,20 @@ exports.getEstadisticas = async (request, response) => {
         productoMasVendido: null,
         porcentajeProducto: 0,
         topSucursales: [],
+        topSucursalesChart: [],
         porcentajeSucursales: 0,
         dbConnected: false
     };
 
     try {
-        const stats = await Estadisticas.getEstadisticasGenerales();
+        const [stats, topSucursalesChart] = await Promise.all([
+            Estadisticas.getEstadisticasGenerales(),
+            Estadisticas.getTopSucursalesPorOrdenes()
+        ]);
         if (stats) {
             pageData = { ...pageData, ...stats, dbConnected: true };
         }
+        pageData.topSucursalesChart = topSucursalesChart || [];
     } catch (error) {
         console.error("Error fetching admin estadísticas from Model:", error);
     }
