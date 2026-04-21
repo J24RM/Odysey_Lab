@@ -222,11 +222,11 @@ module.exports = class Estadisticas {
             conteo[id] = (conteo[id] || 0) + 1;
         }
 
-        // 5. Construir el array resultado, ordenado de mayor a menor
+        // 5. Construir el array resultado, top 10 ordenado de mayor a menor
         const sucursales = sucursalesData.map(s => ({
             nombre: s.nombre_sucursal,
             total: conteo[s.id_sucursal] || 0
-        })).sort((a, b) => b.total - a.total);
+        })).sort((a, b) => b.total - a.total).slice(0, 10);
 
         const total = (ordenes || []).length;
 
