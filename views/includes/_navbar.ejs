@@ -44,14 +44,26 @@
 
     <!-- Menu derecho -->
     <div class="flex items-center space-x-6 shrink-0">
-        <a href="/cliente/mis-pedidos" class="bg-white border text-gray-800 border-gray-300 rounded-md px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">Mis Pedidos</a>
-        <a href="/cart" class="hover:opacity-80 transition-opacity">
+        <a href="/cliente/mis-pedidos" class="bg-white border text-gray-800 border-gray-300 rounded-md px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">Mis Ordenes</a>
+       <a href="/cart" class="hover:opacity-80 transition-opacity relative inline-block">
             <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" class="w-[35px]" alt="Carrito">
+            <% if (locals.cartCount && locals.cartCount > 0) { %>
+                <span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none">
+                <%= locals.cartCount > 99 ? '+99' : locals.cartCount %>
+                </span>
+            <% } %>
         </a>
         <button id="btnPerfil" data-bs-toggle="modal" data-bs-target="#modalSelector" class="block hover:opacity-80 transition-opacity">
             <img src="/img/iconoPerfil.png" class="w-[40px] h-[40px] rounded-full object-cover shadow-sm border" alt="Perfil">
         </button>
     </div>
+    <!-- Carga -->
+<div id="page-loader" class="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-200" style="background-color: rgba(0,39,54,0.35);">
+  <div class="bg-white rounded-2xl shadow-xl px-10 py-8 flex flex-col items-center gap-4">
+    <div class="w-10 h-10 rounded-full border-4 border-gray-200 border-t-[#0078A9] animate-spin"></div>
+    <span class="text-sm font-semibold text-gray-700">Cargando...</span>
+  </div>
+</div>
 </nav>
 
 <%- include('_modal_info') %>

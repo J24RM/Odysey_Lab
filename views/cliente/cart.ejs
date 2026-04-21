@@ -33,11 +33,10 @@
 <div class="max-w-7xl mx-auto px-6 py-10 flex gap-6 items-start">
 
   <!-- Columna izquierda -->
-  <div class="flex-1 rounded-2xl p-8" style="background-color: rgba(0, 120, 169, 0.102);">
+  <div class="flex-1 rounded-2xl p-8 shadow-sm p-7 bg-white">
 
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-4xl font-black text-gray-900">Carrito</h1>
-      <span class="text-xl font-bold" style="color: #1FB5DF;">Sucursal: <%= sucursal_activa.nombre_sucursal %></span>
     </div>
 
     <hr class="border-gray-300 mb-0" />
@@ -83,7 +82,7 @@
         </a>
         
         <div class="flex items-center gap-4 mt-4">
-          <div class="flex items-center gap-2 border-2 rounded-full px-3 py-1" style="border-color: #1FB5DF;">
+          <div class="flex items-center gap-2 border-2 rounded-full px-3 py-1" style="border-color: #00000066;">
             <button onclick="cambiarCantidad(<%= item.id_producto %>, -1)"
               class="text-gray-700 font-bold text-lg w-5 h-5 flex items-center justify-center hover:opacity-70 transition">−</button>
 
@@ -102,7 +101,7 @@
 
           </div>
           <button onclick="eliminarProducto(<%= item.id_producto %>)"                                                                                                                           
-            class="text-sm font-medium hover:underline" style="color: #1FB5DF;">Eliminar</button>
+            class="text-sm font-medium hover:underline" style="color: #000000;">Eliminar</button>
         </div>
       </div>
 
@@ -159,9 +158,10 @@
   document.querySelector('form[action="/orden/registrar"]').addEventListener('submit', function(e) {
     if (!window._sucursalActivaId) {
       e.preventDefault();
+      e.stopImmediatePropagation();
       window.abrirModalPerfil({ forzado: true });
     }
-  });
+  }, true); 
 </script>
 </body>
 </html>

@@ -65,6 +65,11 @@ async function enviarCantidad(idProducto, cantidad) {
 
   if (data.csrfToken) csrfToken = data.csrfToken;
 
+  if (data.cartCount !== undefined) {
+          
+        actualizarCartBadge(data.cartCount);
+  }
+
   if (!res.ok) {
     mostrarError('No se pudo actualizar el producto');
     return;
@@ -137,4 +142,5 @@ document.addEventListener('DOMContentLoaded', () => {
         window.history.replaceState({}, '', '/cart');
     }
 });
+
 

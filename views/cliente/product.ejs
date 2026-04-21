@@ -107,9 +107,6 @@
         <!-- Precio -->
         <p class="text-4xl font-extrabold text-gray-900">$ <%= producto.precio %></p>
 
-        <!-- Sucursal -->
-        <p class="text-sm font-semibold" style="color: #0078A9;">Sucursal: Galerias</p>
-
         <!-- Cantidad -->
       <div class="flex items-center border border-gray-400 rounded-md px-4 py-2 bg-white gap-2">
         <label class="text-sm font-semibold text-gray-800">Cantidad:</label>
@@ -125,6 +122,7 @@
           class="w-16 text-sm font-semibold text-gray-800 outline-none text-right"
         />
       </div>
+      
 
       <!-- Botón agregar al carrito -->
       <form action="/cart/items" method="POST">
