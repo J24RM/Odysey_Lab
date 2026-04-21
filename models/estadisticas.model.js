@@ -233,6 +233,55 @@ module.exports = class Estadisticas {
         return { sucursales, total, estados, edoFiltro };
     }
 
+    static async getDetalleSucursal(id_sucursal) {
+        if (!supabase) return null;
+
+        const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+        // 1. Nombre de la sucursal
+        const { data: sucursal } = await supabase
+            .from('sucursal')
+            .select('nombre_sucursal')
+            .eq('id_sucursal', id_sucursal)
+            .single();
+
+        // 2. Órdenes de los últimos 6 meses
+        const hace6Meses = new Date();
+        hace6Meses.setMonth(hace6Meses.getMonth() - 6);
+
+        const { data: ordenes } = await supabase
+            .from('orden')
+            .select('fecha_realizada')
+            .eq('id_sucursal', id_sucursal)
+            .gte('fecha_realizada', hace6Meses.toISOString());
+
+        // 3. Inicializar los últimos 6 meses con 0
+        const conteo = {};
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date();
+            d.setMonth(d.getMonth() - i);
+            const key = `${d.getFullYear()}-${d.getMonth()}`;
+            conteo[key] = { label: MESES[d.getMonth()], total: 0 };
+        }
+
+        // 4. Contar órdenes por mes
+        for (const ord of (ordenes || [])) {
+            const d = new Date(ord.fecha_realizada);
+            const key = `${d.getFullYear()}-${d.getMonth()}`;
+            if (conteo[key]) conteo[key].total++;
+        }
+
+        const meses   = Object.values(conteo).map(m => m.label);
+        const totales = Object.values(conteo).map(m => m.total);
+
+        return {
+            nombre: sucursal?.nombre_sucursal || 'Sucursal',
+            meses,
+            totales,
+            totalHistorico: (ordenes || []).length
+        };
+    }
+
     static async getFrequenciaSucursales() {
         if (!supabase) return null;
 
