@@ -99,29 +99,24 @@
 
     </div>
 
-    <!-- Bar chart card -->
+    <!-- Line chart card: Total de ventas en el mes -->
     <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)] mb-6">
-        <p class="text-[13px] font-bold text-gray-400 tracking-wide mb-6 uppercase">Sucursales con más pedidos confirmados</p>
+        <p class="text-[13px] font-bold text-gray-400 tracking-wide mb-6 uppercase">Total de ventas en el mes</p>
 
-        <% if (!topSucursalesChart || topSucursalesChart.length === 0) { %>
-            <div class="flex flex-col items-center justify-center py-20 text-center">
-                <div class="text-5xl mb-4">📊</div>
-                <p class="text-gray-400 text-sm">Aún no hay órdenes confirmadas con sucursal asignada.</p>
-            </div>
-        <% } else { %>
         <%
-            const CL = 70, CR = 875, CT = 50, CB = 310;
-            const CW = CR - CL;
-            const CH = CB - CT;
-            const n = topSucursalesChart.length;
-            const gw = CW / n;
-            const bw = Math.max(14, Math.min(26, gw * 0.28));
-            const gap = 5;
+            const vd = typeof ventasDiarias !== 'undefined' ? ventasDiarias : { actual: [], anterior: [], diasEnMes: 30, diasEnMesAnterior: 30 };
+            const diasMes = vd.diasEnMes || 30;
+            const actualArr = vd.actual || [];
+            const anteriorArr = vd.anterior || [];
+            const maxVal = Math.max(1, ...actualArr, ...anteriorArr);
 
-            const maxOrd = Math.max(...topSucursalesChart.map(s => s.total_ordenes));
-            const maxVen = Math.max(...topSucursalesChart.map(s => s.total_ventas));
+            // Chart dimensions
+            const LC = 60, RC = 890, TC = 40, BC = 310;
+            const LW = RC - LC;
+            const LH = BC - TC;
 
-            function niceMax(v) {
+            // Nice max for Y axis
+            function niceMaxLine(v) {
                 if (v <= 0) return 1;
                 const exp = Math.floor(Math.log10(v));
                 const mag = Math.pow(10, exp);
@@ -130,101 +125,107 @@
                 }
                 return 10 * mag;
             }
+            const yMax = niceMaxLine(maxVal);
 
-            const amOrd = niceMax(maxOrd);
-            const amVen = niceMax(maxVen);
+            // Generate Y axis ticks (integers)
+            const yStep = Math.max(1, Math.ceil(yMax / 5));
+            const yTicks = [];
+            for (let v = 0; v <= yMax; v += yStep) yTicks.push(v);
+            if (yTicks[yTicks.length - 1] !== yMax) yTicks.push(yMax);
 
-            function fmtPeso(v) {
-                if (v >= 1000000) return '$' + (v / 1000000).toFixed(1) + 'M';
-                if (v >= 1000) return '$' + Math.round(v / 1000) + 'K';
-                return '$' + Math.round(v);
+            // Generate points for the line charts
+            function makePoints(arr, days) {
+                const pts = [];
+                for (let i = 0; i < days; i++) {
+                    const x = Math.round(LC + (i / (days - 1 || 1)) * LW);
+                    const val = arr[i] || 0;
+                    const y = Math.round(BC - (val / yMax) * LH);
+                    pts.push({ x, y, val, day: i + 1 });
+                }
+                return pts;
             }
 
-            const tickFracs = [0, 0.25, 0.5, 0.75, 1.0];
+            const ptsActual = makePoints(actualArr, diasMes);
+            const ptsAnterior = makePoints(anteriorArr, vd.diasEnMesAnterior || diasMes);
 
-            const ordStep = Math.max(1, Math.ceil(amOrd / 5));
-            const ordTickVals = [];
-            for (let v = 0; v <= amOrd; v += ordStep) ordTickVals.push(v);
-            if (ordTickVals[ordTickVals.length - 1] !== amOrd) ordTickVals.push(amOrd);
+            // Build polyline strings
+            const lineActual = ptsActual.map(p => p.x + ',' + p.y).join(' ');
+            const lineAnterior = ptsAnterior.map(p => p.x + ',' + p.y).join(' ');
+
+            // Area fill under actual line
+            const areaActual = LC + ',' + BC + ' ' + lineActual + ' ' + RC + ',' + BC;
         %>
 
-        <svg viewBox="0 0 960 500" width="100%">
-
-            <% tickFracs.forEach(t => {
-                const gy = Math.round(CB - CH * t);
+        <svg viewBox="0 0 960 380" width="100%">
+            <!-- Grid lines -->
+            <% yTicks.forEach(val => {
+                const gy = Math.round(BC - (val / yMax) * LH);
             %>
-                <line x1="<%= CL %>" y1="<%= gy %>" x2="<%= CR %>" y2="<%= gy %>"
+                <line x1="<%= LC %>" y1="<%= gy %>" x2="<%= RC %>" y2="<%= gy %>"
                       stroke="#f3f4f6" stroke-width="1"/>
+                <text x="<%= LC - 8 %>" y="<%= gy + 4 %>" text-anchor="end"
+                      font-size="10" fill="#9ca3af"><%= val %></text>
             <% }) %>
 
-            <line x1="<%= CL %>" y1="<%= CT %>" x2="<%= CL %>" y2="<%= CB %>" stroke="#e5e7eb" stroke-width="1.5"/>
-            <line x1="<%= CR %>" y1="<%= CT %>" x2="<%= CR %>" y2="<%= CB %>" stroke="#e5e7eb" stroke-width="1.5"/>
-            <line x1="<%= CL %>" y1="<%= CB %>" x2="<%= CR %>" y2="<%= CB %>" stroke="#e5e7eb" stroke-width="1.5"/>
+            <!-- Axis lines -->
+            <line x1="<%= LC %>" y1="<%= TC %>" x2="<%= LC %>" y2="<%= BC %>" stroke="#e5e7eb" stroke-width="1"/>
+            <line x1="<%= LC %>" y1="<%= BC %>" x2="<%= RC %>" y2="<%= BC %>" stroke="#e5e7eb" stroke-width="1"/>
 
-            <% ordTickVals.forEach(val => {
-                const ty = Math.round(CB - (val / amOrd) * CH);
+            <!-- X axis labels (days) -->
+            <% for (let d = 1; d <= diasMes; d++) {
+                const dx = Math.round(LC + ((d - 1) / (diasMes - 1 || 1)) * LW);
             %>
-                <text x="<%= CL - 8 %>" y="<%= ty + 4 %>" text-anchor="end" font-size="10" fill="#9ca3af"><%= val %></text>
-            <% }) %>
-            <text x="<%= CL - 42 %>" y="<%= Math.round((CT + CB) / 2) %>"
-                  transform="rotate(-90, <%= CL - 42 %>, <%= Math.round((CT + CB) / 2) %>)"
-                  text-anchor="middle" font-size="10" fill="#6b7280" font-weight="600">Pedidos</text>
+                <text x="<%= dx %>" y="<%= BC + 18 %>" text-anchor="middle"
+                      font-size="9" fill="#9ca3af"><%= d %></text>
+            <% } %>
 
-            <% tickFracs.forEach(t => {
-                const ty = Math.round(CB - CH * t);
-            %>
-                <text x="<%= CR + 8 %>" y="<%= ty + 4 %>" text-anchor="start" font-size="10" fill="#9ca3af"><%= fmtPeso(amVen * t) %></text>
-            <% }) %>
-            <text x="<%= CR + 54 %>" y="<%= Math.round((CT + CB) / 2) %>"
-                  transform="rotate(90, <%= CR + 54 %>, <%= Math.round((CT + CB) / 2) %>)"
-                  text-anchor="middle" font-size="10" fill="#6b7280" font-weight="600">Ingresos (MXN)</text>
+            <!-- Area fill under current month line -->
+            <defs>
+                <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.25"/>
+                    <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.02"/>
+                </linearGradient>
+            </defs>
+            <polygon points="<%= areaActual %>" fill="url(#areaGrad)"/>
 
-            <% topSucursalesChart.forEach((s, i) => {
-                const groupX = CL + i * gw;
-                const centerX = Math.round(groupX + gw / 2);
-                const offset = (gw - bw * 2 - gap) / 2;
-                const x1 = Math.round(groupX + offset);
-                const x2 = x1 + bw + gap;
+            <!-- Previous month line (pink/red, dashed) -->
+            <% if (ptsAnterior.length > 1) { %>
+            <polyline points="<%= lineAnterior %>"
+                      fill="none" stroke="#f87171" stroke-width="2"
+                      stroke-dasharray="6 4" stroke-opacity="0.6" stroke-linejoin="round"/>
+            <% } %>
 
-                const hOrd = Math.max(2, Math.round((s.total_ordenes / amOrd) * CH));
-                const hVen = Math.max(2, Math.round((s.total_ventas / amVen) * CH));
-                const yOrd = CB - hOrd;
-                const yVen = CB - hVen;
+            <!-- Current month line (blue) -->
+            <% if (ptsActual.length > 1) { %>
+            <polyline points="<%= lineActual %>"
+                      fill="none" stroke="#3b82f6" stroke-width="2.5"
+                      stroke-linejoin="round" stroke-linecap="round"/>
+            <% } %>
 
-                const labelOrdY = Math.max(CT + 12, yOrd - 5);
-                const labelVenY = Math.max(CT + 12, yVen - 5);
-            %>
-                <rect x="<%= x1 %>" y="<%= yOrd %>" width="<%= bw %>" height="<%= hOrd %>"
-                      fill="#0050A0" rx="3">
-                    <title><%= s.nombre_sucursal %> — <%= s.nombre_cuenta %>: <%= s.total_ordenes %> pedidos confirmados</title>
-                </rect>
-                <text x="<%= Math.round(x1 + bw / 2) %>" y="<%= labelOrdY %>"
-                      text-anchor="middle" font-size="9" fill="#0050A0" font-weight="700">
-                    <%= s.total_ordenes %>
-                </text>
-
-                <rect x="<%= x2 %>" y="<%= yVen %>" width="<%= bw %>" height="<%= hVen %>"
-                      fill="#10b981" rx="3">
-                    <title><%= s.nombre_sucursal %> — <%= s.nombre_cuenta %>: <%= fmtPeso(s.total_ventas) %> en ingresos</title>
-                </rect>
-                <text x="<%= Math.round(x2 + bw / 2) %>" y="<%= labelVenY %>"
-                      text-anchor="middle" font-size="9" fill="#10b981" font-weight="700">
-                    <%= fmtPeso(s.total_ventas) %>
-                </text>
-
-                <g transform="translate(<%= centerX %>, <%= CB + 14 %>) rotate(-45)">
-                    <text x="0" y="0" text-anchor="end" font-size="9.5" fill="#374151"><%= s.nombre_sucursal %></text>
-                    <text x="0" y="13" text-anchor="end" font-size="8.5" fill="#9ca3af"><%= s.nombre_cuenta %></text>
-                </g>
+            <!-- Data points for current month -->
+            <% ptsActual.forEach(p => { %>
+                <% if (p.val > 0) { %>
+                <circle cx="<%= p.x %>" cy="<%= p.y %>" r="3" fill="#3b82f6" stroke="#fff" stroke-width="1.5">
+                    <title>Día <%= p.day %>: <%= p.val %> pedidos</title>
+                </circle>
+                <% } %>
             <% }) %>
 
-            <rect x="<%= CL %>" y="<%= CT - 30 %>" width="12" height="12" fill="#0050A0" rx="2"/>
-            <text x="<%= CL + 16 %>" y="<%= CT - 20 %>" font-size="11" fill="#374151">Pedidos confirmados</text>
-            <rect x="<%= CL + 150 %>" y="<%= CT - 30 %>" width="12" height="12" fill="#10b981" rx="2"/>
-            <text x="<%= CL + 166 %>" y="<%= CT - 20 %>" font-size="11" fill="#374151">Ingresos totales (MXN)</text>
+            <!-- Data points for previous month -->
+            <% ptsAnterior.forEach(p => { %>
+                <% if (p.val > 0) { %>
+                <circle cx="<%= p.x %>" cy="<%= p.y %>" r="2.5" fill="#f87171" stroke="#fff" stroke-width="1">
+                    <title>Mes anterior, día <%= p.day %>: <%= p.val %> pedidos</title>
+                </circle>
+                <% } %>
+            <% }) %>
 
+            <!-- Legend -->
+            <rect x="<%= LC %>" y="<%= BC + 35 %>" width="14" height="4" rx="2" fill="#3b82f6"/>
+            <text x="<%= LC + 20 %>" y="<%= BC + 40 %>" font-size="11" fill="#374151">Mes Actual</text>
+            <rect x="<%= LC + 120 %>" y="<%= BC + 35 %>" width="14" height="4" rx="2" fill="#f87171" opacity="0.6"/>
+            <text x="<%= LC + 140 %>" y="<%= BC + 40 %>" font-size="11" fill="#374151">Mes Anterior</text>
         </svg>
-        <% } %>
     </div>
 
     <!-- Weekly branches table -->

@@ -17,14 +17,16 @@ exports.getEstadisticas = async (request, response) => {
     };
 
     try {
-        const [stats, topSucursalesChart] = await Promise.all([
+        const [stats, topSucursalesChart, ventasDiarias] = await Promise.all([
             Estadisticas.getEstadisticasGenerales(),
-            Estadisticas.getTopSucursalesPorOrdenes()
+            Estadisticas.getTopSucursalesPorOrdenes(),
+            Estadisticas.getVentasDiariasGenerales()
         ]);
         if (stats) {
             pageData = { ...pageData, ...stats, dbConnected: true };
         }
         pageData.topSucursalesChart = topSucursalesChart || [];
+        pageData.ventasDiarias = ventasDiarias || { actual: [], anterior: [], diasEnMes: 30, diasEnMesAnterior: 30 };
     } catch (error) {
         console.error("Error fetching admin estadísticas from Model:", error);
     }

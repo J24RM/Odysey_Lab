@@ -242,6 +242,42 @@ module.exports = class Estadisticas {
         return data;
     }
 
+    static async getVentasDiariasGenerales() {
+        if (!supabase) return { actual: [], anterior: [], diasEnMes: 30, diasEnMesAnterior: 30 };
+
+        const now = new Date();
+        const mesInicio = new Date(now.getFullYear(), now.getMonth(), 1);
+        const mesFin = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const mesAnteriorInicio = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const mesAnteriorFin = new Date(now.getFullYear(), now.getMonth(), 0);
+
+        const [{ data: actual }, { data: anterior }] = await Promise.all([
+            supabase.from('orden').select('fecha_realizada')
+                .gte('fecha_realizada', mesInicio.toISOString())
+                .lte('fecha_realizada', mesFin.toISOString()),
+            supabase.from('orden').select('fecha_realizada')
+                .gte('fecha_realizada', mesAnteriorInicio.toISOString())
+                .lte('fecha_realizada', mesAnteriorFin.toISOString())
+        ]);
+
+        const diasEnMes = mesFin.getDate();
+        const diasEnMesAnterior = mesAnteriorFin.getDate();
+
+        const actualPorDia = Array(diasEnMes).fill(0);
+        for (const o of (actual || [])) {
+            const d = new Date(o.fecha_realizada).getDate() - 1;
+            if (d >= 0 && d < diasEnMes) actualPorDia[d]++;
+        }
+
+        const anteriorPorDia = Array(diasEnMesAnterior).fill(0);
+        for (const o of (anterior || [])) {
+            const d = new Date(o.fecha_realizada).getDate() - 1;
+            if (d >= 0 && d < diasEnMesAnterior) anteriorPorDia[d]++;
+        }
+
+        return { actual: actualPorDia, anterior: anteriorPorDia, diasEnMes, diasEnMesAnterior };
+    }
+
     static async getTopSucursalesPorOrdenes() {
         const { data: ordenes, error: e1 } = await supabase
             .from('orden')
