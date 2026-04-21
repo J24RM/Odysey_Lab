@@ -27,8 +27,20 @@ exports.getEstadisticas = async (request, response) => {
     response.render('admin/stats', pageData);
 };
 
-exports.getEstadisticasSucursales = (request, response) => {
-    response.render('admin/stats_sucursales', { usuario: request.session.usuario });
+exports.getEstadisticasSucursales = async (request, response) => {
+    try {
+        const topSucursales = await Estadisticas.getTopSucursalesPorOrdenes();
+        response.render('admin/stats_sucursales', {
+            usuario: request.session.usuario,
+            topSucursales
+        });
+    } catch (error) {
+        console.error('Error stats sucursales:', error);
+        response.render('admin/stats_sucursales', {
+            usuario: request.session.usuario,
+            topSucursales: []
+        });
+    }
 };
 
 // Estadisitcas Por Producto

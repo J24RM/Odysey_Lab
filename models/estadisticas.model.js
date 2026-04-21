@@ -242,4 +242,56 @@ module.exports = class Estadisticas {
         return data;
     }
 
+    static async getTopSucursalesPorOrdenes() {
+        const { data: ordenes, error: e1 } = await supabase
+            .from('orden')
+            .select('id_sucursal, subtotal')
+            .eq('estado', 'confirmada')
+            .not('id_sucursal', 'is', null);
+        if (e1) throw e1;
+
+        const map = {};
+        for (const o of (ordenes || [])) {
+            const id = o.id_sucursal;
+            if (!map[id]) map[id] = { total_ordenes: 0, total_ventas: 0 };
+            map[id].total_ordenes++;
+            map[id].total_ventas += parseFloat(o.subtotal) || 0;
+        }
+
+        if (Object.keys(map).length === 0) return [];
+
+        const ids = Object.keys(map).map(Number);
+
+        const { data: sucursales, error: e2 } = await supabase
+            .from('sucursal')
+            .select('id_sucursal, nombre_sucursal')
+            .in('id_sucursal', ids);
+        if (e2) throw e2;
+
+        const { data: junctions, error: e3 } = await supabase
+            .from('sucursal_cuenta')
+            .select('id_sucursal, cuenta(nombre_dueno)')
+            .in('id_sucursal', ids);
+        if (e3) throw e3;
+
+        const sucMap = {};
+        for (const s of (sucursales || [])) sucMap[s.id_sucursal] = s.nombre_sucursal;
+
+        const cuentaMap = {};
+        for (const j of (junctions || [])) {
+            if (!cuentaMap[j.id_sucursal]) cuentaMap[j.id_sucursal] = j.cuenta?.nombre_dueno || 'Sin cuenta';
+        }
+
+        return Object.entries(map)
+            .map(([id, stats]) => ({
+                id_sucursal: parseInt(id),
+                nombre_sucursal: sucMap[parseInt(id)] || 'Sucursal ' + id,
+                nombre_cuenta: cuentaMap[parseInt(id)] || 'Sin cuenta',
+                total_ordenes: stats.total_ordenes,
+                total_ventas: parseFloat(stats.total_ventas.toFixed(2))
+            }))
+            .sort((a, b) => b.total_ordenes - a.total_ordenes)
+            .slice(0, 10);
+    }
+
 };
