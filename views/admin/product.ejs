@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de Producto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+
+    <%- include('partials/header.ejs') %>
+
+    <div class="flex min-h-screen flex-col">
+        <%- include('partials/sidebar.ejs') %>
+
+        <!-- Main Content -->
+        <main class="ml-48 pt-2 px-10 pb-9 flex-1">
+            <section class="space-y-8">
+                <!-- Back Button -->
+                <a href="/admin/home" class="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 transition-colors">
+                    <span>←</span>
+                    <span>Volver</span>
+                </a>
+
+                <h1 class="text-3xl font-extrabold text-gray-900">Detalle del producto</h1>
+
+                <!-- Product Detail Section -->
+                <div class="grid grid-cols-3 gap-8">
+                    <!-- Left: Product Info -->
+                    <div class="col-span-2 space-y-6">
+                        <!-- Image -->
+                        <div class="bg-white rounded-2xl p-8 shadow-md flex items-center justify-center min-h-96">
+                            <img src="/uploads/<%= producto.imagen %>" alt="<%= producto.nombre %>" class="max-w-full max-h-full object-contain" onerror="this.src='/img/botePintura.png'">
+                        </div>
+
+                        <!-- Product Details -->
+                        <div class="bg-white rounded-2xl p-8 shadow-md space-y-5">
+                            <h2 class="text-2xl font-extrabold text-gray-900"><%= producto.nombre %></h2>
+                            <div class="text-2xl text-yellow-500">★★★★★</div>
+                            <div class="border-t-2 border-gray-200 pt-4">
+                                <p class="text-3xl font-extrabold text-gray-900">$<%= producto.precio %></p>
+                            </div>
+
+                            <!-- Metadata -->
+                            <div class="space-y-2 text-gray-600">
+                                <p class="text-sm"><strong>Peso:</strong> <%= producto.peso %></p>
+                                <p class="text-sm"><strong>Volumen:</strong> <%= producto.volumen %></p>
+                                <p class="text-sm"><strong>Unidad de Venta:</strong> <%= producto.unidadVenta %></p>
+                                <p class="text-sm"><strong>Unidad de Medida:</strong> <%= producto.unidadMedida %></p>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="border-t-2 border-gray-200 pt-4 space-y-3">
+                                <h3 class="font-bold text-gray-900 text-lg">Descripción</h3>
+                                <ul class="list-disc list-inside space-y-1 text-gray-600 text-sm">
+                                    <% producto.descripcion.forEach((item) => { %>
+                                        <li><%= item %></li>
+                                    <% }); %>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Actions -->
+                    <aside class="space-y-4">
+                        <div class="bg-white rounded-2xl p-6 shadow-md space-y-4 h-fit">
+                            <a href="/admin/home_agregarProducto" class="block w-full py-3 px-4 bg-blue-600 text-white font-bold text-center rounded-lg hover:bg-blue-700 transition-colors">
+                                Editar
+                            </a>
+                            <a href="/admin/stats" class="block w-full py-3 px-4 bg-gray-100 text-gray-900 font-bold text-center rounded-lg hover:bg-gray-200 transition-colors">
+                                Ver estadísticas del producto
+                            </a>
+                        </div>
+                    </aside>
+                </div>
+
+                <!-- Similar Products Section -->
+                <section class="space-y-6">
+                    <h2 class="text-2xl font-extrabold text-gray-900">Productos similares</h2>
+                    <div class="grid grid-cols-4 gap-5">
+                        <% producto.similars.forEach((imagen) => { %>
+                            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                                <img src="<%= imagen %>" alt="Producto similar" class="w-full h-48 object-cover">
+                            </div>
+                        <% }); %>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+
+    <%- include('partials/footer.ejs') %>
+
+</body>
+</html>
