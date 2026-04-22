@@ -293,19 +293,24 @@ module.exports = class Estadisticas {
             .single();
 
         // 2. Órdenes de ambos períodos en paralelo
-        const [{ data: ordenesActual }, { data: ordenesAnterior }] = await Promise.all([
+        const filtroActual   = toDbStr(inicioActual);
+        const filtroAnterior = toDbStr(inicioAnterior);
+        console.log(`[detalle] sucursal=${id_sucursal} periodo=${periodo} inicioActual="${filtroActual}" inicioAnterior="${filtroAnterior}"`);
+
+        const [{ data: ordenesActual, error: e1 }, { data: ordenesAnterior, error: e2 }] = await Promise.all([
             supabase.from('orden')
                 .select('fecha_realizada, subtotal, estado')
                 .eq('id_sucursal', id_sucursal)
-                .gte('fecha_realizada', toDbStr(inicioActual))
+                .gte('fecha_realizada', filtroActual)
                 .neq('estado', 'cancelada'),
             supabase.from('orden')
                 .select('fecha_realizada, subtotal')
                 .eq('id_sucursal', id_sucursal)
-                .gte('fecha_realizada', toDbStr(inicioAnterior))
-                .lt('fecha_realizada', toDbStr(inicioActual))
+                .gte('fecha_realizada', filtroAnterior)
+                .lt('fecha_realizada', filtroActual)
                 .neq('estado', 'cancelada')
         ]);
+        console.log(`[detalle] resultados actual=${ordenesActual?.length ?? 'null'} error=${e1?.message ?? 'ok'} | anterior=${ordenesAnterior?.length ?? 'null'} error=${e2?.message ?? 'ok'}`);
 
         // 3. KPIs
         const cantActual   = (ordenesActual  || []).length;
