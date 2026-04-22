@@ -162,11 +162,11 @@ window.perfilUsuario = {
             <span class="stat-value"><%= ordenesDe_hoy %></span>
         </div>
         <div class="stat-item">
-            <span class="stat-label">Ordenes Totales</span>
+            <span class="stat-label">Órdenes Totales</span>
             <span class="stat-value"><%= pedidos.length %></span>
         </div>
         <div class="stat-item">
-            <span class="stat-label">Ordenes confirmadas</span>
+            <span class="stat-label">Órdenes confirmadas</span>
             <span class="stat-value"><%= ordenesConfirmadas %></span>
         </div>
     </div>
@@ -442,7 +442,12 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
             detalles.forEach(d => {
                 const precio = d.producto.precio_unitario;
                 const total = precio * d.cantidad;
-                const img = d.producto.url_imagen || '/img/botePintura.png';
+                let img = '/img/botePintura.png';
+                if (d.producto.url_imagen) {
+                    img = d.producto.url_imagen.startsWith('/uploads/') 
+                        ? d.producto.url_imagen 
+                        : '/uploads/' + d.producto.url_imagen.replace(/^\//, '');
+                }
                 container.innerHTML += `
                     <div class="producto-item flex flex-col sm:flex-row items-center gap-4 border-b border-gray-100 pb-4">
                         <div class="img-box w-16 h-16 shrink-0 bg-gray-50 border border-gray-200 rounded p-1">
