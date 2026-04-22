@@ -1,5 +1,17 @@
 const supabase = require('../utils/supabase');
 
+// Formatea una fecha como "YYYY-MM-DD HH:MM:SS" (mismo formato que toLocaleString guarda en BD)
+function toDbStr(d) {
+    const p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+
+// Extrae solo "YYYY-MM-DD" de una fecha local para comparar contra startsWith
+function toDateStr(d) {
+    const p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+}
+
 module.exports = class Estadisticas {
 
     static getLastWeekRange() {
@@ -187,147 +199,291 @@ module.exports = class Estadisticas {
         return result;
     }
 
-    static async getStatsProductos(inicio, fin) {
-        const { data, error } = await supabase.rpc('stats_productos', {
-            fecha_inicio: inicio.toISOString().split('T')[0],
-            fecha_fin: fin.toISOString().split('T')[0]
-        });
+    static async getEstadisticasSucursales(edoFiltro = null) {
+        if (!supabase) return null;
 
-        if (error) throw error;
+        // 1. Traer todos los estados disponibles para el dropdown
+        const { data: edosData } = await supabase
+            .from('sucursal')
+            .select('edo');
+        const estados = [...new Set((edosData || []).map(s => s.edo).filter(Boolean))].sort();
 
-        return data;
-    }
+        // 2. Traer sucursales (filtradas por estado si aplica)
+        let sucursalQuery = supabase
+            .from('sucursal')
+            .select('id_sucursal, nombre_sucursal, edo');
+        if (edoFiltro) sucursalQuery = sucursalQuery.eq('edo', edoFiltro);
+        const { data: sucursalesData } = await sucursalQuery;
 
-    static async getStatsProductoById(id, inicio, fin) {
-        const { data, error } = await supabase.rpc('stats_producto_by_id', {
-            fecha_inicio: inicio.toISOString().split('T')[0],
-            fecha_fin: fin.toISOString().split('T')[0],
-            p_id_producto: id,
-        });
-
-        if (error) throw error;
-        return data;
-    }
-
-    static async getOrdenesMes(id, inicio, fin) {
-        const { data, error } = await supabase.rpc('ordenes_por_dia_mes', {
-            fecha_inicio: inicio.toISOString().split('T')[0],
-            fecha_fin: fin.toISOString().split('T')[0],
-            p_id_producto: id
-        });
-
-        if (error) throw error;
-        return data;
-    }
-
-    static async getOrdenesSemana(id, inicio, fin) {
-        const { data, error } = await supabase.rpc('ordenes_por_dia_semana', {
-            fecha_inicio: inicio.toISOString().split('T')[0],
-            fecha_fin: fin.toISOString().split('T')[0],
-            p_id_producto: id
-        });
-
-        if (error) throw error;
-        return data;
-    }
-
-    static async getSucursalesProducto(id, inicio, fin) {
-        const { data, error } = await supabase.rpc('sucursales_producto', {
-            p_id_producto: id,
-            fecha_inicio: inicio.toISOString().split('T')[0],
-            fecha_fin: fin.toISOString().split('T')[0]
-        });
-
-        if (error) throw error;
-        return data;
-    }
-
-    static async getVentasDiariasGenerales() {
-        if (!supabase) return { actual: [], anterior: [], diasEnMes: 30, diasEnMesAnterior: 30 };
-
-        const now = new Date();
-        const mesInicio = new Date(now.getFullYear(), now.getMonth(), 1);
-        const mesFin = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        const mesAnteriorInicio = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        const mesAnteriorFin = new Date(now.getFullYear(), now.getMonth(), 0);
-
-        const [{ data: actual }, { data: anterior }] = await Promise.all([
-            supabase.from('orden').select('fecha_realizada')
-                .gte('fecha_realizada', mesInicio.toISOString())
-                .lte('fecha_realizada', mesFin.toISOString()),
-            supabase.from('orden').select('fecha_realizada')
-                .gte('fecha_realizada', mesAnteriorInicio.toISOString())
-                .lte('fecha_realizada', mesAnteriorFin.toISOString())
-        ]);
-
-        const diasEnMes = mesFin.getDate();
-        const diasEnMesAnterior = mesAnteriorFin.getDate();
-
-        const actualPorDia = Array(diasEnMes).fill(0);
-        for (const o of (actual || [])) {
-            const d = new Date(o.fecha_realizada).getDate() - 1;
-            if (d >= 0 && d < diasEnMes) actualPorDia[d]++;
+        if (!sucursalesData || sucursalesData.length === 0) {
+            return { sucursales: [], total: 0, estados, edoFiltro };
         }
 
-        const anteriorPorDia = Array(diasEnMesAnterior).fill(0);
-        for (const o of (anterior || [])) {
-            const d = new Date(o.fecha_realizada).getDate() - 1;
-            if (d >= 0 && d < diasEnMesAnterior) anteriorPorDia[d]++;
-        }
-
-        return { actual: actualPorDia, anterior: anteriorPorDia, diasEnMes, diasEnMesAnterior };
-    }
-
-    static async getTopSucursalesPorOrdenes() {
-        const { data: ordenes, error: e1 } = await supabase
+        // 3. Traer órdenes solo de esas sucursales
+        const ids = sucursalesData.map(s => s.id_sucursal);
+        const { data: ordenes } = await supabase
             .from('orden')
-            .select('id_sucursal, subtotal')
-            .eq('estado', 'confirmada')
-            .not('id_sucursal', 'is', null);
-        if (e1) throw e1;
+            .select('id_sucursal')
+            .in('id_sucursal', ids);
 
-        const map = {};
-        for (const o of (ordenes || [])) {
-            const id = o.id_sucursal;
-            if (!map[id]) map[id] = { total_ordenes: 0, total_ventas: 0 };
-            map[id].total_ordenes++;
-            map[id].total_ventas += parseFloat(o.subtotal) || 0;
+        // 4. Agrupar por sucursal
+        const conteo = {};
+        for (const ord of (ordenes || [])) {
+            const id = ord.id_sucursal;
+            if (!id) continue;
+            conteo[id] = (conteo[id] || 0) + 1;
         }
 
-        if (Object.keys(map).length === 0) return [];
+        // 5. Construir el array resultado, top 10 ordenado de mayor a menor
+        const sucursales = sucursalesData.map(s => ({
+            id_sucursal: s.id_sucursal,
+            nombre: s.nombre_sucursal,
+            total: conteo[s.id_sucursal] || 0
+        })).sort((a, b) => b.total - a.total).slice(0, 10);
 
-        const ids = Object.keys(map).map(Number);
+        const total = (ordenes || []).length;
 
-        const { data: sucursales, error: e2 } = await supabase
+        return { sucursales, total, estados, edoFiltro };
+    }
+
+    static async getDetalleSucursalPagina(id_sucursal, periodo = 'semana') {
+        if (!supabase) return null;
+
+        const hoy = new Date();
+
+        let inicioActual, inicioAnterior, finAnterior, labels;
+
+        if (periodo === 'semana') {
+            // Lunes de la semana actual
+            const diaSemana = hoy.getDay(); // 0=Dom, 1=Lun ... 6=Sáb
+            const diasDesdelLunes = diaSemana === 0 ? 6 : diaSemana - 1;
+
+            inicioActual = new Date(hoy);
+            inicioActual.setDate(hoy.getDate() - diasDesdelLunes);
+            inicioActual.setHours(0, 0, 0, 0);
+
+            // Semana anterior: lunes anterior → domingo anterior
+            inicioAnterior = new Date(inicioActual);
+            inicioAnterior.setDate(inicioActual.getDate() - 7);
+
+            finAnterior = new Date(inicioActual);
+            finAnterior.setSeconds(finAnterior.getSeconds() - 1); // domingo 23:59:59
+
+            labels = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+        } else {
+            // Mes: últimos 6 meses vs 6 meses anteriores, agrupados por mes
+            inicioActual   = new Date(hoy.getFullYear(), hoy.getMonth() - 5, 1, 0, 0, 0);
+            inicioAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 11, 1, 0, 0, 0);
+            finAnterior    = new Date(inicioActual.getTime() - 1);
+
+            const MESES_CORTOS_L = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+            labels = [];
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+                labels.push(MESES_CORTOS_L[d.getMonth()]);
+            }
+        }
+
+        // 1. Info de la sucursal
+        const { data: sucursal } = await supabase
+            .from('sucursal')
+            .select('nombre_sucursal, edo, deleg_municipio')
+            .eq('id_sucursal', id_sucursal)
+            .single();
+
+        // 2. Órdenes de ambos períodos en paralelo
+        const filtroActual   = toDbStr(inicioActual);
+        const filtroAnterior = toDbStr(inicioAnterior);
+        console.log(`[detalle] sucursal=${id_sucursal} periodo=${periodo} inicioActual="${filtroActual}" inicioAnterior="${filtroAnterior}"`);
+
+        const [{ data: ordenesActual, error: e1 }, { data: ordenesAnterior, error: e2 }] = await Promise.all([
+            supabase.from('orden')
+                .select('fecha_realizada, subtotal, estado')
+                .eq('id_sucursal', id_sucursal)
+                .gte('fecha_realizada', filtroActual)
+                .neq('estado', 'cancelada'),
+            supabase.from('orden')
+                .select('fecha_realizada, subtotal')
+                .eq('id_sucursal', id_sucursal)
+                .gte('fecha_realizada', filtroAnterior)
+                .lt('fecha_realizada', filtroActual)
+                .neq('estado', 'cancelada')
+        ]);
+        console.log(`[detalle] resultados actual=${ordenesActual?.length ?? 'null'} error=${e1?.message ?? 'ok'} | anterior=${ordenesAnterior?.length ?? 'null'} error=${e2?.message ?? 'ok'}`);
+
+        // 3. KPIs
+        const cantActual   = (ordenesActual  || []).length;
+        const cantAnterior = (ordenesAnterior || []).length;
+        const subActual    = (ordenesActual  || []).reduce((s, o) => s + (parseFloat(o.subtotal) || 0), 0);
+        const subAnterior  = (ordenesAnterior || []).reduce((s, o) => s + (parseFloat(o.subtotal) || 0), 0);
+
+        const cambioCantidad = cantAnterior > 0 ? Math.round(((cantActual - cantAnterior) / cantAnterior) * 100) : (cantActual > 0 ? 100 : 0);
+        const cambioSubtotal = subAnterior  > 0 ? Math.round(((subActual  - subAnterior)  / subAnterior)  * 100) : (subActual  > 0 ? 100 : 0);
+
+        // 4. Datos para la gráfica día a día
+        const datosActual = [], datosAnterior = [];
+
+        if (periodo === 'semana') {
+            // Iterar lunes→domingo de la semana actual y de la anterior
+            for (let i = 0; i < 7; i++) {
+                const dActual = new Date(inicioActual);
+                dActual.setDate(inicioActual.getDate() + i);
+                const dActualStr = toDateStr(dActual);
+                datosActual.push((ordenesActual || []).filter(o => o.fecha_realizada.startsWith(dActualStr)).length);
+
+                const dAnt = new Date(inicioAnterior);
+                dAnt.setDate(inicioAnterior.getDate() + i);
+                const dAntStr = toDateStr(dAnt);
+                datosAnterior.push((ordenesAnterior || []).filter(o => o.fecha_realizada.startsWith(dAntStr)).length);
+            }
+        } else {
+            // Agrupar por mes: últimos 6 meses vs los 6 meses anteriores a esos
+            for (let i = 5; i >= 0; i--) {
+                const mesActual  = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+                const mes  = mesActual.getMonth();
+                const anio = mesActual.getFullYear();
+                datosActual.push((ordenesActual || []).filter(o => {
+                    const od = new Date(o.fecha_realizada);
+                    return od.getMonth() === mes && od.getFullYear() === anio;
+                }).length);
+
+                const mesAnt  = new Date(hoy.getFullYear(), hoy.getMonth() - i - 6, 1);
+                const mA  = mesAnt.getMonth();
+                const anioA = mesAnt.getFullYear();
+                datosAnterior.push((ordenesAnterior || []).filter(o => {
+                    const od = new Date(o.fecha_realizada);
+                    return od.getMonth() === mA && od.getFullYear() === anioA;
+                }).length);
+            }
+        }
+
+        // 5. Formatear fechas para la leyenda
+        const MESES_CORTOS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        const fmt = d => `${d.getDate()} ${MESES_CORTOS[d.getMonth()]}`;
+
+        let finActualLabel, finAnteriorLabel;
+        if (periodo === 'semana') {
+            const domingoActual = new Date(inicioActual);
+            domingoActual.setDate(inicioActual.getDate() + 6);
+            finActualLabel   = `${fmt(inicioActual)} - ${fmt(domingoActual)}`;
+            finAnteriorLabel = `${fmt(inicioAnterior)} - ${fmt(new Date(inicioActual.getTime() - 86400000))}`;
+        } else {
+            const primerMesActual   = new Date(hoy.getFullYear(), hoy.getMonth() - 5, 1);
+            const primerMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 11, 1);
+            const ultimoMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 6, 1);
+            finActualLabel   = `${MESES_CORTOS[primerMesActual.getMonth()]} - ${MESES_CORTOS[hoy.getMonth()]}`;
+            finAnteriorLabel = `${MESES_CORTOS[primerMesAnterior.getMonth()]} - ${MESES_CORTOS[ultimoMesAnterior.getMonth()]}`;
+        }
+
+        return {
+            nombre:              sucursal?.nombre_sucursal || 'Sucursal',
+            edo:                 sucursal?.edo             || '',
+            municipio:           sucursal?.deleg_municipio || '',
+            cantActual,
+            subtotalActual:      subActual.toFixed(2),
+            cambioCantidad,
+            cambioSubtotal,
+            periodo,
+            labels,
+            datosActual,
+            datosAnterior,
+            labelActual:         `Período Actual (${finActualLabel})`,
+            labelAnterior:       `Período Anterior (${finAnteriorLabel})`
+        };
+    }
+
+    static async getDetalleSucursal(id_sucursal) {
+        if (!supabase) return null;
+
+        const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+        // 1. Nombre de la sucursal
+        const { data: sucursal } = await supabase
+            .from('sucursal')
+            .select('nombre_sucursal')
+            .eq('id_sucursal', id_sucursal)
+            .single();
+
+        // 2. Órdenes de los últimos 6 meses
+        const hace6Meses = new Date();
+        hace6Meses.setMonth(hace6Meses.getMonth() - 6);
+
+        const { data: ordenes } = await supabase
+            .from('orden')
+            .select('fecha_realizada')
+            .eq('id_sucursal', id_sucursal)
+            .gte('fecha_realizada', hace6Meses.toISOString());
+
+        // 3. Inicializar los últimos 6 meses con 0
+        const conteo = {};
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date();
+            d.setMonth(d.getMonth() - i);
+            const key = `${d.getFullYear()}-${d.getMonth()}`;
+            conteo[key] = { label: MESES[d.getMonth()], total: 0 };
+        }
+
+        // 4. Contar órdenes por mes
+        for (const ord of (ordenes || [])) {
+            const d = new Date(ord.fecha_realizada);
+            const key = `${d.getFullYear()}-${d.getMonth()}`;
+            if (conteo[key]) conteo[key].total++;
+        }
+
+        const meses   = Object.values(conteo).map(m => m.label);
+        const totales = Object.values(conteo).map(m => m.total);
+
+        return {
+            nombre: sucursal?.nombre_sucursal || 'Sucursal',
+            meses,
+            totales,
+            totalHistorico: (ordenes || []).length
+        };
+    }
+
+    static async getFrequenciaSucursales() {
+        if (!supabase) return null;
+
+        const hace30Dias = new Date();
+        hace30Dias.setDate(hace30Dias.getDate() - 30);
+
+        // 1. Traer órdenes de los últimos 30 días
+        const { data: ordenes } = await supabase
+            .from('orden')
+            .select('id_sucursal, fecha_realizada')
+            .gte('fecha_realizada', hace30Dias.toISOString());
+
+        if (!ordenes || ordenes.length === 0) {
+            return { frecuencias: [] };
+        }
+
+        // 2. Agrupar conteo por sucursal
+        const conteo = {};
+        for (const ord of ordenes) {
+            const id = ord.id_sucursal;
+            if (!id) continue;
+            conteo[id] = (conteo[id] || 0) + 1;
+        }
+
+        // 3. Traer nombres de sucursales
+        const ids = Object.keys(conteo);
+        const { data: sucursalesData } = await supabase
             .from('sucursal')
             .select('id_sucursal, nombre_sucursal')
             .in('id_sucursal', ids);
-        if (e2) throw e2;
 
-        const { data: junctions, error: e3 } = await supabase
-            .from('sucursal_cuenta')
-            .select('id_sucursal, cuenta(nombre_dueno)')
-            .in('id_sucursal', ids);
-        if (e3) throw e3;
+        // 4. Calcular frecuencia: pedidos / 4.3 semanas
+        const SEMANAS_EN_30_DIAS = 4.3;
+        const frecuencias = (sucursalesData || []).map(s => {
+            const totalMes = conteo[s.id_sucursal] || 0;
+            const pedidosPorSemana = Math.round((totalMes / SEMANAS_EN_30_DIAS) * 10) / 10;
+            return {
+                nombre: s.nombre_sucursal,
+                totalMes,
+                pedidosPorSemana
+            };
+        }).sort((a, b) => b.pedidosPorSemana - a.pedidosPorSemana);
 
-        const sucMap = {};
-        for (const s of (sucursales || [])) sucMap[s.id_sucursal] = s.nombre_sucursal;
-
-        const cuentaMap = {};
-        for (const j of (junctions || [])) {
-            if (!cuentaMap[j.id_sucursal]) cuentaMap[j.id_sucursal] = j.cuenta?.nombre_dueno || 'Sin cuenta';
-        }
-
-        return Object.entries(map)
-            .map(([id, stats]) => ({
-                id_sucursal: parseInt(id),
-                nombre_sucursal: sucMap[parseInt(id)] || 'Sucursal ' + id,
-                nombre_cuenta: cuentaMap[parseInt(id)] || 'Sin cuenta',
-                total_ordenes: stats.total_ordenes,
-                total_ventas: parseFloat(stats.total_ventas.toFixed(2))
-            }))
-            .sort((a, b) => b.total_ventas - a.total_ventas)
-            .slice(0, 10);
+        return { frecuencias };
     }
-
 };

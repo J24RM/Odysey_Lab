@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8" />
+<title>Detalle Sucursal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>* { font-family: 'Public Sans', -apple-system, sans-serif; }</style>
+</head>
+
+<body class="bg-gray-50">
+
+<%- include('partials/header.ejs') %>
+<%- include('partials/sidebar.ejs') %>
+
+<main class="ml-48 pt-2 px-10 pb-9 flex-1 min-h-[calc(100vh-70px)]">
+
+    <!-- Header con back + título + selector de período -->
+    <div class="flex items-center justify-between mb-6 pt-2">
+        <div class="flex items-center gap-3">
+            <a href="/admin/stats/sucursales" class="text-gray-400 hover:text-gray-700 text-xl transition-colors">←</a>
+            <h1 class="text-xl font-extrabold text-gray-800"><%= nombre %></h1>
+            <% if (edo) { %>
+                <span class="text-xs font-semibold bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full"><%= edo %></span>
+            <% } %>
+        </div>
+
+        <!-- Selector de período -->
+        <form method="GET" action="/admin/stats/sucursales/<%= id_sucursal %>">
+            <select name="periodo" onchange="this.form.submit()"
+                class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                <option value="semana" <%= periodo === 'semana' ? 'selected' : '' %>>Esta Semana</option>
+                <option value="mes"    <%= periodo === 'mes'    ? 'selected' : '' %>>Este Mes</option>
+            </select>
+        </form>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-2 gap-5 mb-5">
+
+        <!-- Cantidad Ordenada -->
+        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+            <p class="text-[12px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Cantidad Ordenada</p>
+            <div class="flex items-end gap-3">
+                <span class="text-4xl font-extrabold text-gray-800"><%= cantActual %></span>
+                <span class="mb-1 text-sm font-bold <%= cambioCantidad >= 0 ? 'text-green-500' : 'text-red-500' %>">
+                    <%= cambioCantidad >= 0 ? '▲' : '▼' %> <%= Math.abs(cambioCantidad) %>%
+                </span>
+            </div>
+            <p class="text-xs text-gray-400 mt-2">vs período anterior</p>
+        </div>
+
+        <!-- Ventas -->
+        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+            <p class="text-[12px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Ventas</p>
+            <div class="flex items-end gap-3">
+                <span class="text-4xl font-extrabold text-gray-800">$<%= Number(subtotalActual).toLocaleString('es-MX') %></span>
+                <span class="mb-1 text-sm font-bold <%= cambioSubtotal >= 0 ? 'text-green-500' : 'text-red-500' %>">
+                    <%= cambioSubtotal >= 0 ? '▲' : '▼' %> <%= Math.abs(cambioSubtotal) %>%
+                </span>
+            </div>
+            <p class="text-xs text-gray-400 mt-2">vs período anterior</p>
+        </div>
+    </div>
+
+    <!-- Gráfica de comparación -->
+    <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+        <p class="text-[13px] font-bold text-gray-800 mb-5">Comparación</p>
+        <div class="relative h-64">
+            <canvas id="chart-comparacion"></canvas>
+        </div>
+        <!-- Leyenda -->
+        <div class="flex items-center gap-6 mt-4 justify-center">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-3 rounded bg-blue-400 opacity-70"></div>
+                <span class="text-xs text-gray-500"><%= labelActual %></span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-3 rounded bg-red-300 opacity-70"></div>
+                <span class="text-xs text-gray-500"><%= labelAnterior %></span>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<%- include('partials/footer.ejs') %>
+
+<script>
+    const labels       = <%- JSON.stringify(labels) %>;
+    const datosActual  = <%- JSON.stringify(datosActual) %>;
+    const datosAnterior = <%- JSON.stringify(datosAnterior) %>;
+
+    new Chart(document.getElementById('chart-comparacion'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Período Actual',
+                    data: datosActual,
+                    borderColor: 'rgba(96,165,250,0.9)',
+                    backgroundColor: 'rgba(96,165,250,0.12)',
+                    borderWidth: 2.5,
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgba(96,165,250,1)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Período Anterior',
+                    data: datosAnterior,
+                    borderColor: 'rgba(252,165,165,0.9)',
+                    backgroundColor: 'rgba(252,165,165,0.08)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointBackgroundColor: 'rgba(252,165,165,1)',
+                    borderDash: [5, 4],
+                    fill: false,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
