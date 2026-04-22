@@ -70,8 +70,14 @@ function renderSucursalInfo(sucursal) {
     </div>`;
 }
 
-function renderSucursalSelector(sucursales, sucursal_activa) {
-    if (!sucursales || sucursales.length <= 1) return '';
+function renderSucursalSelector(cuenta_activa, sucursales, sucursal_activa) {
+    if (!cuenta_activa) {
+        return `
+        <p class="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+            Primero selecciona una cuenta para ver las sucursales disponibles.
+        </p>`;
+    }
+    if (!sucursales || sucursales.length === 0) return '';
     const opts = sucursales.map(s =>
         `<option value="${s.id_sucursal}" ${sucursal_activa && sucursal_activa.id_sucursal === s.id_sucursal ? 'selected' : ''}>${s.nombre_sucursal}</option>`
     ).join('');
@@ -159,7 +165,7 @@ function buildModalContent(data, opts = {}) {
     <div class="py-4 border-b border-gray-100">
         <h3 class="text-[11px] font-semibold text-gray-600 uppercase tracking-wider mb-3">Sucursal</h3>
         <div id="sucursalInfo">${renderSucursalInfo(sucursal_activa)}</div>
-        <div id="sucursalSelectorContainer">${renderSucursalSelector(sucursales, sucursal_activa)}</div>
+        <div id="sucursalSelectorContainer">${renderSucursalSelector(cuenta_activa, sucursales, sucursal_activa)}</div>
     </div>
 
     <!-- Footer -->
@@ -195,7 +201,7 @@ function attachModalEvents(opts = {}) {
 
             // Actualizar selector y datos de sucursal
             document.getElementById('sucursalSelectorContainer').innerHTML =
-                renderSucursalSelector(result.sucursales, result.sucursal_activa);
+                renderSucursalSelector(result.cuenta_activa, result.sucursales, result.sucursal_activa);
             document.getElementById('sucursalInfo').innerHTML =
                 renderSucursalInfo(result.sucursal_activa);
 
