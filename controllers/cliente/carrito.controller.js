@@ -68,7 +68,14 @@ exports.agregarItem = async (request, response, next) => {
         );
 
 
-        response.redirect('/cliente/home')
+        const page = request.body.page || '1';  
+        const search = request.body.search || '';
+        
+        if (search) {
+            response.redirect(`/cliente/home?search=${encodeURIComponent(search)}`);
+        } else {
+            response.redirect(`/cliente/home?page=${page}`);
+        }
 
     } catch (err) {
         response.redirect(`/cliente/product/${request.body.id_producto}?error=` + encodeURIComponent("No se pudo agregar el producto al carrito"));

@@ -98,6 +98,8 @@
             <form action="/cart/items" method="POST" class="mt-4">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <input type="hidden" name="cantidad_ingresada" id="cantidad-input-<%= index %>" value="1">
+            <input type="hidden" name="page" value="<%= page %>">
+            <input type="hidden" name="search" value="<%= searchQuery || '' %>">
             <input type="hidden" name="id_producto" value="<%= producto.id_producto %>">
             <button type="submit" class="btn-add-cart">Agregar al carrito</button>
             </form>
