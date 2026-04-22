@@ -4,14 +4,18 @@ function actualizarSubtotal() {
   const filas = document.getElementsByClassName('product-row');
   let subtotal = 0;
   let totalQty = 0;
+  let totalPeso = 0;
 
   for (let i = 0; i < filas.length; i++) {
     const precio = parseFloat(filas[i].dataset.precio);
     const input = document.getElementById('qty-' + filas[i].dataset.id);
     const qty = parseInt(input.value) || 0;
+    const peso = parseFloat(input.dataset.peso) || 0;
+
 
     subtotal += precio * qty;
     totalQty += qty;
+    totalPeso += peso;
   }
 
 
@@ -26,6 +30,9 @@ function actualizarSubtotal() {
 
   document.getElementById('qty-display').textContent =
     'Cantidad de productos: ' + totalQty;
+
+  document.getElementById('peso-display').textContent =
+    'Peso Total: ' + totalPeso.toFixed(2) + " Kg";
 }
 
 // Boton

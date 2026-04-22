@@ -80,6 +80,9 @@
             class="text-base font-semibold text-gray-900 hover:underline leading-snug">
           <%= producto.nombre %>
         </a>
+        <p class="text-base text-gray-600 leading-snug">
+          Peso: <%= producto.peso %> Kg
+        </p>
         
         <div class="flex items-center gap-4 mt-4">
           <div class="flex items-center gap-2 border-2 rounded-full px-3 py-1" style="border-color: #00000066;">
@@ -90,6 +93,7 @@
               id="qty-<%= item.id_producto %>"
               type="text"
               value="<%= item.cantidad %>"
+              data-peso="<%= producto.peso %>"
               inputmode="numeric"
               class="qty text-sm font-semibold text-gray-800 w-10 text-center outline-none"
               oninput="this.value = this.value.replace(/[^0-9]/g, '')"
@@ -129,6 +133,7 @@
       <p class="text-2xl font-bold text-gray-900 leading-tight">Total(IVA incluido):</p>
       <p class="text-3xl font-black text-gray-900 mt-1" id="total-display">$ 0</p>
       <p class="text-sm text-gray-500 mt-4 font-medium" id="qty-display">Cantidad de productos: 0</p>
+      <p class="text-sm text-gray-500 mt-4 font-medium" id="peso-display">Peso Total: 0 kg</p>
       
     </div>
 
