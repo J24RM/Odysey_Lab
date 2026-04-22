@@ -94,10 +94,10 @@ function renderSucursalSelector(cuenta_activa, sucursales, sucursal_activa) {
 // ─── Construcción del modal ───────────────────────────────────────────────────
 
 function buildModalContent(data, opts = {}) {
-    const { usuario, cuentas, cuenta_activa, sucursal_activa, sucursales, multiple_cuentas } = data;
+    const { usuario, cuentas, cuenta_activa, sucursal_activa, sucursales } = data;
 
     // Alerta si no hay sucursal activa (puede venir del carrito o por múltiples cuentas sin seleccionar)
-    const alerta = (opts.forzado || (multiple_cuentas && !cuenta_activa)) ? `
+    const alerta = (opts.forzado || !cuenta_activa) ? `
     <div class="mb-4 flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm text-amber-800">
         <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
@@ -105,9 +105,9 @@ function buildModalContent(data, opts = {}) {
         Selecciona una cuenta y sucursal para poder realizar pedidos.
     </div>` : '';
 
-    // Selector de cuenta (solo si hay más de una)
+    // Selector de cuenta (siempre visible si hay cuentas disponibles)
     let cuentaSelector = '';
-    if (multiple_cuentas) {
+    if (cuentas && cuentas.length > 0) {
         const cuentaOpts = cuentas.map(c =>
             `<option value="${c.id_cuenta}" ${cuenta_activa && cuenta_activa.id_cuenta === c.id_cuenta ? 'selected' : ''}>${c.nombre_dueno} — ${c.rfc}</option>`
         ).join('');
