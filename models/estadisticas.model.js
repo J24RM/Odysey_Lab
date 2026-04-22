@@ -1,5 +1,17 @@
 const supabase = require('../utils/supabase');
 
+// Formatea una fecha como "YYYY-MM-DD HH:MM:SS" (mismo formato que toLocaleString guarda en BD)
+function toDbStr(d) {
+    const p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+
+// Extrae solo "YYYY-MM-DD" de una fecha local para comparar contra startsWith
+function toDateStr(d) {
+    const p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+}
+
 module.exports = class Estadisticas {
 
     static getLastWeekRange() {
@@ -285,13 +297,13 @@ module.exports = class Estadisticas {
             supabase.from('orden')
                 .select('fecha_realizada, subtotal, estado')
                 .eq('id_sucursal', id_sucursal)
-                .gte('fecha_realizada', inicioActual.toISOString())
+                .gte('fecha_realizada', toDbStr(inicioActual))
                 .neq('estado', 'cancelada'),
             supabase.from('orden')
                 .select('fecha_realizada, subtotal')
                 .eq('id_sucursal', id_sucursal)
-                .gte('fecha_realizada', inicioAnterior.toISOString())
-                .lt('fecha_realizada', inicioActual.toISOString())
+                .gte('fecha_realizada', toDbStr(inicioAnterior))
+                .lt('fecha_realizada', toDbStr(inicioActual))
                 .neq('estado', 'cancelada')
         ]);
 
@@ -312,12 +324,12 @@ module.exports = class Estadisticas {
             for (let i = 0; i < 7; i++) {
                 const dActual = new Date(inicioActual);
                 dActual.setDate(inicioActual.getDate() + i);
-                const dActualStr = dActual.toISOString().split('T')[0];
+                const dActualStr = toDateStr(dActual);
                 datosActual.push((ordenesActual || []).filter(o => o.fecha_realizada.startsWith(dActualStr)).length);
 
                 const dAnt = new Date(inicioAnterior);
                 dAnt.setDate(inicioAnterior.getDate() + i);
-                const dAntStr = dAnt.toISOString().split('T')[0];
+                const dAntStr = toDateStr(dAnt);
                 datosAnterior.push((ordenesAnterior || []).filter(o => o.fecha_realizada.startsWith(dAntStr)).length);
             }
         } else {
