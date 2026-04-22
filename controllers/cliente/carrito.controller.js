@@ -93,6 +93,26 @@ exports.agregarItem = async (request, response, next) => {
     }
 };
 
+exports.agregarItem = async (request, response) => {
+    try {
+
+        const data = await detalle_ordenModel.agregarProductoAlCarrito(
+            request.session.usuario,
+            request.body.id_producto,
+            request.body.cantidad_ingresada
+        );
+
+
+        request.session.id_carrito = data;
+
+        response.redirect('/cliente/home?info=' + encodeURIComponent("Se agrego el producto al carrito"));
+
+    } catch (error) {
+        console.log(error)
+        response.redirect(`/cliente/product/${request.body.id_producto}?error=` + encodeURIComponent("No se pudo agregar el producto al carrito"));
+    }
+};
+
 exports.actualizarItem = async (request, response, next) => {
     const { id_producto } = request.params;
     const { cantidad_ingresada } = request.body;

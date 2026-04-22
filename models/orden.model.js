@@ -59,14 +59,13 @@ module.exports = class Orden {
     }
 
     static async CancelarOrden(id_orden) {
-        const { data: orden, error } = await supabase
-            .from('orden')
-            .update({ estado: 'cancelada' })
-            .eq('id_orden', id_orden)
-            .single();
+        const { data, error } = await supabase
+            .rpc('cancelar_orden_tx', {
+                p_id_orden: id_orden
+            });
+            if (error) throw error;
 
-        if (error) throw error;
-        return orden;
+            return data;
     }
 
     static async ObtenerOrdenPorId(id_orden){

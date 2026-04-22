@@ -81,38 +81,26 @@ exports.registrarOrden = async (req, res) => {
 
 exports.postCancelarOrden = async (req, res) => {
     try {
-        const orden = await ordenModel.ObtenerOrdenPorId(req.params.id_orden);
 
-        const configuracion = await configuracionModel.ObtenerConfiguracionActiva();
+        const data = await ordenModel.CancelarOrden(req.params.id_orden);
 
-        // Tiempo actual en México
-        const ahora = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
-
-
-        let esCancelable = false;
-        if (orden && orden.fecha_realizada) {
-            // Convertir fecha_realizada a Date 
-            const fechaOrden = new Date(orden.fecha_realizada.replace(" ", "T"));
-
-            // Diferencia en minutos, le agregamos 20 segundos mas
-            const diferenciaMinutos = (ahora.getTime() + 20000 - fechaOrden.getTime()) / (1000 * 60);
-
-            esCancelable = diferenciaMinutos <= configuracion.tiempo_de_cancelacion;
-        }
-
-        if(esCancelable){
-            await ordenModel.CancelarOrden(req.params.id_orden);
+        if (data === 'OK') {
             log('CLIENTE', 'PEDIDO CANCELADO', `id_cliente: ${req.session.usuario}, id_orden: ${req.params.id_orden}`);
+            return res.redirect('/cliente/mis-pedidos?success=' + encodeURIComponent(" ") + '&order=' + encodeURIComponent("Orden cancelada"));
         }
-        else{
+
+        if (data === 'TIEMPO_EXPIRADO') {
             return res.redirect('/cliente/mis-pedidos?error=' + encodeURIComponent("El tiempo de cancelacion expiro"));
         }
-        return res.redirect('/cliente/mis-pedidos?success=' + encodeURIComponent(" ") + '&order=' + encodeURIComponent("Orden cancelada"));
+
+        return res.redirect('/cliente/mis-pedidos?error=' + encodeURIComponent("Orden no encontrada"));
 
     } catch (error) {
+        console.log(error)
         return res.redirect('/cliente/mis-pedidos?error=' + encodeURIComponent("No se pudo cancelar la orden"));
     }
 };
+
 
 exports.getDetalleOrden = async (req, res) => {
     try {
