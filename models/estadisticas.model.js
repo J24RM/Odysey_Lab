@@ -624,4 +624,53 @@ module.exports = class Estadisticas {
 
         return { frecuencias };
     }
+
+    static async getTop5ProductosDestacados() {
+        if (!supabase) return [];
+
+        const ahora = new Date();
+        const hace30Dias = new Date(ahora);
+        hace30Dias.setDate(ahora.getDate() - 30);
+
+        const { data: ordenes } = await supabase
+            .from('orden')
+            .select('id_orden')
+            .gte('fecha_realizada', hace30Dias.toISOString())
+            .neq('estado', 'cancelada');
+
+        if (!ordenes || ordenes.length === 0) return [];
+
+        const idsOrdenes = ordenes.map(o => o.id_orden);
+
+        const { data: detalles } = await supabase
+            .from('detalle_orden')
+            .select('id_producto, cantidad')
+            .in('id_orden', idsOrdenes);
+
+        if (!detalles || detalles.length === 0) return [];
+
+        const conteo = {};
+        for (const d of detalles) {
+            conteo[d.id_producto] = (conteo[d.id_producto] || 0) + (d.cantidad || 0);
+        }
+
+        const top5Ids = Object.entries(conteo)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([id]) => parseInt(id));
+
+        if (top5Ids.length === 0) return [];
+
+        const { data: productos } = await supabase
+            .from('producto')
+            .select('id_producto, nombre, url_imagen, precio_unitario')
+            .in('id_producto', top5Ids)
+            .eq('activo', true);
+
+        if (!productos) return [];
+
+        return top5Ids
+            .map(id => productos.find(p => p.id_producto === id))
+            .filter(Boolean);
+    }
 };
