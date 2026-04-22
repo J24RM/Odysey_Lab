@@ -49,7 +49,7 @@ module.exports = class Orden {
     static async obtenerOrdenesPorUsuario(id_usuario) {
         const { data: ordenes, error } = await supabase
             .from('orden')
-            .select('*')
+            .select('*, sucursal(nombre_sucursal)')
             .eq('id_usuario', id_usuario)
             .neq('estado', 'carrito')
             .order('fecha_realizada', { ascending: false });

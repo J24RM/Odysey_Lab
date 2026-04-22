@@ -1,4 +1,6 @@
 const Usuario = require('../models/usuario.model');
+const Cuenta = require('../models/cuenta.model');
+const Orden = require('../models/orden.model');
 
 exports.getAdminClientes = async (request, response) => {
     try {
@@ -21,14 +23,33 @@ exports.getDetalleCliente = async (request, response) => {
         const { id } = request.params;
         const clienteDB = await Usuario.obtenerClientePorId(id);
 
+        const cuentasRaw = await Cuenta.obtenerCuentasPorUsuario(id);
+        const cuentas = await Promise.all(
+            cuentasRaw.map(async (cuenta) => {
+                const sucursales = await Cuenta.obtenerSucursalesPorCuenta(cuenta.id_cuenta);
+                return { ...cuenta, sucursales };
+            })
+        );
+
+        const ordenesRaw = await Orden.obtenerOrdenesPorUsuario(id);
+        const pedidos = ordenesRaw.map(o => ({
+            folio: o.folio,
+            fecha: o.fecha_realizada
+                ? new Date(o.fecha_realizada).toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' })
+                : 'N/A',
+            sucursal: o.sucursal?.nombre_sucursal || '—',
+            total: o.subtotal != null
+                ? `$${Number(o.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
+                : 'N/A',
+            estado: o.estado ? o.estado.charAt(0).toUpperCase() + o.estado.slice(1) : ''
+        }));
+
         const cliente = {
             ...clienteDB,
-            nombre: clienteDB.nombre || clienteDB.email,
+            nombre: clienteDB.Nombre_usuario || clienteDB.email,
             correo: clienteDB.email,
-            telefono: clienteDB.telefono || 'N/A',
-            ultimaSesion: 'N/A',
-            sucursales: [],
-            pedidos: []
+            cuentas,
+            pedidos
         };
 
         response.render('admin/client_detail', {
