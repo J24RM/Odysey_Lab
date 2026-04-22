@@ -441,6 +441,144 @@ module.exports = class Estadisticas {
         };
     }
 
+    static async getEstadisticasProductos(periodo = 'semana', busqueda = '') {
+        if (!supabase) return { productos: [], periodo, busqueda };
+
+        const ahora = new Date();
+        let inicioActual, inicioAnterior;
+
+        if (periodo === 'semana') {
+            inicioActual  = new Date(ahora); inicioActual.setDate(ahora.getDate() - 7);
+            inicioAnterior = new Date(inicioActual); inicioAnterior.setDate(inicioActual.getDate() - 7);
+        } else {
+            inicioActual  = new Date(ahora); inicioActual.setMonth(ahora.getMonth() - 1);
+            inicioAnterior = new Date(inicioActual); inicioAnterior.setMonth(inicioActual.getMonth() - 1);
+        }
+
+        let prodQuery = supabase.from('producto').select('id_producto, nombre, url_imagen, precio_unitario').eq('activo', true);
+        if (busqueda) prodQuery = prodQuery.ilike('nombre', `%${busqueda}%`);
+        const { data: productosData } = await prodQuery;
+        if (!productosData || productosData.length === 0) return { productos: [], periodo, busqueda };
+
+        const ids = productosData.map(p => p.id_producto);
+
+        const [{ data: ordenesActual }, { data: ordenesAnterior }] = await Promise.all([
+            supabase.from('orden').select('id_orden').gte('fecha_realizada', inicioActual.toISOString()).neq('estado', 'cancelada'),
+            supabase.from('orden').select('id_orden').gte('fecha_realizada', inicioAnterior.toISOString()).lt('fecha_realizada', inicioActual.toISOString()).neq('estado', 'cancelada')
+        ]);
+
+        const idsActual   = (ordenesActual   || []).map(o => o.id_orden);
+        const idsAnterior = (ordenesAnterior || []).map(o => o.id_orden);
+
+        const [{ data: detActual }, { data: detAnterior }] = await Promise.all([
+            idsActual.length   > 0 ? supabase.from('detalle_orden').select('id_producto, cantidad').in('id_orden', idsActual).in('id_producto', ids)   : Promise.resolve({ data: [] }),
+            idsAnterior.length > 0 ? supabase.from('detalle_orden').select('id_producto, cantidad').in('id_orden', idsAnterior).in('id_producto', ids) : Promise.resolve({ data: [] })
+        ]);
+
+        const productos = productosData.map(p => {
+            const cantA = (detActual   || []).filter(d => d.id_producto === p.id_producto).reduce((s, d) => s + (d.cantidad || 0), 0);
+            const cantP = (detAnterior || []).filter(d => d.id_producto === p.id_producto).reduce((s, d) => s + (d.cantidad || 0), 0);
+            const precio = parseFloat(p.precio_unitario) || 0;
+            const ventA = cantA * precio, ventP = cantP * precio;
+            return {
+                id_producto: p.id_producto,
+                nombre: p.nombre,
+                url_imagen: p.url_imagen || '',
+                cantidad: cantA,
+                ventas: ventA,
+                porcentajeCantidad: cantP > 0 ? ((cantA - cantP) / cantP) * 100 : (cantA > 0 ? 100 : 0),
+                porcentajeVentas:   ventP > 0 ? ((ventA - ventP) / ventP) * 100 : (ventA > 0 ? 100 : 0)
+            };
+        }).sort((a, b) => b.cantidad - a.cantidad);
+
+        return { productos, periodo, busqueda };
+    }
+
+    static async getEstadisticasDetalleProducto(id_producto, periodo = 'semana') {
+        if (!supabase) return null;
+
+        const ahora = new Date();
+        let inicioActual, inicioAnterior;
+
+        if (periodo === 'semana') {
+            inicioActual  = new Date(ahora); inicioActual.setDate(ahora.getDate() - 7);
+            inicioAnterior = new Date(inicioActual); inicioAnterior.setDate(inicioActual.getDate() - 7);
+        } else {
+            inicioActual  = new Date(ahora); inicioActual.setMonth(ahora.getMonth() - 1);
+            inicioAnterior = new Date(inicioActual); inicioAnterior.setMonth(inicioActual.getMonth() - 1);
+        }
+
+        const { data: prodData } = await supabase.from('producto').select('id_producto, nombre, url_imagen, precio_unitario').eq('id_producto', id_producto).single();
+        if (!prodData) return null;
+
+        const [{ data: ordenesActual }, { data: ordenesAnterior }] = await Promise.all([
+            supabase.from('orden').select('id_orden, fecha_realizada, id_sucursal').gte('fecha_realizada', inicioActual.toISOString()).neq('estado', 'cancelada'),
+            supabase.from('orden').select('id_orden, fecha_realizada').gte('fecha_realizada', inicioAnterior.toISOString()).lt('fecha_realizada', inicioActual.toISOString()).neq('estado', 'cancelada')
+        ]);
+
+        const idsActual   = (ordenesActual   || []).map(o => o.id_orden);
+        const idsAnterior = (ordenesAnterior || []).map(o => o.id_orden);
+
+        const [{ data: detActual }, { data: detAnterior }] = await Promise.all([
+            idsActual.length   > 0 ? supabase.from('detalle_orden').select('id_orden, cantidad').in('id_orden', idsActual).eq('id_producto', id_producto)   : Promise.resolve({ data: [] }),
+            idsAnterior.length > 0 ? supabase.from('detalle_orden').select('id_orden, cantidad').in('id_orden', idsAnterior).eq('id_producto', id_producto) : Promise.resolve({ data: [] })
+        ]);
+
+        const cantA = (detActual   || []).reduce((s, d) => s + (d.cantidad || 0), 0);
+        const cantP = (detAnterior || []).reduce((s, d) => s + (d.cantidad || 0), 0);
+        const precio = parseFloat(prodData.precio_unitario) || 0;
+        const ventA = cantA * precio, ventP = cantP * precio;
+
+        // Órdenes por día para la gráfica (últimos 7 días vs período anterior)
+        const ordenMapActual = Object.fromEntries((ordenesActual || []).map(o => [o.id_orden, o]));
+        const ordenMapAnterior = Object.fromEntries((ordenesAnterior || []).map(o => [o.id_orden, o]));
+
+        const ordenesPorDia = [], ordenesPorDiaAnterior = [];
+        for (let i = 6; i >= 0; i--) {
+            const dA = new Date(ahora); dA.setDate(ahora.getDate() - i);
+            const dP = new Date(inicioActual); dP.setDate(inicioActual.getDate() - i - 1);
+            const strA = toDateStr(dA), strP = toDateStr(dP);
+            const label = dA.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric' });
+            ordenesPorDia.push({
+                dia: label,
+                cantidad: (detActual   || []).filter(d => ordenMapActual[d.id_orden]?.fecha_realizada?.startsWith(strA)).reduce((s, d) => s + (d.cantidad || 0), 0)
+            });
+            ordenesPorDiaAnterior.push({
+                dia: label,
+                cantidad: (detAnterior || []).filter(d => ordenMapAnterior[d.id_orden]?.fecha_realizada?.startsWith(strP)).reduce((s, d) => s + (d.cantidad || 0), 0)
+            });
+        }
+
+        // Sucursales
+        const sucursalCounts = {};
+        for (const det of (detActual || [])) {
+            const id = ordenMapActual[det.id_orden]?.id_sucursal;
+            if (id) sucursalCounts[id] = (sucursalCounts[id] || 0) + (det.cantidad || 0);
+        }
+        let sucursales = [];
+        const sucIds = Object.keys(sucursalCounts);
+        if (sucIds.length > 0) {
+            const { data: sucData } = await supabase.from('sucursal').select('id_sucursal, nombre_sucursal').in('id_sucursal', sucIds);
+            sucursales = (sucData || []).map(s => ({ sucursal: s.nombre_sucursal, cantidad: sucursalCounts[s.id_sucursal] || 0 })).sort((a, b) => b.cantidad - a.cantidad);
+        }
+
+        return {
+            producto: {
+                id_producto: prodData.id_producto,
+                nombre: prodData.nombre,
+                url_imagen: prodData.url_imagen || '',
+                cantidad: cantA,
+                ventas: ventA,
+                porcentajeCantidad: cantP > 0 ? ((cantA - cantP) / cantP) * 100 : (cantA > 0 ? 100 : 0),
+                porcentajeVentas:   ventP > 0 ? ((ventA - ventP) / ventP) * 100 : (ventA > 0 ? 100 : 0)
+            },
+            sucursales,
+            ordenesPorDia,
+            ordenesPorDiaAnterior,
+            periodo
+        };
+    }
+
     static async getFrequenciaSucursales() {
         if (!supabase) return null;
 

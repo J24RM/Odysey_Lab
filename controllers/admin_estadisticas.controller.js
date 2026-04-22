@@ -105,8 +105,47 @@ exports.getDetalleSucursal = async (request, response) => {
     }
 };
 
-exports.getEstadisticasProductos = (request, response) => {
-    response.render('admin/stats_productos', { usuario: request.session.usuario });
+exports.getEstadisticasProductos = async (request, response) => {
+    const periodo  = request.query.periodo  || 'semana';
+    const busqueda = request.query.busqueda || '';
+    try {
+        const data = await Estadisticas.getEstadisticasProductos(periodo, busqueda);
+        response.render('admin/stats_productos', { usuario: request.session.usuario, ...data });
+    } catch (error) {
+        console.error('Error fetching estadísticas productos:', error);
+        response.render('admin/stats_productos', { usuario: request.session.usuario, productos: [], periodo, busqueda });
+    }
+};
+
+exports.getEstadisticasDetalleProducto = async (request, response) => {
+    const { id_producto } = request.params;
+    const periodo = request.query.periodo || 'semana';
+    try {
+        const data = await Estadisticas.getEstadisticasDetalleProducto(id_producto, periodo);
+        if (!data) return response.redirect('/admin/stats/productos');
+        response.render('admin/stats_producto_detalle', { usuario: request.session.usuario, ...data });
+    } catch (error) {
+        console.error('Error fetching estadísticas detalle producto:', error);
+        response.redirect('/admin/stats/productos');
+    }
+};
+
+exports.exportarEstadisticasProductosCSV = async (request, response) => {
+    const periodo  = request.query.periodo  || 'semana';
+    const busqueda = request.query.busqueda || '';
+    try {
+        const { productos } = await Estadisticas.getEstadisticasProductos(periodo, busqueda);
+        let csv = '"Producto","Cantidad Ordenada","% Cambio Cantidad","Ventas","% Cambio Ventas"\n';
+        (productos || []).forEach(p => {
+            csv += `"${p.nombre}","${p.cantidad}","${Math.round(p.porcentajeCantidad)}%","$${p.ventas.toFixed(2)}","${Math.round(p.porcentajeVentas)}%"\n`;
+        });
+        response.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        response.setHeader('Content-Disposition', `attachment; filename="estadisticas_productos_${periodo}.csv"`);
+        response.send('﻿' + csv);
+    } catch (error) {
+        console.error('Error exportando estadísticas productos:', error);
+        response.status(500).send('Error al exportar');
+    }
 };
 
 exports.getEstadisticas2 = (request, response) => {
