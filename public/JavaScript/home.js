@@ -1,3 +1,29 @@
+// Countdown preventa
+(function () {
+    const target = new Date('2026-06-11T00:00:00');
+    const pad = n => String(n).padStart(2, '0');
+    function tick() {
+        const diff = target - new Date();
+        if (diff <= 0) {
+            ['cd-dias','cd-hrs','cd-min','cd-seg'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '00';
+            });
+            return;
+        }
+        const d = document.getElementById('cd-dias');
+        const h = document.getElementById('cd-hrs');
+        const m = document.getElementById('cd-min');
+        const s = document.getElementById('cd-seg');
+        if (d) d.textContent = pad(Math.floor(diff / 86400000));
+        if (h) h.textContent = pad(Math.floor((diff % 86400000) / 3600000));
+        if (m) m.textContent = pad(Math.floor((diff % 3600000) / 60000));
+        if (s) s.textContent = pad(Math.floor((diff % 60000) / 1000));
+    }
+    tick();
+    setInterval(tick, 1000);
+})();
+
 const scrollY = sessionStorage.getItem('cartScrollY');
 if (scrollY !== null) {
     document.documentElement.style.scrollBehavior = 'auto';
