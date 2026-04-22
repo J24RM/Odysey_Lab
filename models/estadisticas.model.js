@@ -270,7 +270,6 @@ module.exports = class Estadisticas {
             finAnterior.setSeconds(finAnterior.getSeconds() - 1); // domingo 23:59:59
 
             labels = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-            diasGrafica = 7;
         } else {
             // Mes: últimos 6 meses vs 6 meses anteriores, agrupados por mes
             inicioActual   = new Date(hoy.getFullYear(), hoy.getMonth() - 5, 1, 0, 0, 0);
