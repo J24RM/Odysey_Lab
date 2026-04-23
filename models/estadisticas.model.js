@@ -672,5 +672,91 @@ module.exports = class Estadisticas {
         return top5Ids
             .map(id => productos.find(p => p.id_producto === id))
             .filter(Boolean);
+    static async getVentasDiariasGenerales() {
+        if (!supabase) return { actual: [], anterior: [], diasEnMes: 30, diasEnMesAnterior: 30 };
+
+        const now = new Date();
+        const mesInicio = new Date(now.getFullYear(), now.getMonth(), 1);
+        const mesFin = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const mesAnteriorInicio = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const mesAnteriorFin = new Date(now.getFullYear(), now.getMonth(), 0);
+
+        const [{ data: actual }, { data: anterior }] = await Promise.all([
+            supabase.from('orden').select('fecha_realizada')
+                .gte('fecha_realizada', mesInicio.toISOString())
+                .lte('fecha_realizada', mesFin.toISOString()),
+            supabase.from('orden').select('fecha_realizada')
+                .gte('fecha_realizada', mesAnteriorInicio.toISOString())
+                .lte('fecha_realizada', mesAnteriorFin.toISOString())
+        ]);
+
+        const diasEnMes = mesFin.getDate();
+        const diasEnMesAnterior = mesAnteriorFin.getDate();
+
+        const actualPorDia = Array(diasEnMes).fill(0);
+        for (const o of (actual || [])) {
+            const d = new Date(o.fecha_realizada).getDate() - 1;
+            if (d >= 0 && d < diasEnMes) actualPorDia[d]++;
+        }
+
+        const anteriorPorDia = Array(diasEnMesAnterior).fill(0);
+        for (const o of (anterior || [])) {
+            const d = new Date(o.fecha_realizada).getDate() - 1;
+            if (d >= 0 && d < diasEnMesAnterior) anteriorPorDia[d]++;
+        }
+
+        return { actual: actualPorDia, anterior: anteriorPorDia, diasEnMes, diasEnMesAnterior };
+    }
+
+    static async getTopSucursalesPorOrdenes() {
+        const { data: ordenes, error: e1 } = await supabase
+            .from('orden')
+            .select('id_sucursal, subtotal')
+            .eq('estado', 'confirmada')
+            .not('id_sucursal', 'is', null);
+        if (e1) throw e1;
+
+        const map = {};
+        for (const o of (ordenes || [])) {
+            const id = o.id_sucursal;
+            if (!map[id]) map[id] = { total_ordenes: 0, total_ventas: 0 };
+            map[id].total_ordenes++;
+            map[id].total_ventas += parseFloat(o.subtotal) || 0;
+        }
+
+        if (Object.keys(map).length === 0) return [];
+
+        const ids = Object.keys(map).map(Number);
+
+        const { data: sucursales, error: e2 } = await supabase
+            .from('sucursal')
+            .select('id_sucursal, nombre_sucursal')
+            .in('id_sucursal', ids);
+        if (e2) throw e2;
+
+        const { data: junctions, error: e3 } = await supabase
+            .from('sucursal_cuenta')
+            .select('id_sucursal, cuenta(nombre_dueno)')
+            .in('id_sucursal', ids);
+        if (e3) throw e3;
+
+        const sucMap = {};
+        for (const s of (sucursales || [])) sucMap[s.id_sucursal] = s.nombre_sucursal;
+
+        const cuentaMap = {};
+        for (const j of (junctions || [])) {
+            if (!cuentaMap[j.id_sucursal]) cuentaMap[j.id_sucursal] = j.cuenta?.nombre_dueno || 'Sin cuenta';
+        }
+
+        return Object.entries(map)
+            .map(([id, stats]) => ({
+                id_sucursal: parseInt(id),
+                nombre_sucursal: sucMap[parseInt(id)] || 'Sucursal ' + id,
+                nombre_cuenta: cuentaMap[parseInt(id)] || 'Sin cuenta',
+                total_ordenes: stats.total_ordenes,
+                total_ventas: parseFloat(stats.total_ventas.toFixed(2))
+            }))
+            .sort((a, b) => b.total_ventas - a.total_ventas)
+            .slice(0, 10);
     }
 };
