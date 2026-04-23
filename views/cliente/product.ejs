@@ -260,19 +260,25 @@
     <% } %>
   </section>
 
-  <!-- SECCIÓN PRODUCTOS SIMILARES -->
+  <!-- SECCIÓN PRODUCTOS DESTACADOS -->
+  <% if (productosDestacados && productosDestacados.length > 0) { %>
   <section class="max-w-6xl mx-auto px-6 pb-10 mt-8">
-    <h2 class="text-xl font-bold text-gray-900 mb-4">Productos similares</h2>
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <% for (let i = 0; i < 4; i++) { %>
-      <div class="border border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:shadow-md transition cursor-pointer">
-        <img src="/img/botePintura.png" alt="Producto similar" class="w-24 h-24 object-contain"/>
-      </div>
+    <h2 class="text-xl font-bold text-gray-900 mb-4">Productos destacados</h2>
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <% for (const dest of productosDestacados) { %>
+      <a href="/cliente/product/<%= dest.id_producto %>"
+         class="border border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:shadow-md transition">
+        <img src="/uploads/<%= dest.url_imagen || '/img/botePintura.png' %>"
+             alt="<%= dest.nombre %>"
+             onerror="this.src='/img/botePintura.png'"
+             class="w-24 h-24 object-contain"/>
+        <p class="text-xs font-semibold text-gray-800 text-center line-clamp-2"><%= dest.nombre %></p>
+        <p class="text-xs text-gray-500">$<%= Number(dest.precio_unitario).toLocaleString('es-MX') %></p>
+      </a>
       <% } %>
-
-
     </div>
   </section>
+  <% } %>
 
   <!-- MODAL CALIFICACIÓN ENVIADA -->
   <div id="modal-calificacion" class="fixed inset-0 flex items-center justify-center z-50 hidden">
