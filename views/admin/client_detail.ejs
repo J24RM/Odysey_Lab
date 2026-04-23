@@ -84,7 +84,14 @@
 
                 <!-- Orders Section -->
                 <div class="px-8 py-6">
-                    <h3 class="text-base font-bold text-gray-900 mb-4">Historial de Pedidos</h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-bold text-gray-900">Historial de Pedidos</h3>
+                        <% if (total > 0) { %>
+                        <span class="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+                            Mostrando <%= cliente.pedidos.length %> de <%= total %> &mdash; Página <%= paginaActual %> de <%= Math.max(totalPaginas, 1) %>
+                        </span>
+                        <% } %>
+                    </div>
 
                     <% if (cliente.pedidos && cliente.pedidos.length > 0) { %>
                     <div class="border border-gray-200 overflow-hidden">
@@ -123,6 +130,38 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Pagination -->
+                    <% if (totalPaginas > 1) { %>
+                    <div class="flex items-center justify-center gap-3 pt-5">
+                        <% if (paginaActual > 1) { %>
+                            <a href="/admin/clients/<%= cliente.id_usuario %>?page=<%= paginaActual - 1 %>"
+                               class="px-5 py-2.5 bg-white border-2 border-gray-300 rounded-lg font-semibold text-sm text-gray-700 hover:bg-gray-100 transition-all">
+                                ← Anterior
+                            </a>
+                        <% } else { %>
+                            <span class="px-5 py-2.5 bg-gray-100 border-2 border-gray-200 rounded-lg font-semibold text-sm text-gray-400 cursor-not-allowed">
+                                ← Anterior
+                            </span>
+                        <% } %>
+
+                        <span class="px-4 py-2 text-sm font-semibold text-gray-700">
+                            Página <%= paginaActual %> de <%= totalPaginas %>
+                        </span>
+
+                        <% if (paginaActual < totalPaginas) { %>
+                            <a href="/admin/clients/<%= cliente.id_usuario %>?page=<%= paginaActual + 1 %>"
+                               class="px-5 py-2.5 bg-white border-2 border-gray-300 rounded-lg font-semibold text-sm text-gray-700 hover:bg-gray-100 transition-all">
+                                Siguiente →
+                            </a>
+                        <% } else { %>
+                            <span class="px-5 py-2.5 bg-gray-100 border-2 border-gray-200 rounded-lg font-semibold text-sm text-gray-400 cursor-not-allowed">
+                                Siguiente →
+                            </span>
+                        <% } %>
+                    </div>
+                    <% } %>
+
                     <% } else { %>
                     <p class="text-sm text-gray-400">Este cliente aún no tiene pedidos.</p>
                     <% } %>

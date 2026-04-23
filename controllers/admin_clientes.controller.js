@@ -31,7 +31,11 @@ exports.getDetalleCliente = async (request, response) => {
             })
         );
 
-        const ordenesRaw = await Orden.obtenerOrdenesPorUsuario(id);
+        const page = parseInt(request.query.page) || 1;
+        const perPage = 20;
+        const { ordenes: ordenesRaw, total } = await Orden.obtenerOrdenesPorUsuarioPaginado(id, page, perPage);
+        const totalPaginas = Math.ceil(total / perPage);
+
         const pedidos = ordenesRaw.map(o => ({
             folio: o.folio,
             fecha: o.fecha_realizada
@@ -54,7 +58,10 @@ exports.getDetalleCliente = async (request, response) => {
 
         response.render('admin/client_detail', {
             usuario: request.session.usuario,
-            cliente
+            cliente,
+            paginaActual: page,
+            totalPaginas,
+            total
         });
     } catch (error) {
         console.error('Error al obtener detalle cliente:', error);
