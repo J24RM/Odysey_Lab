@@ -1,5 +1,6 @@
 const Producto = require('../models/producto.model');
 const Calificacion = require('../models/calificacion.model');
+const Estadisticas = require('../models/estadisticas.model');
 const xlsx = require('xlsx');
 const path = require('path');
 const fs = require('fs');
@@ -196,16 +197,11 @@ exports.getProductoCliente = async (request, response) => {
             unidadMedida: productoRaw.unidad_medida || 'N/A',
             descripcion: productoRaw.descripcion ? [productoRaw.descripcion] : ['Sin descripción disponible'],
             imagen: productoRaw.url_imagen || '/img/botePintura.png',
-            similars: [
-                '/img/botePintura.png',
-                '/img/botePintura.png',
-                '/img/botePintura.png',
-                '/img/botePintura.png'
-            ]
         };
-        const [calificacionExistente, resenas] = await Promise.all([
+        const [calificacionExistente, resenas, productosDestacados] = await Promise.all([
             Calificacion.buscarPorUsuarioYProducto(request.session.usuario, id),
-            Calificacion.obtenerPorProducto(id)
+            Calificacion.obtenerPorProducto(id),
+            Estadisticas.getTop5ProductosDestacados()
         ]);
 
         response.render('cliente/product', {
@@ -213,7 +209,8 @@ exports.getProductoCliente = async (request, response) => {
             productoId: id,
             producto,
             calificacion: calificacionExistente,
-            resenas
+            resenas,
+            productosDestacados
         });
     } catch (error) {
         console.error('Error in getProductoCliente:', error);
