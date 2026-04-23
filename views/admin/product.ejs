@@ -81,17 +81,25 @@
                     </aside>
                 </div>
 
-                <!-- Similar Products Section -->
+                <!-- Productos Destacados Section -->
+                <% if (productosDestacados && productosDestacados.length > 0) { %>
                 <section class="space-y-6">
-                    <h2 class="text-2xl font-extrabold text-gray-900">Productos similares</h2>
-                    <div class="grid grid-cols-4 gap-5">
-                        <% producto.similars.forEach((imagen) => { %>
-                            <div class="bg-white border border-gray-200 overflow-hidden hover:border-blue-600 hover:shadow-md transition-all">
-                                <img src="<%= imagen %>" alt="Producto similar" class="w-full h-48 object-cover">
-                            </div>
-                        <% }); %>
+                    <h2 class="text-2xl font-extrabold text-gray-900">Productos destacados</h2>
+                    <div class="grid grid-cols-5 gap-5">
+                        <% for (const dest of productosDestacados) { %>
+                            <a href="/admin/product/<%= dest.id_producto %>"
+                               class="bg-white border border-gray-200 overflow-hidden hover:border-blue-600 hover:shadow-md transition-all flex flex-col items-center p-4 gap-2">
+                                <img src="/uploads/<%= dest.url_imagen || '/img/botePintura.png' %>"
+                                     alt="<%= dest.nombre %>"
+                                     onerror="this.src='/img/botePintura.png'"
+                                     class="w-full h-36 object-contain">
+                                <p class="text-xs font-semibold text-gray-800 text-center line-clamp-2"><%= dest.nombre %></p>
+                                <p class="text-xs text-gray-500">$<%= Number(dest.precio_unitario).toLocaleString('es-MX') %></p>
+                            </a>
+                        <% } %>
                     </div>
                 </section>
+                <% } %>
             </section>
         </main>
     </div>

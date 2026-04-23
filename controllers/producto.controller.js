@@ -158,18 +158,15 @@ exports.getProductoAdmin = async (request, response) => {
             unidadMedida: productoRaw.unidad_medida || 'N/A',
             descripcion: productoRaw.descripcion ? [productoRaw.descripcion] : ['Sin descripción disponible'],
             imagen: productoRaw.url_imagen || '/img/botePintura.png',
-            similars: [
-                '/img/botePintura.png',
-                '/img/botePintura.png',
-                '/img/botePintura.png',
-                '/img/botePintura.png'
-            ]
         };
+
+        const productosDestacados = await Estadisticas.getTop5ProductosDestacados();
 
         response.render('admin/product', {
             usuario: request.session.usuario,
             productoId: id,
-            producto
+            producto,
+            productosDestacados
         });
     } catch (error) {
         console.error('Error in getProductoAdmin:', error);
