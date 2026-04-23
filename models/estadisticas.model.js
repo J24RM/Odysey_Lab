@@ -672,6 +672,8 @@ module.exports = class Estadisticas {
         return top5Ids
             .map(id => productos.find(p => p.id_producto === id))
             .filter(Boolean);
+    }
+
     static async getVentasDiariasGenerales() {
         if (!supabase) return { actual: [], anterior: [], diasEnMes: 30, diasEnMesAnterior: 30 };
 
