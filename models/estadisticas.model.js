@@ -441,7 +441,7 @@ module.exports = class Estadisticas {
         };
     }
 
-    static async getEstadisticasProductos(periodo = 'semana', busqueda = '') {
+    static async getEstadisticasProductos(periodo = 'semana', busqueda = '', orden = 'nombre', dir = 'asc') {
         if (!supabase) return { productos: [], periodo, busqueda };
 
         const ahora = new Date();
@@ -489,7 +489,11 @@ module.exports = class Estadisticas {
                 porcentajeCantidad: cantP > 0 ? ((cantA - cantP) / cantP) * 100 : (cantA > 0 ? 100 : 0),
                 porcentajeVentas:   ventP > 0 ? ((ventA - ventP) / ventP) * 100 : (ventA > 0 ? 100 : 0)
             };
-        }).sort((a, b) => b.cantidad - a.cantidad);
+        }).sort((a, b) => {
+        if (orden === 'cantidad') return dir === 'asc' ? a.cantidad - b.cantidad : b.cantidad - a.cantidad;
+        if (orden === 'ventas')   return dir === 'asc' ? a.ventas   - b.ventas   : b.ventas   - a.ventas;
+        return dir === 'asc' ? a.nombre.localeCompare(b.nombre, 'es') : b.nombre.localeCompare(a.nombre, 'es');
+    });
 
         return { productos, periodo, busqueda };
     }

@@ -39,7 +39,7 @@
                 name="busqueda"
                 value="<%= busqueda %>"
                 placeholder="Buscar producto..."
-                class="w-full px-5 py-2.5 border-2 border-gray-300 rounded-full text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors"
+                class="w-full px-5 py-2.5 border-2 border-gray-300 text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors"
             />
             <input type="hidden" name="periodo" value="<%= periodo %>">
         </form>
@@ -77,9 +77,43 @@
         <table class="w-full text-sm">
             <thead class="bg-gray-100 text-gray-600">
                 <tr>
-                    <th class="text-left px-6 py-4">Producto</th>
-                    <th class="text-center px-6 py-4">Cantidad Ordenada</th>
-                    <th class="text-center px-6 py-4">Ventas</th>
+                    <th class="text-left px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <span>Producto</span>
+                            <a href="?busqueda=<%= busqueda %>&periodo=<%= periodo %>&orden=nombre&dir=<%= (orden === 'nombre' && dir === 'asc') ? 'desc' : 'asc' %>"
+                            class="flex items-center gap-1 group">
+                                <div class="flex flex-col leading-none">
+                                    <span class="text-[9px] <%= (orden === 'nombre' && dir === 'asc') ? 'text-blue-600' : 'text-gray-400' %>">▲</span>
+                                    <span class="text-[9px] <%= (orden === 'nombre' && dir === 'desc') ? 'text-blue-600' : 'text-gray-400' %>">▼</span>
+                                </div>
+                                <span class="text-xs text-gray-400 group-hover:text-gray-600">
+                                    <%= (orden === 'nombre') ? (dir === 'asc' ? 'A-Z' : 'Z-A') : 'A-Z' %>
+                                </span>
+                            </a>
+                        </div>
+                    </th>
+
+                    <th class="text-center px-6 py-4">
+                        <div class="flex items-center justify-center gap-2">
+                            <span>Cantidad Ordenada</span>
+                            <a href="?busqueda=<%= busqueda %>&periodo=<%= periodo %>&orden=cantidad&dir=<%= (orden === 'cantidad' && dir === 'desc') ? 'asc' : 'desc' %>"
+                            class="flex flex-col leading-none">
+                                <span class="text-[9px] <%= (orden === 'cantidad' && dir === 'asc') ? 'text-blue-600' : 'text-gray-400' %>">▲</span>
+                                <span class="text-[9px] <%= (orden === 'cantidad' && dir === 'desc') ? 'text-blue-600' : 'text-gray-400' %>">▼</span>
+                            </a>
+                        </div>
+                    </th>
+
+                    <th class="text-center px-6 py-4">
+                        <div class="flex items-center justify-center gap-2">
+                            <span>Ventas</span>
+                            <a href="?busqueda=<%= busqueda %>&periodo=<%= periodo %>&orden=ventas&dir=<%= (orden === 'ventas' && dir === 'desc') ? 'asc' : 'desc' %>"
+                            class="flex flex-col leading-none">
+                                <span class="text-[9px] <%= (orden === 'ventas' && dir === 'asc') ? 'text-blue-600' : 'text-gray-400' %>">▲</span>
+                                <span class="text-[9px] <%= (orden === 'ventas' && dir === 'desc') ? 'text-blue-600' : 'text-gray-400' %>">▼</span>
+                            </a>
+                        </div>
+                    </th>
                 </tr>
             </thead>
 

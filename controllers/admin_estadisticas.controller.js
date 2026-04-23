@@ -108,12 +108,15 @@ exports.getDetalleSucursal = async (request, response) => {
 exports.getEstadisticasProductos = async (request, response) => {
     const periodo  = request.query.periodo  || 'semana';
     const busqueda = request.query.busqueda || '';
+    const orden    = ['nombre', 'cantidad', 'ventas'].includes(request.query.orden) ? request.query.orden : 'nombre';
+    const dir      = request.query.dir === 'desc' ? 'desc' : 'asc';
+
     try {
-        const data = await Estadisticas.getEstadisticasProductos(periodo, busqueda);
-        response.render('admin/stats_productos', { usuario: request.session.usuario, ...data });
+        const data = await Estadisticas.getEstadisticasProductos(periodo, busqueda, orden, dir);
+        response.render('admin/stats_productos', { usuario: request.session.usuario, ...data, orden, dir });
     } catch (error) {
         console.error('Error fetching estadísticas productos:', error);
-        response.render('admin/stats_productos', { usuario: request.session.usuario, productos: [], periodo, busqueda });
+        response.render('admin/stats_productos', { usuario: request.session.usuario, productos: [], periodo, busqueda, orden, dir });
     }
 };
 
