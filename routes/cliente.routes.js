@@ -14,6 +14,9 @@ const cartCount = require("../utils/cartcount")
 //Ruta get para pagina principal
 router.get('/home',cartCount ,authController.getClienteHome);
 
+//API búsqueda de productos en tiempo real
+router.get('/api/productos', productoController.searchProductos);
+
 //Ruta get para detalle de producto
 router.get('/product/:id',cartCount, productoController.getProductoCliente);
 

@@ -61,6 +61,86 @@ if (scrollY !== null) {
     });
 }
 
+// Búsqueda en tiempo real
+(function () {
+    const searchInput = document.getElementById('clienteSearchInput');
+    const productGrid = document.querySelector('.product-grid');
+    if (!searchInput || !productGrid) return;
+
+    let debounceTimer;
+    let originalHTML = null;
+
+    function buildCard(p, idx) {
+        const src = p.url_imagen ? `/uploads/${p.url_imagen}` : '/img/botePintura.png';
+        let stars = '';
+        for (let i = 1; i <= 5; i++) {
+            const op = i <= Math.round(p.promedio || 0) ? '1' : '0.2';
+            stars += `<img src="/img/estrellita.png" alt="estrella" style="width:18px;height:18px;display:inline-block;opacity:${op}"/>`;
+        }
+        return `
+        <div class="product-card">
+            <a href="/cliente/product/${p.id_producto}" class="product-link">
+                <div class="product-img-wrap">
+                    <img src="${src}" alt="${p.nombre}" onerror="this.src='/img/botePintura.png'">
+                </div>
+                <div class="product-name">${p.nombre}</div>
+                <div class="product-rating">${stars}</div>
+                <div class="product-price">$ ${p.precio_unitario}</div>
+            </a>
+            <hr class="border-gray-300 mb-0"/>
+            <div class="flex items-center justify-start gap-2 mt-4">
+                <label class="text-xs font-semibold text-gray-700">Cantidad:</label>
+                <div class="flex items-center border border-gray-400 rounded bg-white overflow-hidden">
+                    <button type="button" onclick="changeCantidad('s${idx}',-1)" class="px-2 py-1 text-gray-600 hover:bg-gray-100 text-sm leading-none select-none">&#8722;</button>
+                    <input id="cantidad-visible-s${idx}" type="text" value="1" inputmode="numeric" pattern="[0-9]*" maxlength="3"
+                        oninput="this.value=this.value.replace(/[^0-9]/g,'');document.getElementById('cantidad-input-s${idx}').value=this.value||1;"
+                        onblur="if(!this.value||this.value<1){this.value=1;document.getElementById('cantidad-input-s${idx}').value=1;}else{document.getElementById('cantidad-input-s${idx}').value=this.value;}"
+                        class="w-10 text-xs font-semibold text-gray-700 outline-none text-center border-x border-gray-400 py-1"/>
+                    <button type="button" onclick="changeCantidad('s${idx}',1)" class="px-2 py-1 text-gray-600 hover:bg-gray-100 text-sm leading-none select-none">&#43;</button>
+                </div>
+            </div>
+            <form action="/cart/items" method="POST" class="mt-4">
+                <input type="hidden" name="_csrf" value="${window._csrfToken}">
+                <input type="hidden" name="cantidad_ingresada" id="cantidad-input-s${idx}" value="1">
+                <input type="hidden" name="page" value="1">
+                <input type="hidden" name="search" value="">
+                <input type="hidden" name="id_producto" value="${p.id_producto}">
+                <button type="submit" class="btn-add-cart">Agregar al carrito</button>
+            </form>
+        </div>`;
+    }
+
+    searchInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        const query = searchInput.value.trim();
+
+        if (!query) {
+            if (originalHTML !== null) {
+                productGrid.innerHTML = originalHTML;
+                originalHTML = null;
+            }
+            return;
+        }
+
+        debounceTimer = setTimeout(async () => {
+            try {
+                const res = await fetch(`/cliente/api/productos?q=${encodeURIComponent(query)}`);
+                const productos = await res.json();
+
+                if (originalHTML === null) originalHTML = productGrid.innerHTML;
+
+                if (productos.length === 0) {
+                    productGrid.innerHTML = '<div class="col-span-full py-10 text-center text-gray-500">No se encontraron productos.</div>';
+                    return;
+                }
+                productGrid.innerHTML = productos.map((p, i) => buildCard(p, i)).join('');
+            } catch {
+                productGrid.innerHTML = '<div class="col-span-full py-10 text-center text-red-500">Error al buscar productos.</div>';
+            }
+        }, 300);
+    });
+})();
+
 function changeCantidad(index, delta) {
     const visible = document.getElementById('cantidad-visible-' + index);
     const hidden = document.getElementById('cantidad-input-' + index);
