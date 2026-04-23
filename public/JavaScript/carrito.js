@@ -12,12 +12,10 @@ function actualizarSubtotal() {
     const qty = parseInt(input.value) || 0;
     const peso = parseFloat(input.dataset.peso) || 0;
 
-
     subtotal += precio * qty;
     totalQty += qty;
     totalPeso += peso;
   }
-
 
   document.getElementById('subtotal-display').textContent =
     '$ ' + subtotal.toLocaleString('es-MX');
@@ -26,7 +24,6 @@ function actualizarSubtotal() {
 
   document.getElementById('total-display').textContent =
     '$ ' + total.toLocaleString('es-MX');
-
 
   document.getElementById('qty-display').textContent =
     'Cantidad de productos: ' + totalQty;
@@ -59,6 +56,18 @@ async function inputCantidad(idProducto) {
 async function enviarCantidad(idProducto, cantidad) {
   const input = document.getElementById('qty-' + idProducto);
 
+  // Mostrar spinner y ocultar input
+  input.classList.add('hidden');
+  const spinner = document.createElement('div');
+  spinner.id = 'spinner-' + idProducto;
+  spinner.className = 'w-10 h-5 flex items-center justify-center';
+  spinner.innerHTML = `
+    <svg class="animate-spin h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+    </svg>`;
+  input.insertAdjacentElement('afterend', spinner);
+
   const res = await fetch('/cart/items/' + idProducto, {
     method: 'POST',
     headers: { 
@@ -70,11 +79,15 @@ async function enviarCantidad(idProducto, cantidad) {
 
   const data = await res.json();
 
+  // Quitar spinner y mostrar input de nuevo
+  const spinnerEl = document.getElementById('spinner-' + idProducto);
+  if (spinnerEl) spinnerEl.remove();
+  input.classList.remove('hidden');
+
   if (data.csrfToken) csrfToken = data.csrfToken;
 
   if (data.cartCount !== undefined) {
-          
-        actualizarCartBadge(data.cartCount);
+    actualizarCartBadge(data.cartCount);
   }
 
   if (!res.ok) {
@@ -113,15 +126,15 @@ async function eliminarProducto(idProducto) {
   if (data.csrfToken) csrfToken = data.csrfToken;
 
   if (!res.ok) {
-            mostrarError('No se pudo eliminar el producto');
-            return;
+    mostrarError('No se pudo eliminar el producto');
+    return;
   }
 
   if (data.eliminado) {
-  const nombre = document.getElementById('nombre-' + idProducto).textContent;
-  mostrarEliminado(nombre, idProducto);
-  actualizarSubtotal();
-}
+    const nombre = document.getElementById('nombre-' + idProducto).textContent;
+    mostrarEliminado(nombre, idProducto);
+    actualizarSubtotal();
+  }
 }
 
 function mostrarEliminado(nombre, idProducto) {
@@ -149,5 +162,3 @@ document.addEventListener('DOMContentLoaded', () => {
         window.history.replaceState({}, '', '/cart');
     }
 });
-
-

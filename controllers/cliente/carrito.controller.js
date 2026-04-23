@@ -1,6 +1,7 @@
 const ordenModel = require('../../models/orden.model')
 const detalle_ordenModel = require('../../models/detalle_orden.model');
 const productoModel = require('../../models/producto.model')
+const configuracionModel = require('../../models/configuracion.model')
 const { compile } = require('ejs');
 const { log } = require('../../utils/logger');
 const cartcount = require('../../utils/cartcount');
@@ -40,6 +41,10 @@ exports.getCarrito = async (request, response, next) => {
         }
         const productosSugeridos = disponibles.slice(0, 4);
 
+        // Obtener tiempo de cancelacion
+        const configuracion = await configuracionModel.ObtenerConfiguracionActiva();
+        console.log(configuracion);
+
         response.render('cliente/cart', {
             csrfToken: request.csrfToken(),
             usuario: request.session.usuario,
@@ -49,6 +54,7 @@ exports.getCarrito = async (request, response, next) => {
             sucursal_activa: sucursal_activa,
             carrito: request.session.id_carrito,
             productosSugeridos,
+            tiempoCancelacion: configuracion.tiempo_de_cancelacion,
         });
 
     } catch (err) {

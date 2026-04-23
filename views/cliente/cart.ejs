@@ -11,6 +11,7 @@
     .nav-bg { background-color: rgba(0, 120, 169, 0.1); }
     .nav-border { border-color: rgba(0, 120, 169, 0.2); }
   </style>
+  
   <script>
     tailwind.config = {
       theme: {
@@ -28,6 +29,7 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
 
+  
 <%- include('../includes/_navbar') %>
 
 <div class="max-w-7xl mx-auto px-6 py-10 flex gap-6 items-start">
@@ -147,7 +149,7 @@
     </form>
 
     <p class="text-xs text-gray-500 text-center leading-snug px-2">
-      <em>Revisa tu orden, solo tendrás 15 minutos para cancelarla una vez la realices</em>
+      <em>Revisa tu orden, solo tendrás <%= tiempoCancelacion %> minutos para cancelarla una vez la realices</em>
     </p>
   </div>
   

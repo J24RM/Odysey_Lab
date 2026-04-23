@@ -26,89 +26,172 @@ exports.registrarOrden = async (req, res) => {
         const orden = await ordenModel.registrarOrden(id_usuario);
 
         if (id_sucursal && orden?.folio) {
-            await ordenModel.actualizarSucursalPorFolio(orden.folio, id_sucursal);
+            await ordenModel.actualizarSucursalYCuentaPorFolio(orden.folio, id_sucursal, req.session.cuenta_activa.id_cuenta);
         }
         const { folio, subtotal, productos, peso_total } = orden;
 
         let detalleHTML = "";
+        let rowIndex = 1;
         productos.forEach(p => {
             const subtotalFila = parseFloat(p.total);
             const totalFila = subtotalFila * 1.16;
-
+            const bgRow = rowIndex % 2 === 0 ? 'background:#f9f9f9;' : '';
             detalleHTML += `
-                <tr>
-                    <td style="padding:8px; border:1px solid #929292;">${p.nombre}</td>
-                    <td style="padding:8px; border:1px solid #929292;">${p.cantidad}</td>
-                    <td style="padding:8px; border:1px solid #929292;">${p.peso} Kg</td>
-                    <td style="padding:8px; border:1px solid #929292;">$${parseFloat(p.precio).toFixed(2)}</td>
-                    <td style="padding:8px; border:1px solid #929292;">$${subtotalFila.toFixed(2)}</td>
-                    <td style="padding:8px; border:1px solid #929292;">$${totalFila.toFixed(2)}</td>
+                <tr style="${bgRow}">
+                <td style="padding:7px 8px; border:1px solid #ddd;">${rowIndex}</td>
+                <td style="padding:7px 8px; border:1px solid #ddd;">${p.nombre}</td>
+                <td style="padding:7px 8px; border:1px solid #ddd; text-align:right;">$${parseFloat(p.precio).toFixed(2)}</td>
+                <td style="padding:7px 8px; border:1px solid #ddd; text-align:right;">${p.cantidad}</td>
+                <td style="padding:7px 8px; border:1px solid #ddd; text-align:right;">${p.peso}</td>
+                <td style="padding:7px 8px; border:1px solid #ddd; text-align:right;">$${subtotalFila.toFixed(2)}</td>
+                <td style="padding:7px 8px; border:1px solid #ddd; text-align:right;">$${totalFila.toFixed(2)}</td>
                 </tr>
             `;
+            rowIndex++;
         });
 
         const total = subtotal * 1.16;
 
         let sucursalNombre = req.session.sucursal_activa.nombre_sucursal || "";
+        let cuentaNombre = req.session.cuenta_activa.nombre_dueno || "";
+        let cuentaRFC = req.session.cuenta_activa.rfc || "";
+
+        const sucursal = req.session.sucursal_activa;
 
         resend.emails.send({
             from: 'onboarding@resend.dev',
             to: correo,
             subject: `Confirmación de Orden ${folio}`,
-            html: `
-            <div style="font-family: Arial, sans-serif; background:#f4f4f4; padding:20px;">
-                <div style="max-width:600px; margin:auto; background:white; padding:20px; border-radius:10px;">
-                    
-                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px;">
-                        <h2 style="color:#333; margin:0;">Orden Confirmada</h2>
+            html: 
+            `
+            <div style="font-family: Arial, sans-serif; background:#f0f2f5; padding:24px 0;">
+                <div style="max-width:640px; margin:auto; background:white; border-radius:4px; overflow:hidden; border:1px solid #ddd;">
+
+                    <!-- HEADER -->
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; padding:18px 24px 14px; border-bottom:3px solid #1a7abf;">
+                    <div>
                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/PPG_Logo.svg/1280px-PPG_Logo.svg.png" 
-                            alt="PPG Logo" style="width:120px;">
+                            alt="PPG" 
+                            style="height:36px; width:auto; display:block;">
+                        <span style="font-size:20px; font-weight:400; color:#444;"> Sistema de Pedidos</span>
+
+                    </div>
+                    </div>
+                    
+
+                    <!-- INTRO -->
+                    <div style="padding:14px 24px 0;">
+                    <p style="margin:0 0 14px; font-size:13px; color:#333;">
+                        Hola, el usuario <strong>${cuentaNombre}</strong> realizó la confirmación de la siguiente solicitud.
+                    </p>
                     </div>
 
-                    <p>Tu orden ha sido registrada con éxito.</p>
-                    <p><strong>Folio:</strong> ${folio}</p>
-                    <p><strong>Fecha:</strong> ${new Date().toLocaleString()}</p>
-                    <p><strong>Sucursal:</strong> ${sucursalNombre}</p>
-                    <h3>Detalle de la orden:</h3>
-                    <table style="width:100%; border-collapse:collapse; border:1px solid #002736;">
+                    <!-- INFO GRID -->
+                    <div style="padding:0 24px 14px;">
+                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                        <tr>
+                        <td style="padding:4px 0; width:130px;"><strong>Cuenta</strong></td>
+                        <td style="padding:4px 12px;">${cuentaNombre} — ${cuentaRFC}</td>
+                        <td style="padding:4px 0; width:80px;"><strong>Fecha</strong></td>
+                        <td style="padding:4px 12px;">${new Date().toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                        <td style="padding:4px 0;"><strong>Folio</strong></td>
+                        <td style="padding:4px 12px;">${folio}</td>
+                        <td style="padding:4px 0;"><strong>Piezas</strong></td>
+                        <td style="padding:4px 12px;">${productos.length} artículo(s)</td>
+                        </tr>
+                        <tr>
+                        <td style="padding:4px 0;"><strong>Tipo de pedido</strong></td>
+                        <td style="padding:4px 12px;">Normal</td>
+                        <td></td><td></td>
+                        </tr>
+                        <tr>
+                        <td style="padding:4px 0;"><strong>Estado de pedido</strong></td>
+                        <td style="padding:4px 12px;">
+                            <span style="background:#28a745; color:white; font-size:11px; padding:2px 10px; border-radius:3px;">Confirmado</span>
+                        </td>
+                        <td></td><td></td>
+                        </tr>
+                    </table>
+                    </div>
+
+                    <!-- DIRECCIÓN -->
+                    <div style="padding:0 24px 14px;">
+                    <div style="border-top:1px solid #ddd; padding-top:10px;">
+                        <p style="margin:0 0 4px; font-size:13px;"><strong>Dirección de entrega</strong></p>
+                        <table style="font-size:13px; border-collapse:collapse; width:100%;">
+                        <tr>
+                            <td style="width:130px; color:#555; padding:2px 0;">Estado</td>
+                            <td>${sucursalNombre} — ${sucursal.edo}</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#555; padding:2px 0;">Dirección</td>
+                            <td>${sucursal.calle_1} ${sucursal.calle_2}, ${sucursal.deleg_municipio}</td>
+                        </tr>
+                        </table>
+                    </div>
+                    </div>
+
+                    <!-- TABLA DE PRODUCTOS -->
+                    <div style="padding:0 24px 0;">
+                    <div style="border-top:1px solid #ddd; padding-top:10px;">
+                        <table style="width:100%; border-collapse:collapse; font-size:12px;">
                         <thead>
-                            <tr style="background:#002736;">
-                                <th style="padding:8px; color:white; border:1px solid #ddd;">Producto</th>
-                                <th style="padding:8px; color:white; border:1px solid #ddd;">Cantidad</th>
-                                <th style="padding:8px; color:white; border:1px solid #ddd;">Peso</th>
-                                <th style="padding:8px; color:white; border:1px solid #ddd;">Precio</th>
-                                <th style="padding:8px; color:white; border:1px solid #ddd;">Subtotal</th>
-                                <th style="padding:8px; color:white; border:1px solid #ddd;">Total(IVA incluido)</th>
+                            <tr style="background:#1a7abf; color:white;">
+                            <th style="padding:8px; text-align:left; border:1px solid #1a6aab;">#</th>
+                            <th style="padding:8px; text-align:left; border:1px solid #1a6aab;">Producto</th>
+                            <th style="padding:8px; text-align:right; border:1px solid #1a6aab;">Precio</th>
+                            <th style="padding:8px; text-align:right; border:1px solid #1a6aab;">Cantidad</th>
+                            <th style="padding:8px; text-align:right; border:1px solid #1a6aab;">Peso (Kg)</th>
+                            <th style="padding:8px; text-align:right; border:1px solid #1a6aab;">Subtotal</th>
+                            <th style="padding:8px; text-align:right; border:1px solid #1a6aab;">Total (IVA inc.)</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${detalleHTML}
                         </tbody>
-                    </table>
+                        </table>
+                    </div>
+                    </div>
 
-                    <table style="width:100%; margin-top:15px; border-collapse:collapse;">
+                    <!-- TOTALES -->
+                    <div style="padding:10px 24px 20px;">
+                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
                         <tr>
-                            <td style="padding:6px; text-align:right;"><strong>Peso Total:</strong></td>
-                            <td style="padding:6px; text-align:right; width:150px;">${peso_total.toFixed(2)} Kg</td>
+                        <td style="text-align:right; padding:4px 0;"><strong>Peso Total:</strong></td>
+                        <td style="text-align:right; padding:4px 0; width:140px;">${peso_total.toFixed(2)} Kg</td>
                         </tr>
                         <tr>
-                            <td style="padding:6px; text-align:right;"><strong>Subtotal:</strong></td>
-                            <td style="padding:6px; text-align:right; width:150px;">$${subtotal.toFixed(2)}</td>
+                        <td style="text-align:right; padding:4px 0;"><strong>Subtotal:</strong></td>
+                        <td style="text-align:right; padding:4px 0;">$${subtotal.toFixed(2)}</td>
                         </tr>
-                        <tr style="background:#002736; color:white;">
-                            <td style="padding:8px; text-align:right;"><strong>Total(IVA incluido):</strong></td>
-                            <td style="padding:8px; text-align:right; width:150px; white-space:nowrap;"><strong>$${total.toFixed(2)} </strong></td>
+                        <tr>
+                        <td style="text-align:right; padding:4px 0;"><strong>IVA (16%):</strong></td>
+                        <td style="text-align:right; padding:4px 0;">$${(subtotal * 0.16).toFixed(2)}</td>
+                        </tr>
+                        <tr style="background:#1a7abf; color:white;">
+                        <td style="text-align:right; padding:8px 12px; font-weight:700;">Total (IVA incluido):</td>
+                        <td style="text-align:right; padding:8px 12px; font-weight:700; white-space:nowrap;">$${total.toFixed(2)}</td>
                         </tr>
                     </table>
+                    </div>
 
-                    <div style="text-align:center; margin-top:20px;">
-                        <a href="http://localhost:3000/"
-                        style="background:#002736; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">
+                    <!-- NOTA Y CTA -->
+                    <div style="padding:0 24px 20px; font-size:12px; color:#555;">
+                    <p style="margin:0 0 14px;">
+                        *Para visualizar el pedido completo ingresa al sistema de pedidos.
+                    </p>
+                    <div style="text-align:center;">
+                        <a href="https://odyseysistemadepreventas-production.up.railway.app/login"
+                        style="background:#1a7abf; color:white; padding:10px 28px; text-decoration:none; border-radius:4px; font-size:13px; display:inline-block;">
                         Ver mis pedidos
                         </a>
                     </div>
+                    </div>
+
                 </div>
-            </div>
+                </div>
             `
         }).catch(err => {
             console.error("Error correo:", err);
@@ -134,7 +217,6 @@ exports.postCancelarOrden = async (req, res) => {
         const data = await ordenModel.CancelarOrden(req.params.id_orden);
 
         if (data === 'OK') {
-            log('CLIENTE', 'PEDIDO CANCELADO', `id_cliente: ${req.session.usuario}, id_orden: ${req.params.id_orden}`);
             return res.redirect('/cliente/mis-pedidos?success=' + encodeURIComponent(" ") + '&order=' + encodeURIComponent("Orden cancelada"));
         }
 

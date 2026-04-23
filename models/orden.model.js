@@ -89,10 +89,10 @@ module.exports = class Orden {
         return detalles || [];
     }
 
-    static async actualizarSucursalPorFolio(folio, id_sucursal) {
+    static async actualizarSucursalYCuentaPorFolio(folio, id_sucursal, id_cuenta) {
         const { error } = await supabase
             .from('orden')
-            .update({ id_sucursal })
+            .update({ id_sucursal , id_cuenta})
             .eq('folio', folio);
         if (error) throw error;
     }
