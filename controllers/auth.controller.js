@@ -1,13 +1,28 @@
 // Controllers
 const Usuario = require('../models/usuario.model');
 const Producto = require('../models/producto.model');
+const Configuracion = require('../models/configuracion.model');
 const { log } = require('../utils/logger');
 const Calificacion = require('../models/calificacion.model');
 
+function hexToRgb(hex) {
+    if (!hex) return '0,39,54';
+    const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return r ? `${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)}` : '0,39,54';
+}
+
 //Muestra el Login
-exports.getLogin = (request, response) => {
+exports.getLogin = async (request, response) => {
     const motivo = request.query.motivo || null;
-    response.render('login', { mensaje: "Ingresa tus credenciales para acceder", motivo });
+    let config = null;
+    try { config = await Configuracion.ObtenerConfig(); } catch {}
+    const colorRgb = hexToRgb(config && config.color_tema);
+    response.render('login', {
+        mensaje: "Ingresa tus credenciales para acceder",
+        motivo,
+        config,
+        colorRgb
+    });
 };
 
 //Ingresa credenciales

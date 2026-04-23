@@ -8,13 +8,17 @@
 
 /* VARIABLES GLOBALES  */
 :root {
-    --ppg-blue:       #2d7dd2;   /* Azul principal PPG */
-    --ppg-blue-dark:  #1f5fa6;   /* Azul oscuro (hover botón) */
-    --navy:           #1e2a3a;   /* Fondo columna derecha */
-    --card-bg:        #f5f7fa;   /* Fondo de la tarjeta */
-    --input-border:   #c8d6e5;   /* Borde de inputs */
+    --ppg-blue:       #2d7dd2;
+    --ppg-blue-dark:  #1f5fa6;
+    --navy:           #1e2a3a;
+    --card-bg:        #f5f7fa;
+    --input-border:   #c8d6e5;
     --text-dark:      #1a1a2e;
     --error:          #e74c3c;
+    /* Sobreescritas por EJS con el color del tema */
+    --tema-color:     #1e2a3a;
+    --tema-rgb:       30,42,58;
+    --banner-login-url: url('/img/fondoLogin.jpg');
 }
 
 /* Body Divide la pantalla en dos mitades  */
@@ -22,15 +26,11 @@ body {
     font-family: 'Segoe UI', Arial, sans-serif;
     height: 100vh;
     overflow: hidden;
-
-    /* Dos mitades usando pseudo-elemento ::before */
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: flex-end;  /* La tarjeta va a la derecha */
-
-    /* Fondo derecho oscuro (columna donde está la tarjeta) */
-    background: var(--navy);
+    justify-content: flex-end;
+    background: var(--tema-color, var(--navy));
 }
 
 /* Columna izquierda   */
@@ -42,14 +42,9 @@ body::before {
     width: 56%;
     height: 100%;
     border-right: 10px solid #fff;
-    background-image: linear-gradient(
-    rgba(255,255,255,0.60),
-    rgba(255,255,255,0.60)
-    ),
-    url('/img/fondoLogin.jpg');
-    background-size: cover;
-    background-position: center;
-    
+    background-image:
+        linear-gradient(rgba(var(--tema-rgb, 30,42,58), 0.35), rgba(var(--tema-rgb, 30,42,58), 0.35)),
+        var(--banner-login-url, url('/img/fondoLogin.jpg'));
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;

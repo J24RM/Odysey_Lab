@@ -1,6 +1,6 @@
 // Countdown preventa
 (function () {
-    const target = new Date('2026-06-11T00:00:00');
+    const target = new Date(window.CAMPANIA_FIN || '2026-06-11T00:00:00');
     const pad = n => String(n).padStart(2, '0');
     function tick() {
         const diff = target - new Date();

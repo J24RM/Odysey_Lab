@@ -20,16 +20,20 @@
         <main class="ml-48 pt-4 px-10 pb-9 flex-1">
 
             <!-- Banner de campaña -->
-            <section class="mb-6 overflow-hidden" style="background:#002736; padding:28px 40px;">
+            <% const bannerColor = (config && config.color_tema) ? config.color_tema : '#002736'; %>
+            <% const timerImgSrc = (config && config.banner_timer_url) ? '/uploads/' + config.banner_timer_url : '/img/niñoMundial.png'; %>
+            <% const nombreCamp = (config && config.nombre_campania) ? config.nombre_campania : 'Mundial 2026'; %>
+            <% const fechaFin = (config && config.fecha_fin_campania) ? config.fecha_fin_campania : '2026-06-11T00:00:00'; %>
+            <section class="mb-6 overflow-hidden" style="background:<%= bannerColor %>; padding:28px 40px;">
                 <div class="flex items-center justify-between gap-6">
                     <!-- Left -->
                     <div class="flex-1">
                         <p class="text-xs font-bold uppercase tracking-widest mb-2" style="color:#8FBADE;">Preventa activa</p>
                         <h2 class="text-3xl font-extrabold text-white leading-tight mb-2">
                             Productos Exclusivos<br>
-                            <span style="color:#f97316;">Mundial 2026</span>
+                            <span style="color:#f97316;"><%= nombreCamp %></span>
                         </h2>
-                        <p class="text-sm" style="color:#8FBADE;">Hasta el 11 de junio de 2026</p>
+                        <p class="text-sm" style="color:#8FBADE;">Fin: <%= new Date(fechaFin).toLocaleDateString('es-MX', {day:'numeric', month:'long', year:'numeric'}) %></p>
                     </div>
                     <!-- Temporizador e imagen -->
                     <div class="flex items-center gap-4">
@@ -51,7 +55,7 @@
                                 <span class="text-xs uppercase" style="color:#8FBADE;">Seg</span>
                             </div>
                         </div>
-                        <img src="/img/niñoMundial.png" alt="Mundial 2026" class="h-40 w-auto object-contain">
+                        <img src="<%= timerImgSrc %>" alt="<%= nombreCamp %>" class="h-40 w-auto object-contain" onerror="this.src='/img/botePintura.png'">
                     </div>
                 </div>
             </section>
@@ -138,7 +142,7 @@
 
     <script>
         // Temporizador de preventa
-        const target = new Date('2026-06-11T00:00:00');
+        const target = new Date('<%= (config && config.fecha_fin_campania) ? config.fecha_fin_campania : "2026-06-11T00:00:00" %>');
         function updateCountdown() {
             const diff = target - new Date();
             if (diff <= 0) {

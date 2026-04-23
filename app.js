@@ -21,6 +21,7 @@ const adminProductoRoutes = require('./routes/admin/producto.routes');
 const adminOrdenesRoutes = require('./routes/admin/ordenes.routes');
 const adminClientesRoutes = require('./routes/admin/clientes.routes');
 const adminEstadisticasRoutes = require('./routes/admin/estadisticas.routes');
+const adminCampaniaRoutes = require('./routes/admin/campania.routes');
 const clienteRoutes = require('./routes/cliente.routes')
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -86,7 +87,9 @@ const fileFilter = (request, file, callback) => {
 app.use(multer({ storage: fileStorage, fileFilter }).fields([
     { name: 'imagen', maxCount: 1 },
     { name: 'imagenes', maxCount: 50 },
-    { name: 'archivoCSV', maxCount: 1 }
+    { name: 'archivoCSV', maxCount: 1 },
+    { name: 'banner_login', maxCount: 1 },
+    { name: 'banner_timer', maxCount: 1 }
 ]));
 
 app.use(csrfProtection);
@@ -161,12 +164,24 @@ const requireCliente = (request, response, next) => {
     next();
 };
 
+// Middleware: inyecta configuración de campaña en todas las vistas protegidas
+const Configuracion = require('./models/configuracion.model');
+app.use(async (_req, res, next) => {
+    try {
+        res.locals.config = await Configuracion.ObtenerConfig();
+    } catch {
+        res.locals.config = null;
+    }
+    next();
+});
+
 // Rutas para admin (protegidas)
 app.use('/admin', requireAdmin, adminHomeRoutes);
 app.use('/admin', requireAdmin, adminProductoRoutes);
 app.use('/admin', requireAdmin, adminOrdenesRoutes);
 app.use('/admin', requireAdmin, adminClientesRoutes);
 app.use('/admin', requireAdmin, adminEstadisticasRoutes);
+app.use('/admin', requireAdmin, adminCampaniaRoutes);
 
 
 // Rutas del Cliente

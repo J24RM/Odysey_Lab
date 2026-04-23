@@ -1,17 +1,21 @@
 <!-- Sidebar -->
-<aside class="w-48 bg-gray-900 pt-9 pb-6 fixed h-screen">
+<% const temaColor = (config && config.color_tema) ? config.color_tema : '#111827'; %>
+<aside class="w-48 pt-9 pb-6 fixed h-screen" style="background: <%= temaColor %>;">
     <nav class="space-y-1">
-        <a href="/admin/home" class="block px-5 py-3 text-gray-300 font-semibold text-sm border-l-4 border-l-transparent transition-all hover:bg-gray-800 hover:text-white hover:border-l-blue-600">
+        <a href="/admin/home" class="block px-5 py-3 text-gray-300 font-semibold text-sm border-l-4 border-l-transparent transition-all hover:bg-white/10 hover:text-white hover:border-l-white">
             Inicio
         </a>
-        <a href="/admin/stats" class="block px-5 py-3 text-gray-300 font-semibold text-sm border-l-4 border-l-transparent transition-all hover:bg-gray-800 hover:text-white hover:border-l-blue-600">
+        <a href="/admin/stats" class="block px-5 py-3 text-gray-300 font-semibold text-sm border-l-4 border-l-transparent transition-all hover:bg-white/10 hover:text-white hover:border-l-white">
             Estadísticas
         </a>
-        <a href="/admin/orders" class="block px-5 py-3 text-gray-300 font-semibold text-sm border-l-4 border-l-transparent transition-all hover:bg-gray-800 hover:text-white hover:border-l-blue-600">
+        <a href="/admin/orders" class="block px-5 py-3 text-gray-300 font-semibold text-sm border-l-4 border-l-transparent transition-all hover:bg-white/10 hover:text-white hover:border-l-white">
             Historial de órdenes
         </a>
-        <a href="/admin/clients" class="block px-5 py-3 text-gray-300 font-semibold text-sm border-l-4 border-l-transparent transition-all hover:bg-gray-800 hover:text-white hover:border-l-blue-600">
+        <a href="/admin/clients" class="block px-5 py-3 text-gray-300 font-semibold text-sm border-l-4 border-l-transparent transition-all hover:bg-white/10 hover:text-white hover:border-l-white">
             Clientes
+        </a>
+        <a href="/admin/campania" class="block px-5 py-3 text-gray-300 font-semibold text-sm border-l-4 border-l-transparent transition-all hover:bg-white/10 hover:text-white hover:border-l-white">
+            Campaña
         </a>
     </nav>
 </aside>

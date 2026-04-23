@@ -6,6 +6,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/style_cliente_home.css">
     <title>Cliente Home</title>
+    <% const temaColor = (config && config.color_tema) ? config.color_tema : '#002736'; %>
+    <style>:root { --color-tema: <%= temaColor %>; }</style>
 </head>
 <body class="bg-gray-50 flex flex-col min-h-screen">
 <%- include('../includes/_navbar') %>
@@ -20,15 +22,20 @@
     </div> 
 
 
+    <% const campActiva = config && config.campania_activa; %>
+    <% const timerImgSrc = (config && config.banner_timer_url) ? '/uploads/' + config.banner_timer_url : '/img/niñoMundial.png'; %>
+    <% const nombreCamp = (config && config.nombre_campania) ? config.nombre_campania : 'Mundial 2026'; %>
+    <% const fechaFinIso = (config && config.fecha_fin_campania) ? new Date(config.fecha_fin_campania).toISOString() : '2026-06-11T00:00:00.000Z'; %>
+    <% if (campActiva) { %>
     <section class="banner">
         <!-- Izquierda -->
         <div class="banner-left">
             <p class="banner-tag">Preventa activa</p>
             <h2 class="banner-title">
                 Productos Exclusivos<br>
-                <span>Mundial 2026</span>
+                <span><%= nombreCamp %></span>
             </h2>
-            <p class="banner-subtitle">Hasta el 11 de junio de 2026</p>
+            <p class="banner-subtitle">Fin: <%= new Date(fechaFinIso).toLocaleDateString('es-MX', {day:'numeric', month:'long', year:'numeric'}) %></p>
         </div>
         <!-- Temporizador e imagen -->
         <div class="banner-right">
@@ -50,9 +57,10 @@
                     <span class="lbl">Seg</span>
                 </div>
             </div>
-            <img src="/img/niñoMundial.png" alt="Mundial 2026" class="banner-illustration" onerror="this.src='/img/botePintura.png'">
+            <img src="<%= timerImgSrc %>" alt="<%= nombreCamp %>" class="banner-illustration" onerror="this.src='/img/botePintura.png'">
         </div>
     </section>
+    <% } %>
 
     <!-- Grid de productos -->
     <div class="product-grid">
@@ -136,6 +144,7 @@
 </main>
 
 <%- include('../includes/_footer') %>
+<script>window.CAMPANIA_FIN = '<%= fechaFinIso %>';</script>
 <script src="/JavaScript/home.js"></script>
 
 

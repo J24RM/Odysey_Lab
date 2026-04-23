@@ -37,7 +37,7 @@ main.client-main {
 
 /*BANNER — Preventa Mundial 2026  */
 .banner {
-    background: #002736;
+    background: var(--color-tema, #002736);
     padding: 28px 40px;
     display: flex;
     align-items: center;
