@@ -125,6 +125,12 @@
                 <div class="w-8 h-3 rounded bg-blue-400 opacity-70"></div>
                 <span class="text-xs text-gray-500"><%= labelActual %></span>
             </div>
+            <% if (periodo !== 'mes' && periodo !== 'personalizado') { %>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-3 rounded bg-red-300 opacity-70"></div>
+                <span class="text-xs text-gray-500"><%= labelAnterior %></span>
+            </div>
+            <% } %>
         </div>
     </div>
 
@@ -133,27 +139,42 @@
 <%- include('partials/footer.ejs') %>
 
 <script>
-    const labels      = <%- JSON.stringify(labels) %>;
-    const datosActual = <%- JSON.stringify(datosActual) %>;
+    const labels       = <%- JSON.stringify(labels) %>;
+    const datosActual  = <%- JSON.stringify(datosActual) %>;
+    const datosAnterior = <%- JSON.stringify(datosAnterior) %>;
+
+    const datasets = [
+        {
+            label: 'Período Actual',
+            data: datosActual,
+            borderColor: 'rgba(96,165,250,0.9)',
+            backgroundColor: 'rgba(96,165,250,0.12)',
+            borderWidth: 2.5,
+            pointRadius: 4,
+            pointBackgroundColor: 'rgba(96,165,250,1)',
+            fill: true,
+            tension: 0.4
+        }
+    ];
+
+    <% if (periodo !== 'mes' && periodo !== 'personalizado') { %>
+    datasets.push({
+        label: 'Período Anterior',
+        data: datosAnterior,
+        borderColor: 'rgba(252,165,165,0.9)',
+        backgroundColor: 'rgba(252,165,165,0.08)',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: 'rgba(252,165,165,1)',
+        borderDash: [5, 4],
+        fill: false,
+        tension: 0.4
+    });
+    <% } %>
 
     new Chart(document.getElementById('chart-comparacion'), {
         type: 'line',
-        data: {
-            labels,
-            datasets: [
-                {
-                    label: 'Período Actual',
-                    data: datosActual,
-                    borderColor: 'rgba(96,165,250,0.9)',
-                    backgroundColor: 'rgba(96,165,250,0.12)',
-                    borderWidth: 2.5,
-                    pointRadius: 4,
-                    pointBackgroundColor: 'rgba(96,165,250,1)',
-                    fill: true,
-                    tension: 0.4
-                }
-            ]
-        },
+        data: { labels, datasets },
         options: {
             responsive: true,
             maintainAspectRatio: false,
