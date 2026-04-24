@@ -477,7 +477,7 @@ module.exports = class Estadisticas {
         };
     }
 
-    static async getDetalleSucursal(id_sucursal) {
+static async getDetalleSucursal(id_sucursal) {
         if (!supabase) return null;
 
         const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -489,7 +489,6 @@ module.exports = class Estadisticas {
             .eq('id_sucursal', id_sucursal)
             .single();
 
-        // 2. Órdenes de los últimos 6 meses
         const hace6Meses = new Date();
         hace6Meses.setMonth(hace6Meses.getMonth() - 6);
 
@@ -499,7 +498,6 @@ module.exports = class Estadisticas {
             .eq('id_sucursal', id_sucursal)
             .gte('fecha_realizada', hace6Meses.toISOString());
 
-        // 3. Inicializar los últimos 6 meses con 0
         const conteo = {};
         for (let i = 5; i >= 0; i--) {
             const d = new Date();
@@ -508,7 +506,6 @@ module.exports = class Estadisticas {
             conteo[key] = { label: MESES[d.getMonth()], total: 0 };
         }
 
-        // 4. Contar órdenes por mes
         for (const ord of (ordenes || [])) {
             const d = new Date(ord.fecha_realizada);
             const key = `${d.getFullYear()}-${d.getMonth()}`;
@@ -526,7 +523,7 @@ module.exports = class Estadisticas {
         };
     }
 
-    static async getEstadisticasProductos(periodo = 'semana', busqueda = '', orden = 'nombre', dir = 'asc', fechaInicio = null, fechaFin = null) {
+static async getEstadisticasProductos(periodo = 'semana', busqueda = '', orden = 'nombre', dir = 'asc', fechaInicio = null, fechaFin = null) {
     if (!supabase) return { productos: [], periodo, busqueda };
 
     const ahora = new Date();
@@ -535,10 +532,17 @@ module.exports = class Estadisticas {
     if (periodo === 'personalizado' && fechaInicio && fechaFin) {
         inicioActual = new Date(fechaInicio);
         finActual    = new Date(fechaFin);
-        finActual.setHours(23, 59, 59, 999);
 
-        const diff = finActual - inicioActual;
-        inicioAnterior = new Date(inicioActual.getTime() - diff);
+        // Validar que las fechas sean válidas
+        if (isNaN(inicioActual.getTime()) || isNaN(finActual.getTime())) {
+            inicioActual   = new Date(ahora); inicioActual.setDate(ahora.getDate() - 7);
+            finActual      = ahora;
+            inicioAnterior = new Date(inicioActual); inicioAnterior.setDate(inicioActual.getDate() - 7);
+        } else {
+            finActual.setHours(23, 59, 59, 999);
+            const diff = finActual - inicioActual;
+            inicioAnterior = new Date(inicioActual.getTime() - diff);
+        }
     } else if (periodo === 'semana') {
         inicioActual   = new Date(ahora); inicioActual.setDate(ahora.getDate() - 7);
         finActual      = ahora;
@@ -549,7 +553,7 @@ module.exports = class Estadisticas {
         inicioAnterior = new Date(inicioActual); inicioAnterior.setMonth(inicioActual.getMonth() - 1);
     }
 
-    let prodQuery = supabase.from('producto').select('id_producto, nombre, url_imagen, precio_unitario').eq('activo', true);
+    let prodQuery = supabase.from('producto').select('id_producto, nombre, url_imagen, precio_unitario, unidad_venta, unidad_medida, peso').eq('activo', true);
     if (busqueda) prodQuery = prodQuery.ilike('nombre', `%${busqueda}%`);
     const { data: productosData } = await prodQuery;
     if (!productosData || productosData.length === 0) return { productos: [], periodo, busqueda, fechaInicio, fechaFin };
@@ -586,6 +590,9 @@ module.exports = class Estadisticas {
                 url_imagen: p.url_imagen || '',
                 cantidad: cantA,
                 ventas: ventA,
+                unidad_venta:  p.unidad_venta  || '—',   
+                unidad_medida: p.unidad_medida || '—',  
+                peso:          p.peso          ?? '—',   
                 porcentajeCantidad: cantP > 0 ? ((cantA - cantP) / cantP) * 100 : (cantA > 0 ? 100 : 0),
                 porcentajeVentas:   ventP > 0 ? ((ventA - ventP) / ventP) * 100 : (ventA > 0 ? 100 : 0)
             };
