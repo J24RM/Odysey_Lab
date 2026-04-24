@@ -31,8 +31,9 @@
         <form method="GET" action="/admin/stats/sucursales/<%= id_sucursal %>">
             <select name="periodo" onchange="this.form.submit()"
                 class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-                <option value="semana" <%= periodo === 'semana' ? 'selected' : '' %>>Esta Semana</option>
-                <option value="mes"    <%= periodo === 'mes'    ? 'selected' : '' %>>Este Mes</option>
+                <option value="semana"   <%= periodo === 'semana'   ? 'selected' : '' %>>Esta Semana</option>
+                <option value="quincena" <%= periodo === 'quincena' ? 'selected' : '' %>>15 Días</option>
+                <option value="mes"     <%= periodo === 'mes'     ? 'selected' : '' %>>Este Mes</option>
             </select>
         </form>
     </div>

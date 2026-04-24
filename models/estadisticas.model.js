@@ -270,6 +270,24 @@ module.exports = class Estadisticas {
             finAnterior.setSeconds(finAnterior.getSeconds() - 1); // domingo 23:59:59
 
             labels = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+        } else if (periodo === 'quincena') {
+            const hoyDia  = hoy.getDate();
+            const mes     = hoy.getMonth();
+            const anio    = hoy.getFullYear();
+
+            if (hoyDia <= 15) {
+                // Actual: primera quincena del mes actual (días 1-15)
+                inicioActual   = new Date(anio, mes, 1, 0, 0, 0);
+                // Anterior: segunda quincena del mes pasado (días 16-fin)
+                inicioAnterior = new Date(anio, mes - 1, 16, 0, 0, 0);
+            } else {
+                // Actual: segunda quincena del mes actual (días 16-fin)
+                inicioActual   = new Date(anio, mes, 16, 0, 0, 0);
+                // Anterior: primera quincena del mes actual (días 1-15)
+                inicioAnterior = new Date(anio, mes, 1, 0, 0, 0);
+            }
+            finAnterior = new Date(inicioActual.getTime() - 1);
+            labels = Array.from({length: 15}, (_, i) => String(i + 1));
         } else {
             // Mes: últimos 6 meses vs 6 meses anteriores, agrupados por mes
             inicioActual   = new Date(hoy.getFullYear(), hoy.getMonth() - 5, 1, 0, 0, 0);
@@ -336,6 +354,19 @@ module.exports = class Estadisticas {
                 const dAntStr = toDateStr(dAnt);
                 datosAnterior.push((ordenesAnterior || []).filter(o => o.fecha_realizada.startsWith(dAntStr)).length);
             }
+        } else if (periodo === 'quincena') {
+            // Iterar 15 días desde el inicio de cada quincena
+            for (let i = 0; i < 15; i++) {
+                const dActual = new Date(inicioActual);
+                dActual.setDate(inicioActual.getDate() + i);
+                const dActualStr = toDateStr(dActual);
+                datosActual.push((ordenesActual || []).filter(o => o.fecha_realizada.startsWith(dActualStr)).length);
+
+                const dAnt = new Date(inicioAnterior);
+                dAnt.setDate(inicioAnterior.getDate() + i);
+                const dAntStr = toDateStr(dAnt);
+                datosAnterior.push((ordenesAnterior || []).filter(o => o.fecha_realizada.startsWith(dAntStr)).length);
+            }
         } else {
             // Agrupar por mes: últimos 6 meses vs los 6 meses anteriores a esos
             for (let i = 5; i >= 0; i--) {
@@ -367,6 +398,19 @@ module.exports = class Estadisticas {
             domingoActual.setDate(inicioActual.getDate() + 6);
             finActualLabel   = `${fmt(inicioActual)} - ${fmt(domingoActual)}`;
             finAnteriorLabel = `${fmt(inicioAnterior)} - ${fmt(new Date(inicioActual.getTime() - 86400000))}`;
+        } else if (periodo === 'quincena') {
+            const mes = hoy.getMonth();
+            const hoyDia = hoy.getDate();
+            if (hoyDia <= 15) {
+                finActualLabel = `1 ${MESES_CORTOS[mes]} - 15 ${MESES_CORTOS[mes]}`;
+                const mesPasadoIdx = mes === 0 ? 11 : mes - 1;
+                const ultimoDiaMesPasado = new Date(hoy.getFullYear(), mes, 0).getDate();
+                finAnteriorLabel = `16 ${MESES_CORTOS[mesPasadoIdx]} - ${ultimoDiaMesPasado} ${MESES_CORTOS[mesPasadoIdx]}`;
+            } else {
+                const ultimoDiaMes = new Date(hoy.getFullYear(), mes + 1, 0).getDate();
+                finActualLabel   = `16 ${MESES_CORTOS[mes]} - ${ultimoDiaMes} ${MESES_CORTOS[mes]}`;
+                finAnteriorLabel = `1 ${MESES_CORTOS[mes]} - 15 ${MESES_CORTOS[mes]}`;
+            }
         } else {
             const primerMesActual   = new Date(hoy.getFullYear(), hoy.getMonth() - 5, 1);
             const primerMesAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 11, 1);
