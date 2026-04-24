@@ -27,6 +27,24 @@ module.exports = class Configuracion {
         return data;
     }
 
+    // Obtiene todas las campañas para selectores
+    static async fetchAllCampanias() {
+        const { data, error } = await supabase
+            .from('campania')
+            .select('id_campania, nombre, activo')
+            .order('id_campania', { ascending: false });
+        if (error) throw error;
+        return data || [];
+    }
+
+    // Agrega un producto a una campaña
+    static async asociarProductoCampania(id_campania, id_producto) {
+        const { error } = await supabase
+            .from('producto_campania')
+            .insert({ id_campania, id_producto });
+        if (error) throw error;
+    }
+
     // Actualiza la campaña más reciente (o inserta una si no existe)
     static async GuardarConfig(campos) {
         const { data: existing } = await supabase
