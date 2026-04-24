@@ -72,6 +72,21 @@
                                     class="w-full px-4 py-3 border-2 border-gray-300 rounded text-sm shadow-sm focus:border-blue-600 focus:outline-none transition-colors" />
                             </div>
 
+                            <div class="space-y-2">
+                                <label for="campania" class="block text-sm font-semibold text-gray-900">Campaña:</label>
+                                <select id="campania" name="id_campania"
+                                    class="w-full px-4 py-3 border-2 border-gray-300 rounded text-sm shadow-sm focus:border-blue-600 focus:outline-none transition-colors">
+                                    <option value="" data-activo="true">Sin campaña asignada</option>
+                                    <% campanias.forEach(c => { %>
+                                    <option value="<%= c.id_campania %>"
+                                        data-activo="<%= c.activo ? 'true' : 'false' %>"
+                                        <%= formulario?.id_campania == c.id_campania ? 'selected' : '' %>>
+                                        <%= c.nombre %><%= c.activo ? ' (activa)' : '' %>
+                                    </option>
+                                    <% }) %>
+                                </select>
+                            </div>
+
                             <!-- Grid 3 columnas -->
                             <div class="grid grid-cols-3 gap-6">
                                 <div class="space-y-2">
@@ -135,7 +150,7 @@
                                         <span class="block text-sm font-semibold text-gray-900">Marcar producto activo:</span>
                                         <div class="flex items-center gap-3">
                                             <span class="text-sm text-gray-600">No</span>
-                                            <label class="relative inline-flex items-center cursor-pointer">
+                                            <label class="relative inline-flex items-center cursor-pointer" id="activeToggleLabel">
                                                 <input id="activeToggle" type="checkbox" name="activo" value="on"
                                                     class="sr-only peer" <%= formulario?.activo === 'on' ? 'checked' : '' %> />
                                                 <div class="w-11 h-6 bg-gray-300 peer-checked:bg-blue-600 rounded-full
@@ -145,6 +160,9 @@
                                             </label>
                                             <span class="text-sm text-gray-600">Sí</span>
                                         </div>
+                                        <p id="activoWarning" class="hidden text-xs text-amber-600 font-medium">
+                                            La campaña seleccionada no está activa; el producto se guardará como inactivo.
+                                        </p>
                                     </div>
                                 </div>
 
@@ -309,6 +327,30 @@
                 productPanels.forEach(p => p.classList.toggle('hidden', p.dataset.productPanel !== target));
             });
         });
+
+        // Campaign → activo toggle rule
+        const campaniaSelect  = document.getElementById('campania');
+        const activeToggle    = document.getElementById('activeToggle');
+        const activeToggleLbl = document.getElementById('activeToggleLabel');
+        const activoWarning   = document.getElementById('activoWarning');
+
+        function applyCampaniaRule() {
+            const selected = campaniaSelect.options[campaniaSelect.selectedIndex];
+            const campanaActiva = selected?.dataset.activo === 'true';
+            if (!campanaActiva) {
+                activeToggle.checked = false;
+                activeToggle.disabled = true;
+                activeToggleLbl.classList.add('opacity-40', 'cursor-not-allowed');
+                activoWarning.classList.remove('hidden');
+            } else {
+                activeToggle.disabled = false;
+                activeToggleLbl.classList.remove('opacity-40', 'cursor-not-allowed');
+                activoWarning.classList.add('hidden');
+            }
+        }
+
+        campaniaSelect.addEventListener('change', applyCampaniaRule);
+        applyCampaniaRule(); // apply on page load in case form was repopulated
 
         // Confirm modal
         const form         = document.querySelector('form');

@@ -1,4 +1,5 @@
 const Producto = require('../models/producto.model');
+const Configuracion = require('../models/configuracion.model');
 const Calificacion = require('../models/calificacion.model');
 const Estadisticas = require('../models/estadisticas.model');
 const Log = require('../models/log.model');
@@ -19,54 +20,68 @@ exports.getProductos = async (request, response) => {
 };
 
 //Mostrar formulario de agregar producto
-exports.getAgregarProducto = (request, response) => {
-    response.render('admin/home_agregarProducto', {
-        usuario: request.session.usuario,
-        formulario: null,
-        mensaje: null,
-        mensajeBulk: null,
-        errorBulk: null,
-        resultadoCSV: null,
-        error: null
-    });
+exports.getAgregarProducto = async (request, response) => {
+    try {
+        const campanias = await Configuracion.fetchAllCampanias();
+        response.render('admin/home_agregarProducto', {
+            usuario: request.session.usuario,
+            formulario: null,
+            mensaje: null,
+            mensajeBulk: null,
+            errorBulk: null,
+            resultadoCSV: null,
+            error: null,
+            campanias
+        });
+    } catch (error) {
+        console.error('Error cargando campañas:', error);
+        response.render('admin/home_agregarProducto', {
+            usuario: request.session.usuario,
+            formulario: null,
+            mensaje: null,
+            mensajeBulk: null,
+            errorBulk: null,
+            resultadoCSV: null,
+            error: null,
+            campanias: []
+        });
+    }
 };
 
 //Procesar formulario de agregar producto
 exports.postAgregarProducto = async (request, response) => {
+    let campanias = [];
+    try { campanias = await Configuracion.fetchAllCampanias(); } catch (_) {}
+
     try {
-        const { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo } = request.body;
+        const { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo, id_campania } = request.body;
         const imagen = request.files?.['imagen']?.[0];
 
         // Validar que todos los campos requeridos estén presentes
         if (!nombre || !descripcion || !clave || !unidad_venta || !unidad_medida || !peso || !precio_unitario || !imagen) {
             return response.render('admin/home_agregarProducto', {
                 usuario: request.session.usuario,
-                formulario: { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo },
+                formulario: { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo, id_campania },
                 mensaje: null,
                 mensajeBulk: null,
                 errorBulk: null,
                 resultadoCSV: null,
-                error: 'Todos los campos son obligatorios. Por favor, llena todos los campos.'
+                error: 'Todos los campos son obligatorios. Por favor, llena todos los campos.',
+                campanias
             });
         }
 
         // Construir URL de acceso a la imagen (solo el filename)
         const url_imagen = imagen.filename;
 
-        // Convertir activo a booleano
-        const es_activo = activo === 'on' ? true : false;
-
-        console.log('Datos a guardar:', {
-            nombre,
-            descripcion,
-            url_imagen,
-            unidad_venta,
-            unidad_medida,
-            peso: parseFloat(peso),
-            precio_unitario: parseFloat(precio_unitario),
-            activo: es_activo,
-            clave
-        });
+        // Convertir activo a booleano y aplicar regla de campaña inactiva
+        let es_activo = activo === 'on' ? true : false;
+        if (id_campania) {
+            const campanaSeleccionada = campanias.find(c => c.id_campania === parseInt(id_campania));
+            if (campanaSeleccionada && !campanaSeleccionada.activo) {
+                es_activo = false;
+            }
+        }
 
         // Intentar crear el producto
         try {
@@ -82,6 +97,15 @@ exports.postAgregarProducto = async (request, response) => {
                 clave
             });
 
+            // Asociar a campaña si fue seleccionada
+            if (id_campania) {
+                try {
+                    await Configuracion.asociarProductoCampania(parseInt(id_campania), nuevoProducto.id_producto);
+                } catch (campError) {
+                    console.error('Error asociando producto a campaña:', campError);
+                }
+            }
+
             log('ADMIN', 'PRODUCTO AGREGADO', `id_admin: ${request.session.usuario}, producto: "${nombre}" (clave: ${clave})`);
             try { await Log.registrar(request.session.usuario, `Agregó producto: ${clave}`); } catch (_) {}
 
@@ -96,7 +120,8 @@ exports.postAgregarProducto = async (request, response) => {
                 mensajeBulk: null,
                 errorBulk: null,
                 resultadoCSV: null,
-                error: null
+                error: null,
+                campanias
             });
         } catch (dbError) {
             // Detectar error de clave duplicada (código 23505 en PostgreSQL)
@@ -114,12 +139,13 @@ exports.postAgregarProducto = async (request, response) => {
                 dbError.details?.includes('unique')) {
                 return response.render('admin/home_agregarProducto', {
                     usuario: request.session.usuario,
-                    formulario: { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo },
+                    formulario: { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo, id_campania },
                     mensaje: null,
                     mensajeBulk: null,
                     errorBulk: null,
                     resultadoCSV: null,
-                    error: 'La clave del producto ya existe. Por favor, usa una clave diferente.'
+                    error: 'La clave del producto ya existe. Por favor, usa una clave diferente.',
+                    campanias
                 });
             }
             throw dbError;
@@ -134,7 +160,8 @@ exports.postAgregarProducto = async (request, response) => {
             mensajeBulk: null,
             errorBulk: null,
             resultadoCSV: null,
-            error: 'Error al agregar el producto. Intenta de nuevo.'
+            error: 'Error al agregar el producto. Intenta de nuevo.',
+            campanias
         });
     }
 };
@@ -406,7 +433,8 @@ exports.postCargarBulk = async (request, response) => {
         mensajeBulk,
         errorBulk,
         resultadoCSV,
-        error: null
+        error: null,
+        campanias: []
     });
 };
 
@@ -422,7 +450,8 @@ exports.postCargarImagenes = (request, response) => {
             mensajeBulk: null,
             errorBulk: 'No se recibió ninguna imagen. Asegúrate de seleccionar archivos PNG, JPG o JPEG.',
             resultadoCSV: null,
-            error: null
+            error: null,
+            campanias: []
         });
     }
 
@@ -438,7 +467,8 @@ exports.postCargarImagenes = (request, response) => {
         },
         errorBulk: null,
         resultadoCSV: null,
-        error: null
+        error: null,
+        campanias: []
     });
 };
 
@@ -453,7 +483,8 @@ exports.postCargarCSV = async (request, response) => {
         mensajeBulk: null,
         errorBulk: null,
         resultadoCSV: { insertados: [], errores: [msg] },
-        error: null
+        error: null,
+        campanias: []
     });
 
     if (!archivo) {
@@ -579,7 +610,8 @@ exports.postCargarCSV = async (request, response) => {
             mensajeBulk: null,
             errorBulk: null,
             resultadoCSV: { insertados, errores },
-            error: null
+            error: null,
+            campanias: []
         });
 
     } catch (parseError) {
