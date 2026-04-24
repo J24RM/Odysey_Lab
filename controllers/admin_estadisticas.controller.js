@@ -64,7 +64,18 @@ exports.getEstadisticasSucursales = async (request, response) => {
 
 exports.getDetalleSucursalPagina = async (request, response) => {
     const { id } = request.params;
-    const periodo = request.query.periodo || 'semana';
+    let periodo      = request.query.periodo    || 'semana';
+    const desde      = request.query.desde      || '';
+    const hasta      = request.query.hasta      || '';
+    const comp_desde = request.query.comp_desde || '';
+    const comp_hasta = request.query.comp_hasta || '';
+
+    // Si eligió personalizado pero no llenó las fechas, caer a semana
+    if (periodo === 'personalizado' && (!desde || !hasta || !comp_desde || !comp_hasta)) {
+        periodo = 'semana';
+    }
+
+    const opciones = { desde, hasta, comp_desde, comp_hasta };
 
     let pageData = {
         usuario: request.session.usuario,
@@ -76,6 +87,10 @@ exports.getDetalleSucursalPagina = async (request, response) => {
         cambioCantidad: 0,
         cambioSubtotal: 0,
         periodo,
+        desde,
+        hasta,
+        comp_desde,
+        comp_hasta,
         labels: [],
         datosActual: [],
         datosAnterior: [],
@@ -86,7 +101,7 @@ exports.getDetalleSucursalPagina = async (request, response) => {
     };
 
     try {
-        const detalle = await Estadisticas.getDetalleSucursalPagina(id, periodo);
+        const detalle = await Estadisticas.getDetalleSucursalPagina(id, periodo, opciones);
         if (detalle) pageData = { ...pageData, ...detalle, id_sucursal: id, dbConnected: true };
     } catch (error) {
         console.error('Error fetching detalle sucursal página:', error);
