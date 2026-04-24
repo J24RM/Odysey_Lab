@@ -39,16 +39,72 @@
         </div>
 
         <div class="flex gap-3">
-            <form method="GET" class="flex items-center gap-3">
-                <input type="hidden" name="id" value="<%= producto.id_producto %>">
-                <select name="periodo" onchange="this.form.submit()"
-                    class="border rounded-lg px-3 py-2 text-sm">
-                    <option value="semana" <%= periodo === 'semana' ? 'selected' : '' %>>Esta Semana</option>
-                    <option value="mes" <%= periodo === 'mes' ? 'selected' : '' %>>Último Mes</option>
-                </select>
 
-            </form>
+    <!-- FILTRO -->
+    <div class="relative" id="filtro-wrapper">
+        <button type="button" onclick="toggleDropdown(event)"
+            class="border rounded-lg px-3 py-2 text-sm flex items-center gap-2 bg-white hover:bg-gray-50">
+            <span id="label-periodo"><%=
+                periodo === 'semana' ? 'Esta Semana' :
+                periodo === 'mes'    ? 'Último Mes'  :
+                (fechaInicio && fechaFin) ? fechaInicio + ' → ' + fechaFin : 'Período'
+            %></span>
+            <span>▾</span>
+        </button>
+
+        <div id="dropdown-periodo" class="hidden absolute right-0 mt-1 bg-white border rounded-xl shadow-lg z-50 w-64 overflow-hidden">
+
+            <div id="opciones-rapidas">
+                <button type="button" onclick="seleccionarPeriodo('semana')"
+                    class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b <%= periodo === 'semana' ? 'text-blue-600 font-semibold' : '' %>">
+                    Esta Semana
+                </button>
+                <button type="button" onclick="seleccionarPeriodo('mes')"
+                    class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b <%= periodo === 'mes' ? 'text-blue-600 font-semibold' : '' %>">
+                    Último Mes
+                </button>
+                <button type="button" onclick="mostrarCalendario()"
+                    class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 <%= periodo === 'personalizado' ? 'text-blue-600 font-semibold' : '' %>">
+                    Fecha personalizada →
+                </button>
+            </div>
+
+            <div id="panel-calendario" class="hidden p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <button type="button" onclick="volverOpciones()" class="text-xs text-gray-500 hover:text-gray-800">← Volver</button>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="cambiarMes(-1)" class="text-gray-500 hover:text-gray-800 px-1">‹</button>
+                        <span id="cal-titulo" class="text-sm font-semibold w-28 text-center"></span>
+                        <button type="button" onclick="cambiarMes(1)" class="text-gray-500 hover:text-gray-800 px-1">›</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-7 text-center mb-1">
+                    <% ['Lu','Ma','Mi','Ju','Vi','Sá','Do'].forEach(d => { %>
+                        <div class="text-[10px] font-semibold text-gray-400 py-1"><%= d %></div>
+                    <% }) %>
+                </div>
+
+                <div id="cal-dias" class="grid grid-cols-7 text-center gap-y-1"></div>
+
+                <div class="mt-3 text-xs text-gray-500 text-center" id="cal-seleccion">Selecciona inicio</div>
+
+                <button type="button" id="btn-aplicar" onclick="aplicarPersonalizado()"
+                    class="hidden mt-3 w-full bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700">
+                    Aplicar →
+                </button>
+            </div>
         </div>
+    </div>
+
+    <!-- Form oculto -->
+    <form id="form-periodo" method="GET" class="hidden">
+        <input type="hidden" name="periodo"     id="input-periodo"     value="<%= periodo %>">
+        <input type="hidden" name="fechaInicio" id="input-fechaInicio" value="<%= fechaInicio || '' %>">
+        <input type="hidden" name="fechaFin"    id="input-fechaFin"    value="<%= fechaFin    || '' %>">
+    </form>
+
+</div>
     </div>
     <div class="grid grid-cols-2 gap-6 mb-8">
 
@@ -106,16 +162,18 @@
 
     <!-- SUCURSALES -->
     <div class="bg-white p-6 rounded-xl shadow">
-
         <h2 class="font-bold mb-4">Sucursales</h2>
 
         <% sucursales.forEach(s => { %>
-            <div class="flex justify-between border-b py-2">
-                <span><%= s.sucursal %></span>
-                <span><%= s.cantidad %></span>
-            </div>
+            <a href="/admin/stats/sucursales/<%= s.id_sucursal %>" 
+            class="block hover:bg-gray-50 transition">
+                <div class="flex justify-between border-b py-2 px-1">
+                    <span><%= s.sucursal %></span>
+                    <span class="font-semibold"><%= s.cantidad %></span>
+                </div>
+            </a>
         <% }) %>
-        </div>
+    </div>
 </main>
 
 
@@ -166,6 +224,170 @@
             }
         }
     });
+
+
+       // ── Estado del calendario ──────────────────────────────────────────
+    let calYear, calMonth;
+    let selInicio = null, selFin = null;
+
+    const hoyGlobal = new Date(); 
+    hoyGlobal.setHours(0,0,0,0);
+
+    function initCal() {
+        calYear  = hoyGlobal.getFullYear();
+        calMonth = hoyGlobal.getMonth();
+    }
+    initCal();
+
+    // ── Dropdown ───────────────────────────────────────────────────────
+    function toggleDropdown(e) {
+        e.stopPropagation();
+        document.getElementById('dropdown-periodo').classList.toggle('hidden');
+    }
+
+    // Cerrar solo si el click es completamente fuera del filtro-wrapper
+    document.addEventListener('click', e => {
+        if (!document.getElementById('filtro-wrapper').contains(e.target)) {
+            document.getElementById('dropdown-periodo').classList.add('hidden');
+        }
+    });
+
+    // Evitar que cualquier click dentro del dropdown lo cierre
+    document.getElementById('dropdown-periodo').addEventListener('click', e => {
+        e.stopPropagation();
+    });
+
+    // ── Opciones rápidas ───────────────────────────────────────────────
+    function seleccionarPeriodo(valor) {
+        document.getElementById('input-periodo').value = valor;
+        document.getElementById('input-fechaInicio').value = '';
+        document.getElementById('input-fechaFin').value    = '';
+        document.getElementById('form-periodo').submit();
+    }
+
+    // ── Navegación calendario ──────────────────────────────────────────
+    function mostrarCalendario() {
+        document.getElementById('opciones-rapidas').classList.add('hidden');
+        document.getElementById('panel-calendario').classList.remove('hidden');
+        renderCal();
+    }
+
+    function volverOpciones() {
+        document.getElementById('panel-calendario').classList.add('hidden');
+        document.getElementById('opciones-rapidas').classList.remove('hidden');
+        selInicio = null; selFin = null;
+    }
+
+    function cambiarMes(delta) {
+        calMonth += delta;
+        if (calMonth > 11) { calMonth = 0;  calYear++; }
+        if (calMonth < 0)  { calMonth = 11; calYear--; }
+        renderCal();
+    }
+
+    // ── Render del calendario ──────────────────────────────────────────
+    const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+    function renderCal() {
+        document.getElementById('cal-titulo').textContent = `${MESES[calMonth]} ${calYear}`;
+
+        const contenedor = document.getElementById('cal-dias');
+        contenedor.innerHTML = '';
+
+        const primerDia = new Date(calYear, calMonth, 1);
+        const offset    = (primerDia.getDay() + 6) % 7;
+        const diasEnMes = new Date(calYear, calMonth + 1, 0).getDate();
+
+        for (let i = 0; i < offset; i++) {
+            const vacio = document.createElement('div');
+            contenedor.appendChild(vacio);
+        }
+
+        for (let d = 1; d <= diasEnMes; d++) {
+            const fecha    = new Date(calYear, calMonth, d);
+            const isoStr   = toISO(fecha);
+            const esFuturo = fecha > hoyGlobal;
+
+            const div = document.createElement('div');
+            div.textContent = d;
+            div.className = 'w-7 h-7 flex items-center justify-center text-xs rounded-full mx-auto ';
+
+            if (esFuturo) {
+                div.classList.add('text-gray-300', 'cursor-not-allowed');
+            } else {
+                div.classList.add('cursor-pointer');
+                div.dataset.iso = isoStr; // guardamos la fecha en el elemento
+
+                if (selInicio && selFin) {
+                    const f = fecha.getTime();
+                    if (f === selInicio.getTime() || f === selFin.getTime()) {
+                        div.classList.add('bg-blue-600', 'text-white', 'font-bold');
+                    } else if (f > selInicio.getTime() && f < selFin.getTime()) {
+                        div.classList.add('bg-blue-100', 'text-blue-800', '!rounded-none');
+                    } else {
+                        div.classList.add('hover:bg-gray-100');
+                    }
+                } else if (selInicio && fecha.getTime() === selInicio.getTime()) {
+                    div.classList.add('bg-blue-600', 'text-white', 'font-bold');
+                } else {
+                    div.classList.add('hover:bg-gray-100');
+                }
+            }
+
+            contenedor.appendChild(div);
+        }
+    }
+
+    // ── Delegación de eventos en el contenedor de días ─────────────────
+    document.getElementById('cal-dias').addEventListener('click', e => {
+        const dia = e.target.closest('[data-iso]');
+        if (!dia) return;
+        clickDia(dia.dataset.iso);
+    });
+
+    function toISO(fecha) {
+        const y = fecha.getFullYear();
+        const m = String(fecha.getMonth() + 1).padStart(2, '0');
+        const d = String(fecha.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    // ── Selección de días ──────────────────────────────────────────────
+    function clickDia(isoStr) {
+        const fecha = new Date(isoStr + 'T00:00:00');
+
+        if (!selInicio || (selInicio && selFin)) {
+            selInicio = fecha;
+            selFin    = null;
+            document.getElementById('btn-aplicar').classList.add('hidden');
+            document.getElementById('cal-seleccion').textContent = `Desde: ${formatoFecha(isoStr)} — Selecciona fin`;
+        } else {
+            if (fecha < selInicio) {
+                selFin    = selInicio;
+                selInicio = fecha;
+            } else {
+                selFin = fecha;
+            }
+            document.getElementById('cal-seleccion').textContent = `${formatoFecha(toISO(selInicio))} → ${formatoFecha(toISO(selFin))}`;
+            document.getElementById('btn-aplicar').classList.remove('hidden');
+        }
+
+        renderCal();
+    }
+
+    function formatoFecha(iso) {
+        const [y, m, d] = iso.split('-');
+        return `${d}/${m}/${y}`;
+    }
+
+    // ── Aplicar rango ──────────────────────────────────────────────────
+    function aplicarPersonalizado() {
+        if (!selInicio || !selFin) return;
+        document.getElementById('input-periodo').value     = 'personalizado';
+        document.getElementById('input-fechaInicio').value = toISO(selInicio);
+        document.getElementById('input-fechaFin').value    = toISO(selFin);
+        document.getElementById('form-periodo').submit();
+    }
 </script>
 
 </body>

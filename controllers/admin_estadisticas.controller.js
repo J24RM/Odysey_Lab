@@ -106,22 +106,30 @@ exports.getDetalleSucursal = async (request, response) => {
 };
 
 exports.getEstadisticasProductos = async (request, response) => {
-    const periodo  = request.query.periodo  || 'semana';
-    const busqueda = request.query.busqueda || '';
+    const periodo    = request.query.periodo  || 'semana';
+    const busqueda   = request.query.busqueda || '';
+    const orden      = ['nombre', 'cantidad', 'ventas'].includes(request.query.orden) ? request.query.orden : 'nombre';
+    const dir        = request.query.dir === 'desc' ? 'desc' : 'asc';
+    const fechaInicio = request.query.fechaInicio || null;
+    const fechaFin    = request.query.fechaFin    || null;
+
     try {
-        const data = await Estadisticas.getEstadisticasProductos(periodo, busqueda);
-        response.render('admin/stats_productos', { usuario: request.session.usuario, ...data });
+        const data = await Estadisticas.getEstadisticasProductos(periodo, busqueda, orden, dir, fechaInicio, fechaFin);
+        response.render('admin/stats_productos', { usuario: request.session.usuario, ...data, orden, dir });
     } catch (error) {
         console.error('Error fetching estadísticas productos:', error);
-        response.render('admin/stats_productos', { usuario: request.session.usuario, productos: [], periodo, busqueda });
+        response.render('admin/stats_productos', { usuario: request.session.usuario, productos: [], periodo, busqueda, orden, dir, fechaInicio: null, fechaFin: null });
     }
 };
 
 exports.getEstadisticasDetalleProducto = async (request, response) => {
     const { id_producto } = request.params;
-    const periodo = request.query.periodo || 'semana';
+    const periodo     = request.query.periodo     || 'semana';
+    const fechaInicio = request.query.fechaInicio || null;
+    const fechaFin    = request.query.fechaFin    || null;
+
     try {
-        const data = await Estadisticas.getEstadisticasDetalleProducto(id_producto, periodo);
+        const data = await Estadisticas.getEstadisticasDetalleProducto(id_producto, periodo, fechaInicio, fechaFin);
         if (!data) return response.redirect('/admin/stats/productos');
         response.render('admin/stats_producto_detalle', { usuario: request.session.usuario, ...data });
     } catch (error) {

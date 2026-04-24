@@ -38,7 +38,7 @@
     <!-- Buscador centrado -->
     <form action="/cliente/home" method="GET" class="mx-auto w-[45%]">
         <div class="relative">
-            <input type="search" name="search" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" class="w-full text-center border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0078A9] text-gray-800" placeholder="Buscar Producto" aria-label="Buscar Producto">
+            <input id="clienteSearchInput" type="search" name="search" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" class="w-full text-center border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0078A9] text-gray-800" placeholder="Buscar Producto" aria-label="Buscar Producto">
         </div>
     </form>
 

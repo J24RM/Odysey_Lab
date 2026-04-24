@@ -145,6 +145,14 @@ main.client-main {
     flex-direction: column;
 }
 
+.product-link {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    text-decoration: none;
+    color: inherit;
+}
+
 .product-card:hover {
     box-shadow: 0 8px 24px rgba(0, 91, 171, 0.1);
     transform: translateY(-4px);

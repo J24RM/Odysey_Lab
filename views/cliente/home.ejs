@@ -84,19 +84,31 @@
             </div>
             </a>
             <hr class="border-gray-300 mb-0" />
-            <div class="flex items-center justify-start border border-gray-400 rounded px-2 py-1 bg-white gap-2 w-fit mt-4">
-            <label for="cantidad-visible-<%= index %>" class="text-xs font-semibold text-gray-700">Cantidad:</label>
-            <input
-                id="cantidad-visible-<%= index %>"
-                type="text"
-                value="1"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                maxlength="3"
-                oninput="this.value = this.value.replace(/[^0-9]/g, ''); document.getElementById('cantidad-input-<%= index %>').value = this.value || 1;"
-                onblur="if(!this.value) this.value = 1; document.getElementById('cantidad-input-<%= index %>').value = this.value;"
-                class="w-10 text-xs font-semibold text-gray-700 outline-none text-left"
-            />
+            <div class="flex items-center justify-start gap-2 mt-4">
+            <label class="text-xs font-semibold text-gray-700">Cantidad:</label>
+            <div class="flex items-center border border-gray-400 rounded bg-white overflow-hidden">
+                <button
+                    type="button"
+                    onclick="changeCantidad('<%= index %>', -1)"
+                    class="px-2 py-1 text-gray-600 hover:bg-gray-100 text-sm leading-none select-none"
+                >&#8722;</button>
+                <input
+                    id="cantidad-visible-<%= index %>"
+                    type="text"
+                    value="1"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    maxlength="3"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, ''); document.getElementById('cantidad-input-<%= index %>').value = this.value || 1;"
+                    onblur="if(!this.value || this.value < 1) { this.value = 1; document.getElementById('cantidad-input-<%= index %>').value = 1; } else { document.getElementById('cantidad-input-<%= index %>').value = this.value; }"
+                    class="w-10 text-xs font-semibold text-gray-700 outline-none text-center border-x border-gray-400 py-1"
+                />
+                <button
+                    type="button"
+                    onclick="changeCantidad('<%= index %>', 1)"
+                    class="px-2 py-1 text-gray-600 hover:bg-gray-100 text-sm leading-none select-none"
+                >&#43;</button>
+            </div>
             </div>
 
             <form action="/cart/items" method="POST" class="mt-4">
@@ -143,6 +155,7 @@
 
 <%- include('../includes/_footer') %>
 <script>window.CAMPANIA_FIN = '<%= fechaFinIso %>';</script>
+<script>window._csrfToken = '<%= csrfToken %>';</script>
 <script src="/JavaScript/home.js"></script>
 
 
