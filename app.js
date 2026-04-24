@@ -22,6 +22,7 @@ const adminOrdenesRoutes = require('./routes/admin/ordenes.routes');
 const adminClientesRoutes = require('./routes/admin/clientes.routes');
 const adminEstadisticasRoutes = require('./routes/admin/estadisticas.routes');
 const adminBitacoraRoutes = require('./routes/admin/bitacora.routes');
+const adminCampaniaRoutes = require('./routes/admin/campania.routes');
 const clienteRoutes = require('./routes/cliente.routes')
 
 app.use(express.static(path.join(__dirname, 'public')));
