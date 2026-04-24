@@ -35,4 +35,27 @@ module.exports = class Usuario {
         if (error) throw error;
         return data;
     }
+
+    static async buscarAdminsPorNombreOEmail(query) {
+        const { data, error } = await supabase
+            .from('usuario')
+            .select('id_usuario, Nombre_usuario, email')
+            .eq('id_rol', 2)
+            .or(`Nombre_usuario.ilike.%${query}%,email.ilike.%${query}%`);
+
+        if (error) throw error;
+        return data || [];
+    }
+
+    static async obtenerAdminPorId(id_usuario) {
+        const { data, error } = await supabase
+            .from('usuario')
+            .select('id_usuario, Nombre_usuario, email')
+            .eq('id_usuario', id_usuario)
+            .eq('id_rol', 2)
+            .single();
+
+        if (error && error.code !== 'PGRST116') throw error;
+        return data || null;
+    }
 }
