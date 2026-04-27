@@ -108,19 +108,29 @@
         <p class="text-4xl font-extrabold text-gray-900">$ <%= producto.precio %></p>
 
         <!-- Cantidad -->
-      <div class="flex items-center border border-gray-400 rounded-md px-4 py-2 bg-white gap-2">
-        <label class="text-sm font-semibold text-gray-800">Cantidad:</label>
-        <input
-          id="cantidad-visible"
-          type="text"
-          value="1"
-          inputmode="numeric"
-          pattern="[0-9]*"
-          maxlength="3"
-          oninput="this.value = this.value.replace(/[^0-9]/g, ''); document.getElementById('cantidad-input').value = this.value || 1;"
-          onblur="if(!this.value) this.value = 1; document.getElementById('cantidad-input').value = this.value;"
-          class="w-16 text-sm font-semibold text-gray-800 outline-none text-right"
-        />
+      <div class="flex items-center gap-2">
+        <label class="text-sm font-semibold text-gray-700">Cantidad:</label>
+        <div class="flex items-center border border-gray-400 rounded bg-white overflow-hidden">
+          <button type="button"
+            onclick="cambiarCantidad(-1)"
+            class="px-3 py-2 text-gray-600 hover:bg-gray-100 text-sm leading-none select-none"
+          >&#8722;</button>
+          <input
+            id="cantidad-visible"
+            type="text"
+            value="1"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="3"
+            oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value === '' || parseInt(this.value) < 1) this.value = 1; document.getElementById('cantidad-input').value = this.value;"
+            onblur="if(!this.value || parseInt(this.value) < 1) this.value = 1; document.getElementById('cantidad-input').value = this.value;"
+            class="w-10 text-sm font-semibold text-gray-700 outline-none text-center border-x border-gray-400 py-2"
+          />
+          <button type="button"
+            onclick="cambiarCantidad(1)"
+            class="px-3 py-2 text-gray-600 hover:bg-gray-100 text-sm leading-none select-none"
+          >&#43;</button>
+        </div>
       </div>
       
 
@@ -305,6 +315,15 @@
   </div>
 
   <script>
+    function cambiarCantidad(delta) {
+      const input = document.getElementById('cantidad-visible');
+      const hidden = document.getElementById('cantidad-input');
+      let val = parseInt(input.value) || 1;
+      val = Math.max(1, val + delta);
+      input.value = val;
+      hidden.value = val;
+    }
+
     const estrellas = document.querySelectorAll('.estrella');
     const labelEstrellas = document.getElementById('label-estrellas');
     const btnEnviar = document.getElementById('btn-enviar-calificacion');
