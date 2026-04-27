@@ -32,6 +32,7 @@ function actualizarSubtotal() {
     'Peso Total: ' + totalPeso.toFixed(2) + " Kg";
 }
 
+
 // Boton
 async function cambiarCantidad(idProducto, delta) {
   const input = document.getElementById('qty-' + idProducto);
@@ -162,3 +163,71 @@ document.addEventListener('DOMContentLoaded', () => {
         window.history.replaceState({}, '', '/cart');
     }
 });
+
+// ── Selección masiva ──────────────────────────────────────────
+
+function actualizarBulkActions() {
+  const checkboxes = document.querySelectorAll('.product-checkbox');
+  const seleccionados = document.querySelectorAll('.product-checkbox:checked');
+  const bulkActions = document.getElementById('bulk-actions');
+  const selectedCount = document.getElementById('selected-count');
+
+  if (seleccionados.length > 0) {
+    bulkActions.classList.remove('hidden');
+    bulkActions.classList.add('flex');
+    selectedCount.textContent = seleccionados.length + ' seleccionado' + (seleccionados.length > 1 ? 's' : '');
+  } else {
+    bulkActions.classList.add('hidden');
+    bulkActions.classList.remove('flex');
+  }
+}
+
+async function eliminarSeleccionados() {
+  const seleccionados = document.querySelectorAll('.product-checkbox:checked');
+  if (seleccionados.length === 0) return;
+
+  const ids = Array.from(seleccionados).map(cb => cb.dataset.id);
+
+  // Deshabilitar botón mientras se procesa
+  const btn = document.querySelector('#bulk-actions button');
+  btn.disabled = true;
+  btn.textContent = 'Eliminando...';
+
+  // Eliminar en paralelo
+  const promesas = ids.map(idProducto =>
+    fetch('/cart/items/' + idProducto, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'csrf-token': csrfToken
+      },
+      body: JSON.stringify({ cantidad_ingresada: 0 }),
+    }).then(res => res.json().then(data => ({ res, data, idProducto })))
+  );
+
+  const resultados = await Promise.all(promesas);
+
+  resultados.forEach(({ res, data, idProducto }) => {
+    if (data.csrfToken) csrfToken = data.csrfToken;
+
+    if (!res.ok) {
+      mostrarError('No se pudo eliminar el producto ' + idProducto);
+      return;
+    }
+
+    if (data.eliminado) {
+      const nombreEl = document.getElementById('nombre-' + idProducto);
+      const nombre = nombreEl ? nombreEl.textContent : 'Producto';
+      mostrarEliminado(nombre, idProducto);
+    }
+  });
+
+  actualizarSubtotal();
+  actualizarBulkActions();
+
+  // Actualizar badge del carrito con el último valor recibido
+  const ultimo = resultados[resultados.length - 1];
+  if (ultimo?.data?.cartCount !== undefined) {
+    actualizarCartBadge(ultimo.data.cartCount);
+  }
+}

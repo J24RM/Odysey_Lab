@@ -37,8 +37,16 @@
   <!-- Columna izquierda -->
   <div class="flex-1 rounded-2xl p-8 shadow-sm p-7 bg-white">
 
+    <!-- Por este: -->
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-4xl font-black text-gray-900">Carrito</h1>
+      <div id="bulk-actions" class="hidden flex items-center gap-3">
+        <span id="selected-count" class="text-sm text-gray-500 font-medium">0 seleccionados</span>
+        <button onclick="eliminarSeleccionados()"
+          class="text-sm font-semibold text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full transition-all active:scale-95">
+          Eliminar seleccionados
+        </button>
+      </div>
     </div>
 
     <hr class="border-gray-300 mb-0" />
@@ -63,10 +71,17 @@
     <% const producto = detalleProductos[index] && detalleProductos[index][0] %>
     <% if (producto) { %>
 
+    <!-- Por: -->
     <div id="row-<%= item.id_producto%>"
-          class="product-row flex items-center gap-5 py-6 border-b border-gray-300"
+      class="product-row flex items-center gap-5 py-6 border-b border-gray-300 group"
           data-precio="<%= producto.precio_unitario %>"
           data-id="<%= item.id_producto %>">
+
+      <!-- Checkbox de selección -->
+      <input type="checkbox"
+        class="product-checkbox w-5 h-5 rounded cursor-pointer accent-ppg-blue flex-shrink-0"
+        data-id="<%= item.id_producto %>"
+        onchange="actualizarBulkActions()" />
 
       <!-- Imagen -->
       <div class="w-28 h-28 flex-shrink-0 bg-white rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
