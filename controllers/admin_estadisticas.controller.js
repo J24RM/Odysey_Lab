@@ -1,5 +1,6 @@
 const Estadisticas = require('../models/estadisticas.model');
 const ExcelJS = require('exceljs');
+const campaniaModel = require('../models/configuracion.model')
 
 //Accede al panel de estadisticas generales
 exports.getEstadisticas = async (request, response) => {
@@ -131,10 +132,11 @@ exports.getEstadisticasProductos = async (request, response) => {
 
     try {
         const data = await Estadisticas.getEstadisticasProductos(periodo, busqueda, orden, dir, fechaInicio, fechaFin);
-        response.render('admin/stats_productos', { usuario: request.session.usuario, ...data, orden, dir });
+        const campaña = await campaniaModel.ObtenerConfig();
+        response.render('admin/stats_productos', { usuario: request.session.usuario, ...data, orden, dir, campañaNombre: campaña.nombre });
     } catch (error) {
         console.error('Error fetching estadísticas productos:', error);
-        response.render('admin/stats_productos', { usuario: request.session.usuario, productos: [], periodo, busqueda, orden, dir, fechaInicio: null, fechaFin: null });
+        response.render('admin/stats_productos', { usuario: request.session.usuario, productos: [], periodo, busqueda, orden, dir, fechaInicio: null, fechaFin: null ,campañaNombre: ""});
     }
 };
 
@@ -297,6 +299,3 @@ exports.exportarEstadisticasProductosExcel = async (request, response) => {
     }
 };
 
-exports.getEstadisticas2 = (request, response) => {
-    response.render('admin_estadisticas2', { usuario: request.session.usuario });
-};
