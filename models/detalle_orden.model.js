@@ -2,51 +2,14 @@ const supabase = require('../utils/supabase');
 
 module.exports = class Orden {
 
-    static async agregarProductoAlCarrito(id_orden, id_producto, cantidad_ingresada){
-
-        //Buscar si ya existe el producto en la orden
-        const { data: producto, error } = await supabase
-            .from('detalle_orden')
-            .select('*')
-            .eq('id_orden', id_orden)
-            .eq('id_producto', id_producto)
-            .maybeSingle();
-
+    static async agregarProductoAlCarrito(id_usuario, id_producto, cantidad_ingresada){
+        const { data, error } = await supabase.rpc('agregar_item_carrito', {
+            p_id_usuario: id_usuario,
+            p_id_producto: id_producto,
+            p_cantidad: parseInt(cantidad_ingresada) // Pasar a int porque el front da un str
+        });
         if (error) throw error;
-
-        cantidad_ingresada = parseInt(cantidad_ingresada)
-
-        console.log("Se va a agregar el producto " + id_producto)
-
-        // Si existe 
-        if (producto){
-            const nuevaCantidad = producto.cantidad + cantidad_ingresada;
-
-            const { error: updateError } = await supabase
-                .from('detalle_orden')
-                .update({ cantidad: nuevaCantidad })
-                .eq('id_orden', id_orden)
-                .eq('id_producto', id_producto);
-
-            if (updateError) throw updateError;
-
-            return;
-        }
-
-        // Si no existe 
-        const { error: insertError } = await supabase
-            .from('detalle_orden')
-            .insert([
-                {
-                    id_orden: id_orden,
-                    id_producto: id_producto,
-                    cantidad: cantidad_ingresada
-                }
-            ]);
-
-        if (insertError) throw insertError;
-
-        return;
+        return data;
     }
 
 

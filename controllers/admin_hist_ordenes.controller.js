@@ -28,6 +28,7 @@ exports.getDetalleOrdenJSON = async (request, response) => {
         const detalles = await ordenModel.obtenerDetalleOrden(id);
 
         let sucursalNombre = 'N/A';
+        let rfc = null;
         if (orden.id_sucursal) {
             const { data: suc } = await supabase
                 .from('sucursal')
@@ -35,9 +36,17 @@ exports.getDetalleOrdenJSON = async (request, response) => {
                 .eq('id_sucursal', orden.id_sucursal)
                 .single();
             if (suc) sucursalNombre = suc.nombre_sucursal;
+
+            const { data: sc } = await supabase
+                .from('sucursal_cuenta')
+                .select('cuenta(rfc)')
+                .eq('id_sucursal', orden.id_sucursal)
+                .limit(1)
+                .single();
+            if (sc?.cuenta) rfc = sc.cuenta.rfc;
         }
 
-        response.json({ orden, detalles, sucursalNombre });
+        response.json({ orden, detalles, sucursalNombre, rfc });
     } catch (error) {
         console.error('Error al obtener detalle de orden:', error);
         response.status(500).json({ error: error.message });

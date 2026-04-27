@@ -20,76 +20,111 @@
     </div> 
 
 
+    <% const campActiva = config && config.activo; %>
+    <% const timerImgSrc = (config && config.banner_general_url) ? '/uploads/' + config.banner_general_url : '/img/niñoMundial.png'; %>
+    <% const nombreCamp = (config && config.nombre) ? config.nombre : 'Mundial 2026'; %>
+    <% const fechaFinIso = (config && config.fecha_de_fin) ? new Date(config.fecha_de_fin).toISOString() : '2026-06-11T00:00:00.000Z'; %>
+    <% if (campActiva) { %>
     <section class="banner">
-        <div class="banner-text">
-            <h2>Preventa Activa: Productos Exclusivos <span>Mundial 2026</span></h2>
+        <!-- Izquierda -->
+        <div class="banner-left">
+            <p class="banner-tag">Preventa activa</p>
+            <h2 class="banner-title">
+                Productos Exclusivos<br>
+                <span><%= nombreCamp %></span>
+            </h2>
+            <p class="banner-subtitle">Fin: <%= new Date(fechaFinIso).toLocaleDateString('es-MX', {day:'numeric', month:'long', year:'numeric'}) %></p>
         </div>
+        <!-- Temporizador e imagen -->
         <div class="banner-right">
-            <div class="countdown-block">
-                <div class="countdown-date">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    del 1 de Mayo al 2 de Julio
+            <div class="countdown-tiles">
+                <div class="tile">
+                    <span id="cd-dias" class="num">--</span>
+                    <span class="lbl">Días</span>
                 </div>
-                <div class="countdown-tiles">
-                    <div class="tile">
-                        <div class="num">32</div>
-                        <div class="lbl">Días</div>
-                    </div>
-                    <div class="tile">
-                        <div class="num">12</div>
-                        <div class="lbl">Horas</div>
-                    </div>
-                    <div class="tile">
-                        <div class="num">45</div>
-                        <div class="lbl">Min</div>
-                    </div>
-                    <div class="tile">
-                        <div class="num">20</div>
-                        <div class="lbl">Seg</div>
-                    </div>
+                <div class="tile">
+                    <span id="cd-hrs" class="num">--</span>
+                    <span class="lbl">Hrs</span>
+                </div>
+                <div class="tile">
+                    <span id="cd-min" class="num">--</span>
+                    <span class="lbl">Min</span>
+                </div>
+                <div class="tile">
+                    <span id="cd-seg" class="num">--</span>
+                    <span class="lbl">Seg</span>
                 </div>
             </div>
-            <img src="/img/niñoMundial.png" alt="Mundial 2026" class="banner-illustration" onerror="this.src='https://cdn-icons-png.flaticon.com/512/33/33736.png'">
+            <img src="<%= timerImgSrc %>" alt="<%= nombreCamp %>" class="banner-illustration" onerror="this.src='/img/botePintura.png'">
         </div>
     </section>
+    <% } %>
 
-    <!-- Product Grid -->
+    <!-- Grid de productos -->
     <div class="product-grid">
         <% if (productos && productos.length > 0) { %>
-            <% productos.forEach(producto => { %>
-                <div class="product-card">
-                    <a href="/cliente/product/<%= producto.id_producto %>" class="product-link">
-                        <div class="product-img-wrap">
-                            <img src="/uploads/<%= producto.url_imagen || '/img/botePintura.png' %>" alt="<%= producto.nombre %>" onerror="this.src='/img/botePintura.png'">
-                        </div>
-                        <div class="product-name">
-                            <%= producto.nombre %>
-                        </div>
-                        <div class="product-rating">
-                            <% for (let i = 1; i <= 5; i++) { %>
-                                <img src="/img/estrellita.png" alt="estrella"
-                                    style="width:18px;height:18px;display:inline-block;opacity:<%= i <= Math.round(producto.promedio) ? '1' : '0.2' %>"/>
-                            <% } %>
-                        </div>
-                        <div class="product-price">
-                            $ <%= producto.precio_unitario %>
-                        </div>
-                    </a>
-                    <form action="/cart/items" method="POST">
-                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                        <input type="hidden" name="cantidad_ingresada" value="1">
-                        <input type="hidden" name="id_producto" value="<%= producto.id_producto %>">
-                        <button type="submit" class="btn-add-cart">Agregar al carrito</button>
-                    </form>
-                </div>
-            <% }) %>
-        <% } else { %>
-            <div class="col-span-full py-10 text-center text-gray-500">
-                No se encontraron productos.
+        <% productos.forEach((producto, index) => { %>
+        <div class="product-card">
+            <a href="/cliente/product/<%= producto.id_producto %>" class="product-link">
+            <div class="product-img-wrap">
+                <img src="/uploads/<%= producto.url_imagen || '/img/botePintura.png' %>" alt="<%= producto.nombre %>" onerror="this.src='/img/botePintura.png'">
             </div>
+            <div class="product-name">
+                <%= producto.nombre %>
+            </div>
+            <div class="product-rating">
+                <% for (let i = 1; i <= 5; i++) { %>
+                <img src="/img/estrellita.png" alt="estrella"
+                style="width:18px;height:18px;display:inline-block;opacity:<%= i <= Math.round(producto.promedio) ? '1' : '0.2' %>"/>
+                <% } %>
+            </div>
+            
+            <div class="product-price">
+                $ <%= producto.precio_unitario %>
+            </div>
+            </a>
+            <hr class="border-gray-300 mb-0" />
+            <div class="flex items-center justify-start gap-2 mt-4">
+            <label class="text-xs font-semibold text-gray-700">Cantidad:</label>
+            <div class="flex items-center border border-gray-400 rounded bg-white overflow-hidden">
+                <button
+                    type="button"
+                    onclick="changeCantidad('<%= index %>', -1)"
+                    class="px-2 py-1 text-gray-600 hover:bg-gray-100 text-sm leading-none select-none"
+                >&#8722;</button>
+                <input
+                    id="cantidad-visible-<%= index %>"
+                    type="text"
+                    value="1"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    maxlength="3"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, ''); document.getElementById('cantidad-input-<%= index %>').value = this.value || 1;"
+                    onblur="if(!this.value || this.value < 1) { this.value = 1; document.getElementById('cantidad-input-<%= index %>').value = 1; } else { document.getElementById('cantidad-input-<%= index %>').value = this.value; }"
+                    class="w-10 text-xs font-semibold text-gray-700 outline-none text-center border-x border-gray-400 py-1"
+                />
+                <button
+                    type="button"
+                    onclick="changeCantidad('<%= index %>', 1)"
+                    class="px-2 py-1 text-gray-600 hover:bg-gray-100 text-sm leading-none select-none"
+                >&#43;</button>
+            </div>
+            </div>
+
+            <form action="/cart/items" method="POST" class="mt-4">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <input type="hidden" name="cantidad_ingresada" id="cantidad-input-<%= index %>" value="1">
+            <input type="hidden" name="page" value="<%= page %>">
+            <input type="hidden" name="search" value="<%= searchQuery || '' %>">
+            <input type="hidden" name="id_producto" value="<%= producto.id_producto %>">
+            <button type="submit" class="btn-add-cart">Agregar al carrito</button>
+            </form>
+        </div>
+        <% }) %>
+        <% } else { %>
+        <div class="col-span-full py-10 text-center text-gray-500">
+            No se encontraron productos.
+        </div>
         <% } %>
     </div>
 
@@ -119,6 +154,8 @@
 </main>
 
 <%- include('../includes/_footer') %>
+<script>window.CAMPANIA_FIN = '<%= fechaFinIso %>';</script>
+<script>window._csrfToken = '<%= csrfToken %>';</script>
 <script src="/JavaScript/home.js"></script>
 
 

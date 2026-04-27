@@ -100,13 +100,22 @@ module.exports = class Producto {
     }
 
     static async searchByNameClaveId(query) {
+        const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+        const q = norm(query);
+
         const { data: productos, error } = await supabase
             .from('producto')
-            .select('*')
-            .or(`nombre.ilike.%${query}%,clave.ilike.%${query}%,id_producto.eq.${isNaN(query) ? -1 : parseInt(query)}`);
+            .select('*');
 
         if (error) throw error;
-        return productos.map(fixProducto);
+
+        const filtered = productos.filter(p =>
+            norm(p.nombre).includes(q) ||
+            norm(p.clave).includes(q) ||
+            (!isNaN(query) && p.id_producto === parseInt(query))
+        );
+
+        return filtered.map(fixProducto);
     }
 
     static async actualizarProducto(id_producto, { nombre, descripcion, url_imagen, unidad_venta, unidad_medida, peso, precio_unitario, activo, clave }) {

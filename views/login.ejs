@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="/style_login.css">
+    <% if (config && config.banner_login_url) { %>
+    <style>:root { --banner-login-url: url('/uploads/<%= config.banner_login_url %>'); }</style>
+    <% } %>
+    <style>
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.visible {
+            display: flex;
+        }
+        .modal-box {
+            background: #fff;
+            border-radius: 10px;
+            padding: 32px 28px 24px;
+            max-width: 360px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+        }
+        .modal-box p {
+            margin: 0 0 20px;
+            font-size: 15px;
+            color: #333;
+            line-height: 1.5;
+        }
+        .modal-box button {
+            background: #0078A9;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 9px 28px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .modal-box button:hover {
+            background: #005f87;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- Modal de notificación post-sesión -->
+<% if (motivo) { %>
+<div class="modal-overlay visible" id="modalSesion">
+    <div class="modal-box">
+        <% if (motivo === 'logout') { %>
+            <p>Tu sesión ha sido cerrada correctamente.</p>
+        <% } else if (motivo === 'inactividad') { %>
+            <p>Tu sesión se ha cerrado por inactividad.</p>
+        <% } else if (motivo === 'error_logout') { %>
+            <p>No se pudo cerrar la sesión. Por favor, vuelve a intentarlo.</p>
+        <% } %>
+        <button onclick="document.getElementById('modalSesion').classList.remove('visible')">Aceptar</button>
+    </div>
+</div>
+<% } %>
+
+<div class="card">
+    <h2>Iniciar sesión</h2>
+
+    <form action="/login" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="text" name="usuario" placeholder="Usuario" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+        <button type="submit">Aceptar</button>
+    </form>
+
+    <% if (mensaje) { %>
+        <div class="mensaje"><%= mensaje %></div>
+    <% } %>
+</div>
+
+</body>
+</html>

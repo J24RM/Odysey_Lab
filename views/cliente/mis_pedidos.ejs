@@ -50,6 +50,9 @@ window.perfilUsuario = {
                             Estado de la orden: <span id="modal-estado" class="status-pill inline-block px-2 py-1 text-[11px] rounded-full"></span>
                         </p>
                         <p class="mb-0 font-bold flex items-center md:justify-end gap-2">
+                            Peso Total:  <span id="modal-peso" class="font-normal text-gray-500"></span>
+                        </p>
+                        <p class="mb-0 font-bold flex items-center md:justify-end gap-2">
                             Subtotal: <span id="modal-subtotal" class="font-normal text-gray-500"></span>
                         </p>
                         <p class="mb-0 font-bold flex items-center md:justify-end gap-2 text-lg">
@@ -122,7 +125,7 @@ window.perfilUsuario = {
 
 <!-- Contenido principal -->
 <div class="pedidos-container flex-1">
-    <h1 class="pedidos-titulo">Ordenes</h1>
+    <h1 class="pedidos-titulo">Mis Órdenes</h1>
 
     <!-- Barra de herramientas -->
     <div class="pedidos-toolbar">
@@ -162,11 +165,11 @@ window.perfilUsuario = {
             <span class="stat-value"><%= ordenesDe_hoy %></span>
         </div>
         <div class="stat-item">
-            <span class="stat-label">Ordenes Totales</span>
+            <span class="stat-label">Órdenes Totales</span>
             <span class="stat-value"><%= pedidos.length %></span>
         </div>
         <div class="stat-item">
-            <span class="stat-label">Ordenes confirmadas</span>
+            <span class="stat-label">Órdenes confirmadas</span>
             <span class="stat-value"><%= ordenesConfirmadas %></span>
         </div>
     </div>
@@ -355,6 +358,11 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
         try {
             const res = await fetch(`/orden/detalle/${idOrden}`);
             const { orden, detalles } = await res.json();
+            console.log(detalles);
+
+            const res2 = await fetch(`/orden/detalle/${idOrden}`);
+            const { producto } = await res2.json();
+            console.log(detalles);
 
             // Fill summary
             document.getElementById('modal-folio').textContent = 'A' + String(orden.id_orden).padStart(4, '0');
@@ -372,6 +380,9 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
 
             document.getElementById('modal-subtotal').textContent = orden.subtotal ? 
                 Number(orden.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2 }) : '0.00';
+
+            // Peso
+            document.getElementById('modal-peso').textContent = orden.peso_total + ' Kg';
 
             const total = orden.subtotal * 1.16;
 
@@ -441,8 +452,14 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
             container.innerHTML = '';
             detalles.forEach(d => {
                 const precio = d.producto.precio_unitario;
+                const peso = d.producto.peso * d.cantidad;
                 const total = precio * d.cantidad;
-                const img = d.producto.url_imagen || '/img/botePintura.png';
+                let img = '/img/botePintura.png';
+                if (d.producto.url_imagen) {
+                    img = d.producto.url_imagen.startsWith('/uploads/') 
+                        ? d.producto.url_imagen 
+                        : '/uploads/' + d.producto.url_imagen.replace(/^\//, '');
+                }
                 container.innerHTML += `
                     <div class="producto-item flex flex-col sm:flex-row items-center gap-4 border-b border-gray-100 pb-4">
                         <div class="img-box w-16 h-16 shrink-0 bg-gray-50 border border-gray-200 rounded p-1">
@@ -461,6 +478,7 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
                         <div class="producto-precio text-center sm:text-right shrink-0 mt-2 sm:mt-0">
                             <div class="font-bold text-lg text-gray-800">$ ${total.toLocaleString('es-MX')}</div>
                             <div class="text-gray-500 text-[11px]">($ ${Number(precio).toLocaleString('es-MX')} / unidad)</div>
+                            <div class="text-gray-500 text-[11px]">( ${Number(peso)} Kg)</div>
                         </div>
                     </div>
                 `;

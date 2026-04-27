@@ -1,5 +1,6 @@
 const title = document.getElementById("modalTitle");
 const body  = document.getElementById("modalBody");
+const loader = document.getElementById('page-loader');
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -69,14 +70,19 @@ function renderSucursalInfo(sucursal) {
     </div>`;
 }
 
-function renderSucursalSelector(sucursales, sucursal_activa) {
-    if (!sucursales || sucursales.length <= 1) return '';
+function renderSucursalSelector(cuenta_activa, sucursales, sucursal_activa) {
+    if (!cuenta_activa) {
+        return `
+        <p class="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+            Primero selecciona una cuenta para ver las sucursales disponibles.
+        </p>`;
+    }
+    if (!sucursales || sucursales.length === 0) return '';
     const opts = sucursales.map(s =>
         `<option value="${s.id_sucursal}" ${sucursal_activa && sucursal_activa.id_sucursal === s.id_sucursal ? 'selected' : ''}>${s.nombre_sucursal}</option>`
     ).join('');
     return `
-    <div class="mt-4 mb-3">
-        <label class="block text-[11px] font-semibold text-gray-600 uppercase tracking-wider mb-1">Cambiar sucursal</label>
+    <div class="my-3">
         <select id="selectSucursal" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0078A9] bg-white">
             <option value="">— Seleccionar sucursal —</option>
             ${opts}
@@ -87,10 +93,10 @@ function renderSucursalSelector(sucursales, sucursal_activa) {
 // ─── Construcción del modal ───────────────────────────────────────────────────
 
 function buildModalContent(data, opts = {}) {
-    const { usuario, cuentas, cuenta_activa, sucursal_activa, sucursales, multiple_cuentas } = data;
+    const { usuario, cuentas, cuenta_activa, sucursal_activa, sucursales } = data;
 
     // Alerta si no hay sucursal activa (puede venir del carrito o por múltiples cuentas sin seleccionar)
-    const alerta = (opts.forzado || (multiple_cuentas && !cuenta_activa)) ? `
+    const alerta = (opts.forzado || !cuenta_activa) ? `
     <div class="mb-4 flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-md text-sm text-amber-800">
         <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
@@ -98,16 +104,15 @@ function buildModalContent(data, opts = {}) {
         Selecciona una cuenta y sucursal para poder realizar pedidos.
     </div>` : '';
 
-    // Selector de cuenta (solo si hay más de una)
+    // Selector de cuenta (siempre visible si hay cuentas disponibles)
     let cuentaSelector = '';
-    if (multiple_cuentas) {
+    if (cuentas && cuentas.length > 0) {
         const cuentaOpts = cuentas.map(c =>
             `<option value="${c.id_cuenta}" ${cuenta_activa && cuenta_activa.id_cuenta === c.id_cuenta ? 'selected' : ''}>${c.nombre_dueno} — ${c.rfc}</option>`
         ).join('');
         cuentaSelector = `
-        <div class="mt-4 mb-3">
-            <label class="block text-[11px] font-semibold text-gray-600 uppercase tracking-wider mb-1">Cambiar cuenta</label>
-            <select id="selectCuenta" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0078A9] bg-white">
+        <div class="my-3">
+<select id="selectCuenta" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0078A9] bg-white">
                 <option value="">— Seleccionar cuenta —</option>
                 ${cuentaOpts}
             </select>
@@ -150,15 +155,15 @@ function buildModalContent(data, opts = {}) {
     <!-- Cuenta -->
     <div class="py-4 border-b border-gray-100">
         <h3 class="text-[11px] font-semibold text-gray-600 uppercase tracking-wider mb-3">Cuenta</h3>
-        <div id="cuentaInfo">${renderCuentaInfo(cuenta_activa)}</div>
         ${cuentaSelector}
+        <div id="cuentaInfo">${renderCuentaInfo(cuenta_activa)}</div>
     </div>
 
     <!-- Sucursal -->
     <div class="py-4 border-b border-gray-100">
         <h3 class="text-[11px] font-semibold text-gray-600 uppercase tracking-wider mb-3">Sucursal</h3>
+        <div id="sucursalSelectorContainer">${renderSucursalSelector(cuenta_activa, sucursales, sucursal_activa)}</div>
         <div id="sucursalInfo">${renderSucursalInfo(sucursal_activa)}</div>
-        <div id="sucursalSelectorContainer">${renderSucursalSelector(sucursales, sucursal_activa)}</div>
     </div>
 
     <!-- Footer -->
@@ -194,7 +199,7 @@ function attachModalEvents(opts = {}) {
 
             // Actualizar selector y datos de sucursal
             document.getElementById('sucursalSelectorContainer').innerHTML =
-                renderSucursalSelector(result.sucursales, result.sucursal_activa);
+                renderSucursalSelector(result.cuenta_activa, result.sucursales, result.sucursal_activa);
             document.getElementById('sucursalInfo').innerHTML =
                 renderSucursalInfo(result.sucursal_activa);
 
@@ -259,6 +264,7 @@ document.getElementById("btnPerfil").addEventListener("click", () => {
 
 // ─── Lógica de apertura/cierre del modal ─────────────────────────────────────
 
+
 document.addEventListener("DOMContentLoaded", () => {
     const modals = document.querySelectorAll('.tw-modal');
 
@@ -295,3 +301,56 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+
+
+// Actualiza el badge del carrito en la navbar
+function actualizarCartBadge(count) {
+    const carritoLink = document.querySelector('a[href="/cart"]');
+    if (!carritoLink) return;
+
+    let badge = carritoLink.querySelector('span');
+
+    if (count <= 0) {
+        if (badge) badge.remove();
+        return;
+    }
+
+    if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none';
+        carritoLink.appendChild(badge);
+    }
+
+    badge.textContent = count > 99 ? '+99' : count;
+}
+
+function showLoader() {
+    loader.style.opacity = '1';
+    loader.style.pointerEvents = 'all';
+  }
+
+  function hideLoader() {
+    loader.style.opacity = '0';
+    loader.style.pointerEvents = 'none';
+  }
+
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a');
+    if (!link) return;
+    if (
+      link.target === '_blank' ||
+      link.href.startsWith('javascript') ||
+      link.href.includes('#') ||
+      link.getAttribute('onclick')
+    ) return;
+    showLoader();
+  });
+
+  document.addEventListener('submit', function(e) {
+    showLoader();
+  });
+
+  window.addEventListener('pageshow', hideLoader);
+  window.addEventListener('load', hideLoader);
+  

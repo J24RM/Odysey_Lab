@@ -1,13 +1,21 @@
 // Controllers
 const Usuario = require('../models/usuario.model');
 const Producto = require('../models/producto.model');
+const Configuracion = require('../models/configuracion.model');
 const { log } = require('../utils/logger');
 const Calificacion = require('../models/calificacion.model');
 
+
 //Muestra el Login
-exports.getLogin = (request, response) => {
+exports.getLogin = async (request, response) => {
     const motivo = request.query.motivo || null;
-    response.render('login', { mensaje: "Ingresa tus credenciales para acceder", motivo });
+    let config = null;
+    try { config = await Configuracion.ObtenerConfig(); } catch {}
+    response.render('login', {
+        mensaje: "Ingresa tus credenciales para acceder",
+        motivo,
+        config
+    });
 };
 
 //Ingresa credenciales
@@ -148,6 +156,7 @@ exports.getClienteHome = async (request, response) => {
         response.status(500).send('Error interno del servidor');
     }
 };
+
 
 //Se accede al dar clic en "Cerrar sesion"
 exports.logout = (request, response) => {

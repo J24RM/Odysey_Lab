@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de orden</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <%- include('partials/header.ejs') %>
+
+    <div class="flex min-h-screen flex-col">
+        <%- include('partials/sidebar.ejs') %>
+
+        <!-- Main Content -->
+        <main class="ml-48 pt-2 px-10 pb-9 flex-1">
+            <section class="space-y-8">
+                <!-- Back Button -->
+                <a href="/admin/orders" class="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 transition-colors">
+                    <span>←</span>
+                    <span>Volver</span>
+                </a>
+
+                <h1 class="text-3xl font-extrabold text-gray-900">Detalle de orden</h1>
+
+                <!-- Summary Card -->
+                <div class="bg-white rounded-2xl p-8 shadow-md grid grid-cols-3 gap-8">
+                    <!-- Left Column -->
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-sm font-semibold text-gray-600">Folio:</span>
+                            <p class="font-bold text-gray-900"><%= orden.folio %></p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold text-gray-600">Fecha:</span>
+                            <p class="font-bold text-gray-900"><%= orden.fecha %></p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold text-gray-600">Usuario que ordenó:</span>
+                            <p class="font-bold text-gray-900"><%= orden.usuario %></p>
+                        </div>
+                    </div>
+
+                    <!-- Middle Column -->
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-sm font-semibold text-gray-600">Sucursal:</span>
+                            <p class="font-bold text-gray-900"><%= orden.sucursal %></p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold text-gray-600">Total de productos:</span>
+                            <p class="font-bold text-gray-900"><%= orden.totalProductos %></p>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-sm font-semibold text-gray-600">Estado de la orden:</span>
+                            <div class="mt-1">
+                                <span class="inline-block px-3 py-1 rounded-full text-sm font-bold bg-green-100 text-green-800">
+                                    <%= orden.estado %>
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-sm font-semibold text-gray-600">Subtotal:</span>
+                            <p class="font-bold text-gray-900"><%= orden.subtotal %></p>
+                        </div>
+                        <button type="button" class="w-full py-2.5 bg-blue-600 text-white font-bold text-sm rounded-lg hover:bg-blue-700 transition-all">
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+
+
+                <!-- Products Section -->
+                <div>
+                    <h2 class="text-2xl font-extrabold text-gray-900 mb-6">Productos</h2>
+
+                    <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+                        <div class="divide-y divide-gray-200">
+                            <% orden.productos.forEach((producto) => { %>
+                                <article class="flex gap-6 p-6 hover:bg-blue-50 transition-colors <%= producto.destacado ? 'bg-yellow-50' : '' %>">
+                                    <!-- Image -->
+                                    <div class="w-24 h-24 flex-shrink-0 rounded-lg bg-gray-100 flex items-center justify-center">
+                                        <img src="<%= producto.imagen %>" alt="<%= producto.nombre %>" class="max-h-20 max-w-full object-contain">
+                                    </div>
+
+                                    <!-- Info -->
+                                    <div class="flex-1 flex items-center justify-between">
+                                        <div>
+                                            <p class="font-bold text-gray-900"><%= producto.nombre %></p>
+                                            <p class="text-sm text-gray-600 mt-1">Cantidad: <span class="font-semibold"><%= producto.cantidad %></span></p>
+                                        </div>
+
+                                        <!-- Price -->
+                                        <div class="text-right">
+                                            <p class="text-lg font-bold text-gray-900">$<%= producto.total %></p>
+                                            <p class="text-sm text-gray-600">($<%= producto.precioUnitario %>/unidad)</p>
+                                        </div>
+                                    </div>
+                                </article>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <%- include('partials/footer.ejs') %>
+</body>
+
+</html>

@@ -261,6 +261,9 @@
         }
         initializeEditButtons();
 
+        const autoId = new URLSearchParams(window.location.search).get('id');
+        if (autoId) openEditForm(autoId);
+
         searchInput.addEventListener('input', async (e) => {
             const query = e.target.value;
             try {
@@ -372,7 +375,7 @@
 
         closeResultBtn.addEventListener('click', () => {
             resultModal.classList.add('hidden');
-            window.location.href = '/admin/home';
+            window.location.href = `/admin/product/${selectedProductId}`;
         });
     </script>
 
