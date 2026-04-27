@@ -16,6 +16,14 @@
 })();
 </script>
 
+<!-- Loader de navegación -->
+<div id="page-loader" class="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-200" style="background-color: rgba(0,39,54,0.35);">
+  <div class="bg-white rounded-2xl shadow-xl px-10 py-8 flex flex-col items-center gap-4">
+    <div class="w-10 h-10 rounded-full border-4 border-gray-200 border-t-[#0078A9] animate-spin"></div>
+    <span class="text-sm font-semibold text-gray-700">Cargando...</span>
+  </div>
+</div>
+
 <!-- Header -->
 <header class="sticky top-0 z-50 bg-blue-50 border-b border-blue-100 shadow-sm">
     <div class="flex items-center justify-between px-7 h-[60px]">

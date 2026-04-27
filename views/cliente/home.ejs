@@ -74,8 +74,12 @@
             </div>
             <div class="product-rating">
                 <% for (let i = 1; i <= 5; i++) { %>
-                <img src="/img/estrellita.png" alt="estrella"
-                style="width:18px;height:18px;display:inline-block;opacity:<%= i <= Math.round(producto.promedio) ? '1' : '0.2' %>"/>
+                <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"
+                    fill="<%= i <= Math.round(producto.promedio) ? '#FBBF24' : '#E5E7EB' %>"
+                    stroke="<%= i <= Math.round(producto.promedio) ? '#F59E0B' : '#D1D5DB' %>"
+                    stroke-width="1" stroke-linejoin="round"/>
+                </svg>
                 <% } %>
             </div>
             

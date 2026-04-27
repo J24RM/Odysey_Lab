@@ -56,12 +56,13 @@ exports.postAgregarProducto = async (request, response) => {
     try {
         const { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo, id_campania } = request.body;
         const imagen = request.files?.['imagen']?.[0];
+        const imagenFilename = imagen?.filename || request.body.imagen_temp || null;
 
         // Validar que todos los campos requeridos estén presentes
-        if (!nombre || !descripcion || !clave || !unidad_venta || !unidad_medida || !peso || !precio_unitario || !imagen) {
+        if (!nombre || !descripcion || !clave || !unidad_venta || !unidad_medida || !peso || !precio_unitario || !imagenFilename) {
             return response.render('admin/home_agregarProducto', {
                 usuario: request.session.usuario,
-                formulario: { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo, id_campania },
+                formulario: { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo, id_campania, imagen_temp: imagenFilename },
                 mensaje: null,
                 mensajeBulk: null,
                 errorBulk: null,
@@ -72,7 +73,7 @@ exports.postAgregarProducto = async (request, response) => {
         }
 
         // Construir URL de acceso a la imagen (solo el filename)
-        const url_imagen = imagen.filename;
+        const url_imagen = imagenFilename;
 
         // Convertir activo a booleano y aplicar regla de campaña inactiva
         let es_activo = activo === 'on' ? true : false;
@@ -139,7 +140,7 @@ exports.postAgregarProducto = async (request, response) => {
                 dbError.details?.includes('unique')) {
                 return response.render('admin/home_agregarProducto', {
                     usuario: request.session.usuario,
-                    formulario: { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo, id_campania },
+                    formulario: { nombre, descripcion, clave, unidad_venta, unidad_medida, peso, precio_unitario, activo, id_campania, imagen_temp: imagenFilename },
                     mensaje: null,
                     mensajeBulk: null,
                     errorBulk: null,
@@ -155,7 +156,7 @@ exports.postAgregarProducto = async (request, response) => {
         console.error('Error en agregar producto:', error);
         return response.render('admin/home_agregarProducto', {
             usuario: request.session.usuario,
-            formulario: request.body,
+            formulario: { ...request.body, imagen_temp: request.files?.['imagen']?.[0]?.filename || request.body.imagen_temp || null },
             mensaje: null,
             mensajeBulk: null,
             errorBulk: null,
