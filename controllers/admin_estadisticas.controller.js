@@ -36,7 +36,15 @@ exports.getEstadisticas = async (request, response) => {
 };
 
 exports.getEstadisticasSucursales = async (request, response) => {
-    const edoFiltro = request.query.edo || null;
+    const edoFiltro    = request.query.edo    || null;
+    const edoFiltroFre = request.query.edoFre || null;
+    const desdeFre     = request.query.desdeFre || null;
+    const hastaFre     = request.query.hastaFre || null;
+    const desdeVol     = request.query.desdeVol || null;
+    const hastaVol     = request.query.hastaVol || null;
+    const DIAS_VALIDOS = [7, 15, 30, 60, 90];
+    const diasFre = DIAS_VALIDOS.includes(Number(request.query.diasFre)) ? Number(request.query.diasFre) : 30;
+    const diasVol = DIAS_VALIDOS.includes(Number(request.query.diasVol)) ? Number(request.query.diasVol) : null;
 
     let pageData = {
         usuario: request.session.usuario,
@@ -44,14 +52,24 @@ exports.getEstadisticasSucursales = async (request, response) => {
         total: 0,
         estados: [],
         edoFiltro,
+        diasVol,
+        desdeVol,
+        hastaVol,
+        diasVolPeriodo: null,
         frecuencias: [],
+        estadosFre: [],
+        edoFiltroFre,
+        diasFre,
+        desdeFre,
+        hastaFre,
+        diasPeriodo: diasFre,
         dbConnected: false
     };
 
     try {
         const [statsVolumen, statsFrecuencia] = await Promise.all([
-            Estadisticas.getEstadisticasSucursales(edoFiltro),
-            Estadisticas.getFrequenciaSucursales()
+            Estadisticas.getEstadisticasSucursales(edoFiltro, diasVol, desdeVol, hastaVol),
+            Estadisticas.getFrequenciaSucursales(edoFiltroFre, diasFre, desdeFre, hastaFre)
         ]);
 
         if (statsVolumen)   pageData = { ...pageData, ...statsVolumen,   dbConnected: true };

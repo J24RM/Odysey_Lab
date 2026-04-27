@@ -199,7 +199,7 @@ module.exports = class Estadisticas {
         return result;
     }
 
-    static async getEstadisticasSucursales(edoFiltro = null) {
+    static async getEstadisticasSucursales(edoFiltro = null, diasVol = null, desdeVol = null, hastaVol = null) {
         if (!supabase) return null;
 
         // 1. Traer todos los estados disponibles para el dropdown
@@ -216,17 +216,32 @@ module.exports = class Estadisticas {
         const { data: sucursalesData } = await sucursalQuery;
 
         if (!sucursalesData || sucursalesData.length === 0) {
-            return { sucursales: [], total: 0, estados, edoFiltro };
+            return { sucursales: [], total: 0, estados, edoFiltro, diasVol, desdeVol, hastaVol, diasVolPeriodo: null };
         }
 
-        // 3. Traer órdenes solo de esas sucursales
+        // 3. Calcular rango de fechas
+        let fechaDesde = null, fechaHasta = null, diasVolPeriodo = null;
+        if (desdeVol && hastaVol) {
+            fechaDesde    = new Date(desdeVol + 'T00:00:00');
+            fechaHasta    = new Date(hastaVol + 'T23:59:59');
+            diasVolPeriodo = Math.round((fechaHasta - fechaDesde) / 86400000) + 1;
+        } else if (diasVol) {
+            fechaDesde    = new Date();
+            fechaDesde.setDate(fechaDesde.getDate() - diasVol);
+            diasVolPeriodo = diasVol;
+        }
+
+        // 4. Traer órdenes de esas sucursales (con filtro de fecha si aplica)
         const ids = sucursalesData.map(s => s.id_sucursal);
-        const { data: ordenes } = await supabase
+        let ordenQuery = supabase
             .from('orden')
             .select('id_sucursal')
             .in('id_sucursal', ids);
+        if (fechaDesde) ordenQuery = ordenQuery.gte('fecha_realizada', fechaDesde.toISOString());
+        if (fechaHasta) ordenQuery = ordenQuery.lte('fecha_realizada', fechaHasta.toISOString());
+        const { data: ordenes } = await ordenQuery;
 
-        // 4. Agrupar por sucursal
+        // 5. Agrupar por sucursal
         const conteo = {};
         for (const ord of (ordenes || [])) {
             const id = ord.id_sucursal;
@@ -234,7 +249,7 @@ module.exports = class Estadisticas {
             conteo[id] = (conteo[id] || 0) + 1;
         }
 
-        // 5. Construir el array resultado, top 10 ordenado de mayor a menor
+        // 6. Top 10 ordenado de mayor a menor
         const sucursales = sucursalesData.map(s => ({
             id_sucursal: s.id_sucursal,
             nombre: s.nombre_sucursal,
@@ -243,7 +258,7 @@ module.exports = class Estadisticas {
 
         const total = (ordenes || []).length;
 
-        return { sucursales, total, estados, edoFiltro };
+        return { sucursales, total, estados, edoFiltro, diasVol, desdeVol, hastaVol, diasVolPeriodo };
     }
 
     static async getDetalleSucursalPagina(id_sucursal, periodo = 'semana', opciones = {}) {
@@ -287,16 +302,26 @@ module.exports = class Estadisticas {
                 inicioAnterior = new Date(anio, mes, 1, 0, 0, 0);
             }
             finAnterior = new Date(inicioActual.getTime() - 1);
-            labels = Array.from({length: 15}, (_, i) => String(i + 1));
+            const primerDiaQuincena = hoyDia <= 15 ? 1 : 16;
+            labels = Array.from({length: 15}, (_, i) => String(primerDiaQuincena + i));
         } else if (periodo === 'personalizado') {
             const MESES_CORTOS_P = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-            inicioActual   = new Date(opciones.desde      + 'T00:00:00');
-            finActual      = new Date(opciones.hasta      + 'T23:59:59');
-            inicioAnterior = new Date(opciones.comp_desde + 'T00:00:00');
-            finAnterior    = new Date(opciones.comp_hasta + 'T23:59:59');
+            inicioActual = new Date(opciones.desde + 'T00:00:00');
+            finActual    = new Date(opciones.hasta + 'T23:59:59');
 
             const diffMs  = finActual.getTime() - inicioActual.getTime();
             const numDias = Math.min(Math.ceil(diffMs / 86400000) + 1, 90);
+
+            if (opciones.comp_desde && opciones.comp_hasta) {
+                inicioAnterior = new Date(opciones.comp_desde + 'T00:00:00');
+                finAnterior    = new Date(opciones.comp_hasta + 'T23:59:59');
+            } else {
+                // Auto: mismo número de días inmediatamente antes del período actual
+                finAnterior    = new Date(inicioActual.getTime() - 1);
+                inicioAnterior = new Date(inicioActual);
+                inicioAnterior.setDate(inicioActual.getDate() - numDias);
+                inicioAnterior.setHours(0, 0, 0, 0);
+            }
 
             labels = [];
             for (let i = 0; i < numDias; i++) {
@@ -437,8 +462,8 @@ module.exports = class Estadisticas {
             finActualLabel   = `${fmt(inicioActual)} - ${fmt(domingoActual)}`;
             finAnteriorLabel = `${fmt(inicioAnterior)} - ${fmt(new Date(inicioActual.getTime() - 86400000))}`;
         } else if (periodo === 'personalizado') {
-            finActualLabel   = `${fmt(inicioActual)} - ${fmt(new Date(opciones.hasta      + 'T00:00:00'))}`;
-            finAnteriorLabel = `${fmt(inicioAnterior)} - ${fmt(new Date(opciones.comp_hasta + 'T00:00:00'))}`;
+            finActualLabel   = `${fmt(inicioActual)} - ${fmt(new Date(opciones.hasta + 'T00:00:00'))}`;
+            finAnteriorLabel = `${fmt(inicioAnterior)} - ${fmt(finAnterior)}`;
         } else if (periodo === 'quincena') {
             const mes = hoy.getMonth();
             const hoyDia = hoy.getDate();
@@ -720,50 +745,71 @@ static async getEstadisticasProductos(periodo = 'semana', busqueda = '', orden =
     };
 }
 
-    static async getFrequenciaSucursales() {
+    static async getFrequenciaSucursales(edoFiltro = null, dias = 30, desdeFre = null, hastaFre = null) {
         if (!supabase) return null;
 
-        const hace30Dias = new Date();
-        hace30Dias.setDate(hace30Dias.getDate() - 30);
+        // 1. Traer todos los estados disponibles para el dropdown
+        const { data: edosData } = await supabase
+            .from('sucursal')
+            .select('edo');
+        const estadosFre = [...new Set((edosData || []).map(s => s.edo).filter(Boolean))].sort();
 
-        // 1. Traer órdenes de los últimos 30 días
-        const { data: ordenes } = await supabase
-            .from('orden')
-            .select('id_sucursal, fecha_realizada')
-            .gte('fecha_realizada', hace30Dias.toISOString());
+        // 2. Traer sucursales (filtradas por estado si aplica)
+        let sucursalQuery = supabase
+            .from('sucursal')
+            .select('id_sucursal, nombre_sucursal, edo');
+        if (edoFiltro) sucursalQuery = sucursalQuery.eq('edo', edoFiltro);
+        const { data: sucursalesData } = await sucursalQuery;
 
-        if (!ordenes || ordenes.length === 0) {
-            return { frecuencias: [] };
+        if (!sucursalesData || sucursalesData.length === 0) {
+            return { frecuencias: [], estadosFre, edoFiltroFre: edoFiltro };
         }
 
-        // 2. Agrupar conteo por sucursal
+        // 3. Calcular rango de fechas
+        let fechaDesde, fechaHasta, diasPeriodo;
+        if (desdeFre && hastaFre) {
+            fechaDesde  = new Date(desdeFre + 'T00:00:00');
+            fechaHasta  = new Date(hastaFre + 'T23:59:59');
+            diasPeriodo = Math.round((fechaHasta - fechaDesde) / 86400000) + 1;
+        } else {
+            fechaDesde  = new Date();
+            fechaDesde.setDate(fechaDesde.getDate() - dias);
+            fechaHasta  = null;
+            diasPeriodo = dias;
+        }
+
+        // 4. Traer órdenes del período de esas sucursales
+        const ids = sucursalesData.map(s => s.id_sucursal);
+        let ordenQuery = supabase
+            .from('orden')
+            .select('id_sucursal, fecha_realizada')
+            .in('id_sucursal', ids)
+            .gte('fecha_realizada', fechaDesde.toISOString());
+        if (fechaHasta) ordenQuery = ordenQuery.lte('fecha_realizada', fechaHasta.toISOString());
+        const { data: ordenes } = await ordenQuery;
+
+        // 5. Agrupar conteo por sucursal
         const conteo = {};
-        for (const ord of ordenes) {
+        for (const ord of (ordenes || [])) {
             const id = ord.id_sucursal;
             if (!id) continue;
             conteo[id] = (conteo[id] || 0) + 1;
         }
 
-        // 3. Traer nombres de sucursales
-        const ids = Object.keys(conteo);
-        const { data: sucursalesData } = await supabase
-            .from('sucursal')
-            .select('id_sucursal, nombre_sucursal')
-            .in('id_sucursal', ids);
-
-        // 4. Calcular frecuencia: pedidos / 4.3 semanas
-        const SEMANAS_EN_30_DIAS = 4.3;
-        const frecuencias = (sucursalesData || []).map(s => {
+        // 6. Calcular frecuencia y top 10
+        const semanas = diasPeriodo / 7;
+        const frecuencias = sucursalesData.map(s => {
             const totalMes = conteo[s.id_sucursal] || 0;
-            const pedidosPorSemana = Math.round((totalMes / SEMANAS_EN_30_DIAS) * 10) / 10;
+            const pedidosPorSemana = Math.round((totalMes / semanas) * 10) / 10;
             return {
+                id_sucursal: s.id_sucursal,
                 nombre: s.nombre_sucursal,
                 totalMes,
                 pedidosPorSemana
             };
-        }).sort((a, b) => b.pedidosPorSemana - a.pedidosPorSemana);
+        }).sort((a, b) => b.pedidosPorSemana - a.pedidosPorSemana).slice(0, 10);
 
-        return { frecuencias };
+        return { frecuencias, estadosFre, edoFiltroFre: edoFiltro, diasPeriodo };
     }
 
     static async getTop5ProductosDestacados() {
