@@ -93,7 +93,7 @@
                                 <div class="space-y-2">
                                     <label for="productKey" class="block text-sm font-semibold text-gray-900">Clave del producto:</label>
                                     <input id="productKey" name="clave" type="text"
-                                        placeholder="Ingresa la clave alfanumérica"
+                                        placeholder="Ingresa la clave"
                                         value="<%= formulario?.clave ?? '' %>" maxlength="12"
                                         class="w-full px-4 py-3 border-2 border-gray-300 rounded text-sm shadow-sm focus:border-blue-600 focus:outline-none transition-colors" />
                                 </div>
@@ -243,7 +243,7 @@
                                         <h3 class="text-xl font-bold text-gray-900">Cargar archivo</h3>
                                         <p class="text-sm text-gray-500 mt-1">Sube un CSV o Excel con el listado de productos.</p>
                                         <p class="text-xs text-gray-400 mt-1">Columnas requeridas (en orden): <span class="font-mono">nombre, descripcion, url_imagen, unidad_venta, unidad_medida, peso, precio_unitario, activo, clave</span></p>
-                                        <p class="text-xs text-gray-400 mt-0.5">La clave no debe exceder 7 caracteres. La url_imagen debe coincidir con el nombre del archivo subido en "Subir imágenes".</p>
+                                        <p class="text-xs text-gray-400 mt-0.5">La clave no debe exceder 12 caracteres. La url_imagen debe coincidir con el nombre del archivo subido en "Subir imágenes".</p>
                                     </div>
                                     <label id="csvDropZone"
                                         class="flex flex-col items-center justify-center gap-2 p-10 border-2 border-dashed border-gray-300 rounded shadow-sm cursor-pointer hover:border-blue-600 hover:bg-blue-50 transition-all">

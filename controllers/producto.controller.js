@@ -375,7 +375,7 @@ exports.postCargarBulk = async (request, response) => {
                             continue;
                         }
 
-                        if (clave.length > 7) {
+                        if (clave.length > 12) {
                             errores.push(`Fila ${numFila}: La clave "${clave}" excede 7 caracteres (tiene ${clave.length}).`);
                             continue;
                         }
@@ -543,7 +543,7 @@ exports.postCargarCSV = async (request, response) => {
             }
 
             // Validar longitud de clave (máximo 7 caracteres)
-            if (clave.length > 7) {
+            if (clave.length > 12) {
                 errores.push(`Fila ${numFila}: La clave "${clave}" excede 7 caracteres (tiene ${clave.length}).`);
                 continue;
             }
