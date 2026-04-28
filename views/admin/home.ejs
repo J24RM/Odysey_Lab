@@ -63,20 +63,20 @@
             <section class="bg-white border border-gray-200 p-5 mb-6 flex gap-4">
                 <a href="/admin/agregar_producto"
                     class="flex-1 py-4 px-5 bg-green-700 text-white font-bold text-sm text-center rounded transition-colors hover:bg-green-800">
-                    Agregar Producto
+                    Agregar Producto al Catálogo
                 </a>
                 <a href="/admin/editar_producto"
                     class="flex-1 py-4 px-5 bg-blue-700 text-white font-bold text-sm text-center rounded transition-colors hover:bg-blue-800">
-                    Editar Producto
+                    Editar Producto del Catálogo
                 </a>
             </section>
 
             <!-- Seccion del catálogo -->
             <section class="bg-white border border-blue-100 p-7">
-                <div class="flex items-center justify-between mb-6 gap-4">
+                <div class="flex flex-col items-center mb-6 gap-4">
                     <h3 class="text-2xl font-extrabold text-gray-900 m-0">Catálogo de Productos</h3>
-                    <input id="searchInput" type="text" placeholder="Buscar Productos"
-                        class="px-4 py-2.5 border-2 border-gray-300 rounded text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors w-64" />
+                    <input id="searchInput" type="text" placeholder="Buscar Producto"
+                        class="px-4 py-2.5 border-2 border-gray-300 rounded text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors w-full max-w-2xl" />
                 </div>
 
                 <!-- Grid de productos -->

@@ -76,7 +76,7 @@
                                 <label for="campania" class="block text-sm font-semibold text-gray-900">Campaña:</label>
                                 <select id="campania" name="id_campania"
                                     class="w-full px-4 py-3 border-2 border-gray-300 rounded text-sm shadow-sm focus:border-blue-600 focus:outline-none transition-colors">
-                                    <option value="" data-activo="true">Sin campaña asignada</option>
+                                    <option value="" data-activo="true">Selecciona la campaña a a que pertenece el producto:</option>
                                     <% campanias.forEach(c => { %>
                                     <option value="<%= c.id_campania %>"
                                         data-activo="<%= c.activo ? 'true' : 'false' %>"
@@ -92,8 +92,8 @@
                                 <div class="space-y-2">
                                     <label for="productKey" class="block text-sm font-semibold text-gray-900">Clave del producto:</label>
                                     <input id="productKey" name="clave" type="text"
-                                        placeholder="Ingresa la clave"
-                                        value="<%= formulario?.clave ?? '' %>" maxlength="7"
+                                        placeholder="Ingresa la clave alfanumérica"
+                                        value="<%= formulario?.clave ?? '' %>" maxlength="12"
                                         class="w-full px-4 py-3 border-2 border-gray-300 rounded text-sm shadow-sm focus:border-blue-600 focus:outline-none transition-colors" />
                                 </div>
 
