@@ -96,8 +96,13 @@ exports.actualizarItem = async (request, response, next) => {
     try {
         if (cantidad_ingresada == 0) {
             await detalle_ordenModel.eliminarProducto(request.session.id_carrito, id_producto);
+
+            const items = await detalle_ordenModel.detalleOrden(request.session.id_carrito);
+            const nuevoTotal = items.reduce((sum, i) => sum + i.cantidad, 0);
+
             return response.json({
                 eliminado: true ,
+                cartCount: nuevoTotal,
                 csrfToken: request.csrfToken()
             });
         } else {

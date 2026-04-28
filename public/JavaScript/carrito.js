@@ -135,8 +135,13 @@ async function eliminarProducto(idProducto) {
     const nombre = document.getElementById('nombre-' + idProducto).textContent;
     mostrarEliminado(nombre, idProducto);
     actualizarSubtotal();
+
+    if (data.cartCount !== undefined) {
+        actualizarCartBadge(data.cartCount);
+    }
   }
 }
+
 
 function mostrarEliminado(nombre, idProducto) {
   const aviso = document.createElement('div');
