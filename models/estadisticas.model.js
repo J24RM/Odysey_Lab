@@ -897,20 +897,43 @@ static async getEstadisticasProductos(periodo = 'semana', busqueda = '', orden =
         return { actual: actualPorDia, anterior: anteriorPorDia, diasEnMes, diasEnMesAnterior };
     }
 
-    static async getTopSucursalesPorOrdenes() {
+    static getWeekRange(weeksAgo = 0) {
+        const hoy = new Date();
+        const diaSemana = hoy.getDay(); // 0=Dom..6=Sab
+        const diasDesdelLunes = diaSemana === 0 ? 6 : diaSemana - 1;
+
+        const lunes = new Date(hoy);
+        lunes.setDate(hoy.getDate() - diasDesdelLunes - weeksAgo * 7);
+        lunes.setHours(0, 0, 0, 0);
+
+        const domingo = new Date(lunes);
+        domingo.setDate(lunes.getDate() + 6);
+        domingo.setHours(23, 59, 59, 999);
+
+        return { start: lunes, end: domingo };
+    }
+
+    static async getTopSucursalesPorOrdenes(weeksAgo = 0) {
+        const { start, end } = this.getWeekRange(weeksAgo);
+
         const { data: ordenes, error: e1 } = await supabase
             .from('orden')
             .select('id_sucursal, subtotal')
             .eq('estado', 'confirmada')
-            .not('id_sucursal', 'is', null);
+            .not('id_sucursal', 'is', null)
+            .gte('fecha_realizada', start.toISOString())
+            .lte('fecha_realizada', end.toISOString());
         if (e1) throw e1;
 
         const map = {};
+        let totalVentasGlobal = 0;
         for (const o of (ordenes || [])) {
             const id = o.id_sucursal;
             if (!map[id]) map[id] = { total_ordenes: 0, total_ventas: 0 };
             map[id].total_ordenes++;
-            map[id].total_ventas += parseFloat(o.subtotal) || 0;
+            const v = parseFloat(o.subtotal) || 0;
+            map[id].total_ventas += v;
+            totalVentasGlobal += v;
         }
 
         if (Object.keys(map).length === 0) return [];
@@ -943,7 +966,10 @@ static async getEstadisticasProductos(periodo = 'semana', busqueda = '', orden =
                 nombre_sucursal: sucMap[parseInt(id)] || 'Sucursal ' + id,
                 nombre_cuenta: cuentaMap[parseInt(id)] || 'Sin cuenta',
                 total_ordenes: stats.total_ordenes,
-                total_ventas: parseFloat(stats.total_ventas.toFixed(2))
+                total_ventas: parseFloat(stats.total_ventas.toFixed(2)),
+                porcentaje: totalVentasGlobal > 0
+                    ? Math.round((stats.total_ventas / totalVentasGlobal) * 100)
+                    : 0
             }))
             .sort((a, b) => b.total_ventas - a.total_ventas)
             .slice(0, 10);

@@ -4,6 +4,10 @@ const campaniaModel = require('../models/configuracion.model')
 
 //Accede al panel de estadisticas generales
 exports.getEstadisticas = async (request, response) => {
+    const semanaFiltro = [0, 1, 2].includes(Number(request.query.semana))
+        ? Number(request.query.semana)
+        : 0;
+
     let pageData = {
         usuario: request.session.usuario,
         totalMensual: 0,
@@ -15,13 +19,14 @@ exports.getEstadisticas = async (request, response) => {
         topSucursales: [],
         topSucursalesChart: [],
         porcentajeSucursales: 0,
+        semanaFiltro,
         dbConnected: false
     };
 
     try {
         const [stats, topSucursalesChart, ventasDiarias] = await Promise.all([
             Estadisticas.getEstadisticasGenerales(),
-            Estadisticas.getTopSucursalesPorOrdenes(),
+            Estadisticas.getTopSucursalesPorOrdenes(semanaFiltro),
             Estadisticas.getVentasDiariasGenerales()
         ]);
         if (stats) {

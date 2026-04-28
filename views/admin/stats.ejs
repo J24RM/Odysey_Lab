@@ -3,6 +3,7 @@
 
 <head>
 <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/img/PPG_Logo2.svg">
 <title>Estadísticas Generales</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -101,13 +102,27 @@
 
     <!-- Weekly branches table -->
     <div class="bg-white rounded-[14px] shadow-[0_4px_16px_rgba(0,0,0,0.07)] overflow-hidden">
-        <div class="px-6 pt-5 pb-3 border-b border-gray-100">
-            <p class="text-[13px] font-bold text-gray-400 tracking-wide uppercase">Sucursales con más pedidos en la semana</p>
+        <div class="px-6 pt-5 pb-4 border-b border-gray-100 flex items-center justify-between gap-4 flex-wrap">
+            <p class="text-[13px] font-bold text-gray-400 tracking-wide uppercase">Top 10 sucursales con más pedidos</p>
+            <div class="flex gap-1">
+                <a href="/admin/stats?semana=0"
+                   class="px-3 py-1.5 text-xs font-semibold rounded transition-colors <%= semanaFiltro === 0 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                   Semana actual
+                </a>
+                <a href="/admin/stats?semana=1"
+                   class="px-3 py-1.5 text-xs font-semibold rounded transition-colors <%= semanaFiltro === 1 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                   Semana pasada
+                </a>
+                <a href="/admin/stats?semana=2"
+                   class="px-3 py-1.5 text-xs font-semibold rounded transition-colors <%= semanaFiltro === 2 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                   Hace 2 semanas
+                </a>
+            </div>
         </div>
         <% if (!topSucursalesChart || topSucursalesChart.length === 0) { %>
         <div class="flex flex-col items-center justify-center py-14 text-center">
             <span class="text-4xl mb-3">🏪</span>
-            <p class="text-gray-400 text-sm">Sin datos de sucursales disponibles.</p>
+            <p class="text-gray-400 text-sm">Sin pedidos confirmados en este período.</p>
         </div>
         <% } else { %>
         <table class="w-full">
@@ -115,8 +130,9 @@
                 <tr class="text-left">
                     <th class="px-6 py-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Sucursal</th>
                     <th class="px-6 py-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Gerente</th>
-                    <th class="px-6 py-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Pedidos Semanales</th>
-                    <th class="px-6 py-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Ingresos Semanales</th>
+                    <th class="px-6 py-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Pedidos</th>
+                    <th class="px-6 py-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Ingresos</th>
+                    <th class="px-6 py-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">% de ingresos</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
@@ -140,6 +156,14 @@
                             %>
                             <%= fmt %>
                         </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-1 bg-gray-100 rounded-full h-1.5 min-w-[60px]">
+                                <div class="bg-blue-500 h-1.5 rounded-full" style="width:<%= s.porcentaje %>%"></div>
+                            </div>
+                            <span class="text-xs font-bold text-gray-700 w-9 text-right"><%= s.porcentaje %>%</span>
+                        </div>
                     </td>
                 </tr>
                 <% }) %>
