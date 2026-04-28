@@ -69,15 +69,10 @@ exports.registrarOrden = async (req, res) => {
 
                     <!-- HEADER -->
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; padding:18px 24px 14px; border-bottom:3px solid #1a7abf;">
-                    <div>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/PPG_Logo.svg/1280px-PPG_Logo.svg.png" 
-                            alt="PPG" 
-                            style="height:36px; width:auto; display:block;">
-                        <span style="font-size:20px; font-weight:400; color:#444;"> Sistema de Pedidos</span>
-
+                        <div>
+                            <span style="font-size:20px; font-weight:400; color:#444;"> Sistema de Pedidos</span>
+                        </div>
                     </div>
-                    </div>
-                    
 
                     <!-- INTRO -->
                     <div style="padding:14px 24px 0;">
