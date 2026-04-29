@@ -214,10 +214,10 @@ body {
 .pedidos-table-head,
 .pedidos-row {
     display: grid;
-    grid-template-columns: 1.4fr 1.2fr 1.6fr 140px 200px;
-    gap: 16px;
+    grid-template-columns: 0.8fr 1.4fr 2fr 1.1fr 1.5fr;
+    gap: 32px;
     align-items: center;
-    padding: 14px 28px;
+    padding: 14px 32px;
 }
 
 .pedidos-table-head span,

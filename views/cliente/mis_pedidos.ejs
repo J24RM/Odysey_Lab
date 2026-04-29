@@ -43,7 +43,7 @@ window.perfilUsuario = {
                         <p class="mb-0 font-bold">Fecha: <span id="modal-fecha" class="font-normal text-gray-700"></span></p>
                     </div>
                     <div class="md:w-5/12">
-                        <p class="mb-1 font-bold">Sucursal: <span class="font-normal text-gray-700">Jurica</span></p>
+                        <p class="mb-1 font-bold">Sucursal: <span id="modal-sucursal" class="font-normal text-gray-700"></span></p>
                         <p class="mb-0 font-bold">Total de productos: <span id="modal-total-productos" class="font-normal text-gray-700"></span></p>
                     </div>
                     <div class="md:w-2/4 md:text-right">
@@ -180,7 +180,7 @@ window.perfilUsuario = {
         <div class="pedidos-table-head">
             <span>Orden</span>
             <span>Fecha</span>
-            <span>Cliente</span>
+            <span>Sucursal</span>
             <span>Total</span>
             <span class="text-center">Estatus de pedido</span>
         </div>
@@ -193,10 +193,10 @@ window.perfilUsuario = {
                 <% const fecha = pedido.fecha_realizada ? new Date(pedido.fecha_realizada).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Sin fecha'; %>
                 <% const estado = pedido.estado.charAt(0).toUpperCase() + pedido.estado.slice(1); %>
                 <% const total = pedido.subtotal * 1.16; %>
-                <div class="pedidos-row" data-id="<%= pedido.id_orden %>" data-fecha="<%= pedido.fecha_realizada || '' %>" style="cursor:pointer;">
+                <div class="pedidos-row" data-id="<%= pedido.id_orden %>" data-fecha="<%= pedido.fecha_realizada || '' %>" data-sucursal="<%= pedido.sucursal ? pedido.sucursal.nombre_sucursal : 'Sin sucursal' %>" style="cursor:pointer;">
                     <span><%= String(pedido.id_orden).padStart(4, '0') %></span>
                     <span><%= fecha %></span>
-                    <span>Concesionario Jurica</span>
+                    <span><%= pedido.sucursal ? pedido.sucursal.nombre_sucursal : 'Sin sucursal' %></span>
                     <span>$<%= total ? total.toLocaleString('es-MX', { minimumFractionDigits: 2 }) : '0.00' %></span>
                     <span class="status-cell">
                         <span class="status-pill <%= estado === 'Pendiente' ? 'status-pending' : estado === 'Cancelada' ? 'status-cancelled' : 'status-confirmed' %>">
@@ -408,6 +408,7 @@ document.querySelector('.pedidos-table-body').addEventListener('click', async (e
             document.getElementById('modal-folio').textContent = 'A' + String(orden.id_orden).padStart(4, '0');
             const fecha = orden.fecha_realizada ? new Date(orden.fecha_realizada).toLocaleDateString('es-MX') : 'N/A';
             document.getElementById('modal-fecha').textContent = fecha;
+            document.getElementById('modal-sucursal').textContent = row.dataset.sucursal || 'Sin sucursal';
             
             const totalProductos = detalles.reduce((sum, d) => sum + d.cantidad, 0);
             document.getElementById('modal-total-productos').textContent = totalProductos;
