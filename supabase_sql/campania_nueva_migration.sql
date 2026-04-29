@@ -1,22 +1,28 @@
 -- ============================================================
 -- MIGRACIÓN: Nueva estructura de campañas y configuraciones
 -- Ejecutar en el SQL Editor de Supabase
+-- NOTA: Corre este archivo únicamente. No es necesario correr
+--       campania_migration.sql antes de este.
 -- ============================================================
 
 -- 1. Agregar columnas nuevas a la tabla campania
+--    (fecha_de_inicio ya existe; IF NOT EXISTS la ignora sin error)
 ALTER TABLE public.campania
-    ADD COLUMN IF NOT EXISTS fecha_de_inicio       TIMESTAMP WITH TIME ZONE,
     ADD COLUMN IF NOT EXISTS tiempo_de_cancelacion INTEGER,
     ADD COLUMN IF NOT EXISTS banner_login          INTEGER,
     ADD COLUMN IF NOT EXISTS banner_general        INTEGER;
 
--- Eliminar columnas antiguas de campania
+-- Eliminar columnas obsoletas de campania (por si existieran de migraciones anteriores)
 ALTER TABLE public.campania
     DROP COLUMN IF EXISTS banner_login_url,
     DROP COLUMN IF EXISTS banner_timer_url;
 
 -- 2. Limpiar columnas antiguas de configuraciones
+--    Incluye las columnas del esquema original (tiempo_de_cancelacion, banner_url)
+--    y las de migraciones intermedias anteriores (si se hubieran ejecutado)
 ALTER TABLE public.configuraciones
+    DROP COLUMN IF EXISTS tiempo_de_cancelacion,
+    DROP COLUMN IF EXISTS banner_url,
     DROP COLUMN IF EXISTS fecha_fin_campania,
     DROP COLUMN IF EXISTS campania_activa,
     DROP COLUMN IF EXISTS banner_login_url,
@@ -32,7 +38,8 @@ ALTER TABLE public.configuraciones
     ADD COLUMN IF NOT EXISTS banner  VARCHAR;
 
 -- 4. Agregar FK de campania hacia configuraciones
---    (se hace después de que configuraciones ya tiene id_configuraciones como PK)
+--    Se hace al final porque configuraciones debe existir primero.
+--    campania.banner_login/banner_general pueden ser NULL (campaña sin banner asignado aún).
 DO $$
 BEGIN
     IF NOT EXISTS (
