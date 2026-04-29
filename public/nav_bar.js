@@ -77,7 +77,7 @@ function renderSucursalSelector(cuenta_activa, sucursales, sucursal_activa) {
             Primero selecciona una cuenta para ver las sucursales disponibles.
         </p>`;
     }
-    if (!sucursales || sucursales.length === 0) return '';
+    if (!sucursales || sucursales.length <= 1) return '';
     const opts = sucursales.map(s =>
         `<option value="${s.id_sucursal}" ${sucursal_activa && sucursal_activa.id_sucursal === s.id_sucursal ? 'selected' : ''}>${s.nombre_sucursal}</option>`
     ).join('');
@@ -106,13 +106,13 @@ function buildModalContent(data, opts = {}) {
 
     // Selector de cuenta (siempre visible si hay cuentas disponibles)
     let cuentaSelector = '';
-    if (cuentas && cuentas.length > 0) {
+    if (cuentas && cuentas.length > 1) {
         const cuentaOpts = cuentas.map(c =>
             `<option value="${c.id_cuenta}" ${cuenta_activa && cuenta_activa.id_cuenta === c.id_cuenta ? 'selected' : ''}>${c.nombre_dueno} — ${c.rfc}</option>`
         ).join('');
         cuentaSelector = `
         <div class="my-3">
-<select id="selectCuenta" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0078A9] bg-white">
+            <select id="selectCuenta" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0078A9] bg-white">
                 <option value="">— Seleccionar cuenta —</option>
                 ${cuentaOpts}
             </select>
