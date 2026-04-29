@@ -158,7 +158,9 @@ app.use((request, response, next) => {
 //Middleware de autorizacion para rutas admin
 const requireAdmin = (request, response, next) => {
     if (request.session.id_rol !== 2) {
-        return response.status(404).send('La ruta no existe');
+        return response.status(404).render('error', {
+
+        });
     }
     next();
 };
@@ -207,15 +209,31 @@ app.use("/cart",requireCliente,carrito);
 const ordenRoutes = require('./routes/orden.routes');
 app.use("/orden", requireCliente, ordenRoutes);
 
-app.use((request, response, next) => {
-    response.status(404).send("La ruta no existe");
+// 404 — ruta no encontrada
+app.use((req, res) => {
+    res.status(404).render('error', {
+        codigo: 404,
+        mensaje: 'Página no encontrada.',
+        detalle: 'La ruta que buscas no existe o fue movida.'
+    });
 });
 
+// 500 — error interno
 app.use((err, req, res, next) => {
     if (err.code === 'EBADCSRFTOKEN') {
-        return res.status(403).send('Token CSRF inválido');
+        return res.status(403).render('error', {
+            codigo: 403,
+            mensaje: 'Token de seguridad inválido o expirado.',
+            detalle: 'Recarga la página e intenta de nuevo.'
+        });
     }
-    next(err);
+
+    console.error(err);
+    res.status(500).render('error', {
+        codigo: 500,
+        mensaje: 'Error interno del servidor.',
+        detalle: 'Algo salió mal. Por favor intenta más tarde.'
+    });
 });
 
 app.listen(PORT, () => {
