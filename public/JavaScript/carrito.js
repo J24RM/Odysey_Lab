@@ -33,25 +33,50 @@ function actualizarSubtotal() {
 }
 
 
-// Boton
+const _actualizando = new Set();
+
+// Botón
 async function cambiarCantidad(idProducto, delta) {
-  const input = document.getElementById('qty-' + idProducto);
-  let cantidadActual = parseInt(input.value) || 1;
+    if (_actualizando.has(idProducto)) return;
 
-  const nuevaCantidad = cantidadActual + delta;
-  if (nuevaCantidad < 1) return;
+    const input    = document.getElementById('qty-' + idProducto);
+    const btnMenos = input.previousElementSibling;
+    const btnMas   = input.nextElementSibling;
 
-  await enviarCantidad(idProducto, nuevaCantidad);
+    let cantidadActual = parseInt(input.value) || 1;
+    const nuevaCantidad = cantidadActual + delta;
+    if (nuevaCantidad < 1) return;
+
+    _actualizando.add(idProducto);
+    btnMenos.disabled = btnMas.disabled = input.disabled = true;
+    btnMenos.classList.add('opacity-30', 'cursor-not-allowed');
+    btnMas.classList.add('opacity-30', 'cursor-not-allowed');
+
+    try {
+        await enviarCantidad(idProducto, nuevaCantidad);
+    } finally {
+        btnMenos.disabled = btnMas.disabled = input.disabled = false;
+        btnMenos.classList.remove('opacity-30', 'cursor-not-allowed');
+        btnMas.classList.remove('opacity-30', 'cursor-not-allowed');
+        _actualizando.delete(idProducto);
+    }
 }
 
-// Texto
+// Input texto
 async function inputCantidad(idProducto) {
-  const input = document.getElementById('qty-' + idProducto);
-  let cantidad = parseInt(input.value);
+    if (_actualizando.has(idProducto)) return;
 
-  if (!cantidad || cantidad < 1) cantidad = 1;
+    const input = document.getElementById('qty-' + idProducto);
+    let cantidad = parseInt(input.value);
+    if (!cantidad || cantidad < 1) cantidad = 1;
+    input.value = cantidad;
 
-  await enviarCantidad(idProducto, cantidad);
+    _actualizando.add(idProducto);
+    try {
+        await enviarCantidad(idProducto, cantidad);
+    } finally {
+        _actualizando.delete(idProducto);
+    }
 }
 
 async function enviarCantidad(idProducto, cantidad) {
