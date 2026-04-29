@@ -11,6 +11,8 @@ router.get("/detalle/:id_orden",cartCount ,ordenesController.getDetalleOrden);
 // Registrar Orden
 router.post("/registrar", ordenesController.registrarOrden);
 
+router.get('/exportar-historial', ordenesController.exportarHistorialPedidosExcel);
+
 // Cancelar Orden
 router.post("/cancelar/:id_orden", ordenesController.postCancelarOrden);
 

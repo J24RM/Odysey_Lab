@@ -6,6 +6,7 @@ const supabase = require('../utils/supabase');
 const PDFDocument = require('pdfkit');
 const SVGtoPDF = require('svg-to-pdfkit');
 const path = require('path');
+const ExcelJS = require('exceljs');
 const fs = require('fs');
 const { log } = require('../utils/logger');
 const { Resend } = require('resend');
@@ -429,34 +430,7 @@ exports.getPdfOrden = async (req, res) => {
                    .fill(LIGHT_BLUE);
             }
 
-            // Imagen del producto (solo archivos locales de /uploads/)
-            let imgDrawn = false;
-            if (prod.url_imagen) {
-                try {
-                    let imgPath = null;
-                    if (prod.url_imagen.startsWith('/uploads/')) {
-                        imgPath = path.join(__dirname, '..', prod.url_imagen);
-                    }
-                    if (imgPath && fs.existsSync(imgPath)) {
-                        doc.image(imgPath, MARGIN + 4, py - rowPad + (rowH - imgSize) / 2, {
-                            width: imgSize, height: imgSize, fit: [imgSize, imgSize]
-                        });
-                        imgDrawn = true;
-                    }
-                } catch (_) { /* imagen no disponible, continuar */ }
-            }
-
-            // Placeholder si no hay imagen
-            if (!imgDrawn) {
-                doc.roundedRect(MARGIN + 4, py - rowPad + (rowH - imgSize) / 2, imgSize, imgSize, 4)
-                   .lineWidth(0.5).strokeColor('#CBD5E1').fillAndStroke('#F1F5F9', '#CBD5E1');
-                doc.fontSize(7).font('Helvetica').fillColor(GRAY)
-                   .text('Sin img', MARGIN + 4, py - rowPad + (rowH - imgSize) / 2 + imgSize / 2 - 4, {
-                       width: imgSize, align: 'center'
-                   });
-            }
-
-            const textX = MARGIN + imgSize + 14;
+            const textX = MARGIN + imgSize;
             const textW = PW - MARGIN * 2 - imgSize - 120;
 
             // Nombre del producto
@@ -499,3 +473,352 @@ exports.getPdfOrden = async (req, res) => {
     }
 };
 
+
+exports.exportarHistorialPedidosExcel = async (request, response) => {
+    try {
+        const usuarioId = request.session.usuario;
+
+        // ── Pedidos del usuario ───────────────────────────────────────────────
+        const { data: pedidos, error: pedidosError } = await supabase
+            .from('orden')
+            .select(`
+                *,
+                sucursal (id_sucursal, nombre_sucursal, edo, deleg_municipio)
+            `)
+            .eq('id_usuario', usuarioId)
+            .order('fecha_realizada', { ascending: false });
+
+        if (pedidosError) throw pedidosError;
+
+        // ── Detalles de cada orden ────────────────────────────────────────────
+        const detallesPorOrden = await Promise.all(
+            pedidos.map(async (p) => {
+                const { data: detalles, error } = await supabase
+                    .from('detalle_orden')
+                    .select(`
+                        *,
+                        producto (nombre, clave, precio_unitario, peso)
+                    `)
+                    .eq('id_orden', p.id_orden);
+
+                if (error) throw error;
+                return detalles;
+            })
+        );
+
+        // ── Paleta de colores ─────────────────────────────────────────────────
+        const C = {
+            TITLE_BG:  'FF1F3864',
+            HEADER_BG: 'FF2E75B6',
+            HEADER_FG: 'FFFFFFFF',
+            ROW_WHITE: 'FFFFFFFF',
+            ROW_LIGHT: 'FFDCE6F1',
+            TOTAL_BG:  'FF1F3864',
+            TOTAL_FG:  'FFFFFFFF',
+            BORDER:    'FFBDD7EE',
+            GREEN:     'FF1F7A45',
+            RED:       'FFC00000',
+            META_BG:   'FFF2F8FC',
+            META_FG:   'FF444444',
+        };
+
+        const thinBorder = {
+            top:    { style: 'thin', color: { argb: C.BORDER } },
+            bottom: { style: 'thin', color: { argb: C.BORDER } },
+            left:   { style: 'thin', color: { argb: C.BORDER } },
+            right:  { style: 'thin', color: { argb: C.BORDER } },
+        };
+        const mediumBottom = {
+            ...thinBorder,
+            bottom: { style: 'medium', color: { argb: C.TITLE_BG } },
+        };
+
+        const fechaExport = new Date().toLocaleDateString('es-MX', {
+            year: 'numeric', month: 'long', day: 'numeric',
+            hour: '2-digit', minute: '2-digit',
+        });
+
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = 'PPG Industries';
+
+        // ════════════════════════════════════════════════════════════════════════
+        //  HOJA 1 — Historial general
+        // ════════════════════════════════════════════════════════════════════════
+        const wsH = workbook.addWorksheet('Historial', {
+            views: [{ state: 'frozen', ySplit: 3 }],
+        });
+
+        wsH.columns = [
+            { key: 'folio',    width: 14 },
+            { key: 'fecha',    width: 22 },
+            { key: 'sucursal', width: 30 },
+            { key: 'subtotal', width: 18 },
+            { key: 'total',    width: 18 },
+            { key: 'estado',   width: 16 },
+        ];
+
+        // Título
+        wsH.mergeCells('A1:F1');
+        const hTitle     = wsH.getCell('A1');
+        hTitle.value     = 'HISTORIAL DE PEDIDOS — PPG Industries';
+        hTitle.font      = { name: 'Arial', bold: true, size: 14, color: { argb: C.HEADER_FG } };
+        hTitle.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.TITLE_BG } };
+        hTitle.alignment = { horizontal: 'center', vertical: 'middle' };
+        wsH.getRow(1).height = 32;
+
+        // Metadatos
+        wsH.mergeCells('A2:C2');
+        const metaL     = wsH.getCell('A2');
+        metaL.value     = `Exportado el: ${fechaExport}`;
+        metaL.font      = { name: 'Arial', size: 9, color: { argb: C.META_FG } };
+        metaL.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.META_BG } };
+        metaL.alignment = { horizontal: 'left', vertical: 'middle' };
+
+        wsH.mergeCells('D2:F2');
+        const metaR     = wsH.getCell('D2');
+        metaR.value     = `Total de órdenes: ${pedidos.length}`;
+        metaR.font      = { name: 'Arial', size: 9, color: { argb: C.META_FG } };
+        metaR.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.META_BG } };
+        metaR.alignment = { horizontal: 'right', vertical: 'middle' };
+        wsH.getRow(2).height = 16;
+
+        // Cabeceras
+        const hHeaders = ['Folio', 'Fecha', 'Sucursal', 'Subtotal', 'Total (IVA)', 'Estado'];
+        const hRow3 = wsH.getRow(3);
+        hRow3.height = 22;
+        hHeaders.forEach((h, i) => {
+            const cell     = hRow3.getCell(i + 1);
+            cell.value     = h;
+            cell.font      = { name: 'Arial', bold: true, size: 11, color: { argb: C.HEADER_FG } };
+            cell.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.HEADER_BG } };
+            cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+            cell.border    = mediumBottom;
+        });
+
+        // Datos
+        pedidos.forEach((p, idx) => {
+            const bgColor  = idx % 2 === 0 ? C.ROW_WHITE : C.ROW_LIGHT;
+            const folio    = p.folio || ('A' + String(p.id_orden).padStart(4, '0'));
+            const fecha    = p.fecha_realizada
+                ? new Date(p.fecha_realizada).toLocaleDateString('es-MX',
+                    { day: '2-digit', month: 'long', year: 'numeric' })
+                : 'Sin fecha';
+            const subtotal = parseFloat(p.subtotal || 0);
+            const estado   = (p.estado || '').charAt(0).toUpperCase() + (p.estado || '').slice(1);
+
+            const row = wsH.addRow({
+                folio,
+                fecha,
+                sucursal: p.sucursal?.nombre_sucursal || 'Sin sucursal',
+                subtotal,
+                total:    subtotal * 1.16,
+                estado,
+            });
+            row.height = 20;
+
+            row.eachCell((cell, colNum) => {
+                cell.font      = { name: 'Arial', size: 10 };
+                cell.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+                cell.alignment = { vertical: 'middle', horizontal: colNum === 3 ? 'left' : 'center' };
+                cell.border    = thinBorder;
+            });
+
+            row.getCell('subtotal').numFmt = '"$"#,##0.00';
+            row.getCell('total').numFmt    = '"$"#,##0.00';
+
+            const estadoCell  = row.getCell('estado');
+            const colorEstado = estado === 'Cancelada'  ? C.RED :
+                                estado === 'Confirmada' ? C.GREEN : C.META_FG;
+            estadoCell.font = { name: 'Arial', size: 10, bold: true, color: { argb: colorEstado } };
+        });
+
+        // Fila de totales
+        const hDataStart = 4;
+        const hDataEnd   = 3 + pedidos.length;
+
+        wsH.mergeCells(`A${hDataEnd + 1}:C${hDataEnd + 1}`);
+        const hTotalRow  = wsH.getRow(hDataEnd + 1);
+        hTotalRow.height = 22;
+
+        const hTotalLabel     = hTotalRow.getCell(1);
+        hTotalLabel.value     = 'TOTAL';
+        hTotalLabel.font      = { name: 'Arial', bold: true, size: 11, color: { argb: C.TOTAL_FG } };
+        hTotalLabel.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.TOTAL_BG } };
+        hTotalLabel.alignment = { horizontal: 'center', vertical: 'middle' };
+
+        [4, 5].forEach(col => {
+            const cell      = hTotalRow.getCell(col);
+            const colLetter = wsH.getColumn(col).letter;
+            cell.value      = { formula: `=SUM(${colLetter}${hDataStart}:${colLetter}${hDataEnd})` };
+            cell.font       = { name: 'Arial', bold: true, size: 11, color: { argb: C.TOTAL_FG } };
+            cell.fill       = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.TOTAL_BG } };
+            cell.numFmt     = '"$"#,##0.00';
+            cell.alignment  = { horizontal: 'center', vertical: 'middle' };
+            cell.border     = thinBorder;
+        });
+
+        [2, 3, 6].forEach(col => {
+            hTotalRow.getCell(col).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.TOTAL_BG } };
+        });
+
+        // ════════════════════════════════════════════════════════════════════════
+        //  HOJAS DE DETALLE — una pestaña por orden
+        // ════════════════════════════════════════════════════════════════════════
+        pedidos.forEach((p, idx) => {
+            const detalles   = detallesPorOrden[idx] || [];
+            const folio      = p.folio || ('A' + String(p.id_orden).padStart(4, '0'));
+            const fechaOrden = p.fecha_realizada
+                ? new Date(p.fecha_realizada).toLocaleDateString('es-MX',
+                    { day: '2-digit', month: 'long', year: 'numeric' })
+                : 'Sin fecha';
+
+            const wsD = workbook.addWorksheet(folio, {
+                views: [{ state: 'frozen', ySplit: 9 }],
+            });
+
+            wsD.columns = [
+                { key: 'nombre',   width: 40 },
+                { key: 'sku',      width: 16 },
+                { key: 'cantidad', width: 13 },
+                { key: 'precio',   width: 18 },
+                { key: 'subtotal', width: 18 },
+                { key: 'peso',     width: 13 },
+            ];
+
+            // Título
+            wsD.mergeCells('A1:F1');
+            const dTitle     = wsD.getCell('A1');
+            dTitle.value     = 'DETALLE DE ORDEN — PPG Industries';
+            dTitle.font      = { name: 'Arial', bold: true, size: 14, color: { argb: C.HEADER_FG } };
+            dTitle.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.TITLE_BG } };
+            dTitle.alignment = { horizontal: 'center', vertical: 'middle' };
+            wsD.getRow(1).height = 32;
+
+            // Bloque de metadatos (filas 2–7)
+            const subtotalVal = parseFloat(p.subtotal || 0);
+            const estado      = (p.estado || '').charAt(0).toUpperCase() + (p.estado || '').slice(1);
+            const meta = [
+                ['Folio:',           folio],
+                ['Fecha:',           fechaOrden],
+                ['Sucursal:',        p.sucursal?.nombre_sucursal || 'Sin sucursal'],
+                ['Subtotal:',        subtotalVal],
+                ['Total (IVA 16%):', subtotalVal * 1.16],
+                ['Estado:',          estado],
+            ];
+
+            meta.forEach(([label, val], i) => {
+                const rowNum = i + 2;
+                wsD.mergeCells(`B${rowNum}:F${rowNum}`);
+
+                const lCell     = wsD.getCell(`A${rowNum}`);
+                lCell.value     = label;
+                lCell.font      = { name: 'Arial', bold: true, size: 10, color: { argb: C.TITLE_BG } };
+                lCell.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.META_BG } };
+                lCell.alignment = { horizontal: 'right', vertical: 'middle' };
+                lCell.border    = thinBorder;
+
+                const vCell     = wsD.getCell(`B${rowNum}`);
+                vCell.value     = val;
+                vCell.font      = { name: 'Arial', size: 10, color: { argb: 'FF222222' } };
+                vCell.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.ROW_WHITE } };
+                vCell.alignment = { horizontal: 'left', vertical: 'middle' };
+                vCell.border    = thinBorder;
+
+                if (label === 'Subtotal:' || label === 'Total (IVA 16%):') {
+                    vCell.numFmt = '"$"#,##0.00';
+                }
+                if (label === 'Estado:') {
+                    const colorEstado = val === 'Cancelada'  ? C.RED :
+                                        val === 'Confirmada' ? C.GREEN : C.META_FG;
+                    vCell.font = { name: 'Arial', size: 10, bold: true, color: { argb: colorEstado } };
+                }
+                wsD.getRow(rowNum).height = 18;
+            });
+
+            wsD.getRow(8).height = 6;
+
+            // Cabeceras de productos
+            const dHeaders = ['Producto', 'SKU', 'Cantidad', 'Precio Unitario', 'Subtotal', 'Peso (Kg)'];
+            const dHeaderRow = wsD.getRow(9);
+            dHeaderRow.height = 22;
+            dHeaders.forEach((h, i) => {
+                const cell     = dHeaderRow.getCell(i + 1);
+                cell.value     = h;
+                cell.font      = { name: 'Arial', bold: true, size: 11, color: { argb: C.HEADER_FG } };
+                cell.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.HEADER_BG } };
+                cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                cell.border    = mediumBottom;
+            });
+
+            // Filas de productos
+            detalles.forEach((d, dIdx) => {
+                const bgColor = dIdx % 2 === 0 ? C.ROW_WHITE : C.ROW_LIGHT;
+                const precio  = parseFloat(d.producto?.precio_unitario || 0);
+                const peso    = parseFloat(d.producto?.peso || 0) * d.cantidad;
+
+                const dRow = wsD.addRow({
+                    nombre:   d.producto?.nombre || 'Producto Desconocido',
+                    sku:      d.producto?.clave  || 'N/A',
+                    cantidad: d.cantidad,
+                    precio,
+                    subtotal: precio * d.cantidad,
+                    peso,
+                });
+                dRow.height = 20;
+
+                dRow.eachCell((cell, colNum) => {
+                    cell.font      = { name: 'Arial', size: 10 };
+                    cell.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColor } };
+                    cell.alignment = { vertical: 'middle', horizontal: colNum === 1 ? 'left' : 'center', wrapText: colNum === 1 };
+                    cell.border    = thinBorder;
+                });
+
+                dRow.getCell('precio').numFmt   = '"$"#,##0.00';
+                dRow.getCell('subtotal').numFmt = '"$"#,##0.00';
+            });
+
+            // Fila de totales
+            const dDataStart = 10;
+            const dDataEnd   = 9 + detalles.length;
+
+            wsD.mergeCells(`A${dDataEnd + 1}:D${dDataEnd + 1}`);
+            const dTotalRow  = wsD.getRow(dDataEnd + 1);
+            dTotalRow.height = 22;
+
+            const dTotalLabel     = dTotalRow.getCell(1);
+            dTotalLabel.value     = 'TOTAL';
+            dTotalLabel.font      = { name: 'Arial', bold: true, size: 11, color: { argb: C.TOTAL_FG } };
+            dTotalLabel.fill      = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.TOTAL_BG } };
+            dTotalLabel.alignment = { horizontal: 'center', vertical: 'middle' };
+
+            [5, 6].forEach(col => {
+                const cell      = dTotalRow.getCell(col);
+                const colLetter = wsD.getColumn(col).letter;
+                cell.value      = { formula: `=SUM(${colLetter}${dDataStart}:${colLetter}${dDataEnd})` };
+                cell.font       = { name: 'Arial', bold: true, size: 11, color: { argb: C.TOTAL_FG } };
+                cell.fill       = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.TOTAL_BG } };
+                cell.alignment  = { horizontal: 'center', vertical: 'middle' };
+                cell.border     = thinBorder;
+                if (col === 5) cell.numFmt = '"$"#,##0.00';
+            });
+
+            [2, 3, 4].forEach(col => {
+                dTotalRow.getCell(col).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: C.TOTAL_BG } };
+            });
+        });
+
+        // ── Enviar respuesta ──────────────────────────────────────────────────
+        const fechaArchivo = new Date().toISOString().slice(0, 10);
+        response.setHeader('Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        response.setHeader('Content-Disposition',
+            `attachment; filename="historial_pedidos_${fechaArchivo}.xlsx"`);
+
+        await workbook.xlsx.write(response);
+        response.end();
+
+    } catch (error) {
+        console.error('Error exportando historial de pedidos:', error);
+        response.status(500).send('Error al exportar');
+    }
+};

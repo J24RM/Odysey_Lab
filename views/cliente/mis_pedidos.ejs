@@ -69,7 +69,6 @@ window.perfilUsuario = {
             <div class="flex justify-between items-center mb-4">
                 <h5 class="font-bold text-lg mb-0 text-gray-800">Desglose de orden:</h5>
                 <div class="flex gap-2">
-                    <button class="btn btn-exportar-small shadow-sm border rounded px-3 py-1 bg-white hover:bg-gray-50 text-sm font-semibold text-gray-800">Exportar</button>
                     <a id="btn-descargar-pdf"
                        href="#"
                        target="_blank"
@@ -194,7 +193,7 @@ window.perfilUsuario = {
                 <% const estado = pedido.estado.charAt(0).toUpperCase() + pedido.estado.slice(1); %>
                 <% const total = pedido.subtotal * 1.16; %>
                 <div class="pedidos-row" data-id="<%= pedido.id_orden %>" data-fecha="<%= pedido.fecha_realizada || '' %>" data-sucursal="<%= pedido.sucursal ? pedido.sucursal.nombre_sucursal : 'Sin sucursal' %>" style="cursor:pointer;">
-                    <span><%= String(pedido.id_orden).padStart(4, '0') %></span>
+                    <span><%= pedido.folio%></span>
                     <span><%= fecha %></span>
                     <span><%= pedido.sucursal ? pedido.sucursal.nombre_sucursal : 'Sin sucursal' %></span>
                     <span>$<%= total ? total.toLocaleString('es-MX', { minimumFractionDigits: 2 }) : '0.00' %></span>
@@ -298,80 +297,6 @@ document.querySelector('.pedidos-search input').addEventListener('input', aplica
 // Filtro por periodo de tiempo
 document.querySelector('.select-filter').addEventListener('change', aplicarFiltros);
 
-document.querySelector('.btn-exportar').addEventListener('click', async function() {
-    const btn = this;
-    const originalText = btn.innerText;
-    btn.innerText = 'Generando ZIP...';
-    btn.disabled = true;
-
-    try {
-        const zip = new JSZip();
-        const fechaExport = new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-
-        // Generar CSV general — se usan TODOS los pedidos (textContent funciona en filas ocultas)
-        const rows = document.querySelectorAll('.pedidos-row');
-        let csvMain = '"HISTORIAL DE PEDIDOS - PPG Industries"\n';
-        csvMain += `"Exportado el:","${fechaExport}"\n`;
-        csvMain += `"Total de órdenes:","${rows.length}"\n\n`;
-        csvMain += '"Orden","Fecha","Cliente","Total","Estatus"\n';
-        rows.forEach(row => {
-            const data = Array.from(row.querySelectorAll('span')).map(s => s.textContent.trim());
-            csvMain += `"${data[0]}","${data[1]}","${data[2]}","${data[3]}","${data[4]}"\n`;
-        });
-        zip.file("historial_pedidos.csv", "\uFEFF" + csvMain);
-
-        const detallesFolder = zip.folder("Detalles_Ordenes");
-
-        // Fetch detalles de cada orden concurrentemente
-        const fetchPromises = Array.from(rows).map(async (row) => {
-            const idOrden = row.dataset.id;
-            const res = await fetch(`/orden/detalle/${idOrden}`);
-            if (!res.ok) throw new Error('Error al fetchear detalle');
-            const { orden, detalles } = await res.json();
-
-            const folio = 'A' + String(orden.id_orden).padStart(4, '0');
-            const fechaOrden = orden.fecha_realizada
-                ? new Date(orden.fecha_realizada).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })
-                : 'Sin fecha';
-            const subtotalOrden = orden.subtotal
-                ? parseFloat(orden.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2 })
-                : '0.00';
-
-            let csvDetail = `"DETALLE DE ORDEN - PPG Industries"\n`;
-            csvDetail += `"Folio:","${folio}"\n`;
-            csvDetail += `"Fecha:","${fechaOrden}"\n`;
-            csvDetail += `"Subtotal:","$${subtotalOrden}"\n`;
-            csvDetail += `"Exportado el:","${fechaExport}"\n\n`;
-            csvDetail += '"Producto","SKU","Unidades","Precio Unitario","Subtotal"\n';
-            detalles.forEach(d => {
-                const nombre = (d.producto && d.producto.nombre) ? d.producto.nombre.replace(/"/g, '""') : 'Producto Desconocido';
-                const sku = (d.producto && d.producto.clave) ? d.producto.clave : 'N/A';
-                const precio = d.producto ? parseFloat(d.producto.precio_unitario || 0) : 0;
-                const total = precio * d.cantidad;
-                csvDetail += `"${nombre}","${sku}","${d.cantidad}","$${precio.toFixed(2)}","$${total.toFixed(2)}"\n`;
-            });
-
-            detallesFolder.file(`detalle_${folio}.csv`, "\uFEFF" + csvDetail);
-        });
-
-        await Promise.all(fetchPromises);
-
-        // Generar el archivo ZIP
-        const blob = await zip.generateAsync({ type: 'blob' });
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = 'historial_y_detalles.zip';
-        link.click();
-
-    } catch (err) {
-        console.error("Error generando ZIP:", err);
-        alert("Ocurrió un error al descargar el historial completo.");
-    } finally {
-        btn.innerText = originalText;
-        btn.disabled = false;
-    }
-});
-
 // Modal logic
 const modal = document.getElementById('modalDetalleOrden');
 const closeBtn = modal.querySelector('.btn-close-modal');
@@ -396,6 +321,7 @@ document.querySelector('.pedidos-table-body').addEventListener('click', async (e
     {
         const idOrden = row.dataset.id;
         try {
+            showLoader();
             const res = await fetch(`/orden/detalle/${idOrden}`);
             const { orden, detalles } = await res.json();
             console.log(detalles);
@@ -510,6 +436,9 @@ document.querySelector('.pedidos-table-body').addEventListener('click', async (e
                             <h6 class="font-medium text-gray-700 mb-2 text-sm sm:max-w-[90%] pointer-events-auto h-auto">
                                 <a href="/product/${d.id_producto}" class="hover:underline">${d.producto.nombre}</a>
                             </h6>
+                            <h6 class="font-medium text-gray-700 mb-2 text-sm sm:max-w-[90%] pointer-events-auto h-auto">
+                                SKU: ${d.producto.clave}
+                            </h6>
                             <div class="flex items-center justify-center sm:justify-start gap-2">
                                 <div class="cantidad-box text-sm text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded">
                                     Unidades: ${d.cantidad}
@@ -528,36 +457,12 @@ document.querySelector('.pedidos-table-body').addEventListener('click', async (e
             // Enlace de descarga PDF
             document.getElementById('btn-descargar-pdf').href = `/orden/pdf/${idOrden}`;
 
-            // Exportar detalle de esta orden como CSV
-            modal.querySelector('.btn-exportar-small').onclick = () => {
-                const folioModal = document.getElementById('modal-folio').textContent;
-                const fechaModal = document.getElementById('modal-fecha').textContent;
-                const totalModal = document.getElementById('modal-total').textContent;
-                const subtotalModal = document.getElementById('modal-subtotal').textContent;
-                let csv = `"DETALLE DE ORDEN - PPG Industries"\n`;
-                csv += `"Folio:","${folioModal}"\n`;
-                csv += `"Fecha:","${fechaModal}"\n`;
-                csv += `"Subtotal:","$${subtotalModal}"\n`;
-                csv += `"Total (IVA incluido):","$${totalModal}"\n\n`;
-                csv += '"Producto","SKU","Unidades","Precio Unitario","Subtotal"\n';
-                detalles.forEach(d => {
-                    const nombre = (d.producto && d.producto.nombre) ? d.producto.nombre.replace(/"/g, '""') : 'Producto Desconocido';
-                    const sku = (d.producto && d.producto.clave) ? d.producto.clave : 'N/A';
-                    const precio = d.producto ? parseFloat(d.producto.precio_unitario || 0) : 0;
-                    const totalProd = precio * d.cantidad;
-                    csv += `"${nombre}","${sku}","${d.cantidad}","$${precio.toFixed(2)}","$${totalProd.toFixed(2)}"\n`;
-                });
-                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `detalle_${folioModal}.csv`;
-                link.click();
-            };
-
             modal.classList.remove('hidden');
             modal.style.display = 'flex';
         } catch (err) {
             console.error('Error cargando detalle:', err);
+        } finally {
+            hideLoader();
         }
     }
 });
@@ -591,6 +496,11 @@ document.addEventListener('DOMContentLoaded', () => {
             modalSuccess.classList.add('hidden');
         });
     }
+});
+
+document.querySelector('.btn-exportar').addEventListener('click', () => {
+    const params = new URLSearchParams(window.location.search);
+    window.location.href = `/orden/exportar-historial`;
 });
 
 </script>
