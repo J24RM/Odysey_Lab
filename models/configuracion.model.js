@@ -20,6 +20,7 @@ module.exports = class Configuracion {
         const { data, error } = await supabase
             .from('campania')
             .select('*')
+            .eq('activo', true)
             .order('id_campania', { ascending: false })
             .limit(1)
             .maybeSingle();
@@ -153,5 +154,43 @@ module.exports = class Configuracion {
             if (error) throw error;
             return data;
         }
+    }
+
+    // Activa los productos de una campaña
+    static async activarProductosDeCampania(id_campania) {
+        const { data: relaciones, error: errRel } = await supabase
+            .from('producto_campania')
+            .select('id_producto')
+            .eq('id_campania', id_campania);
+        
+        if (errRel) throw errRel;
+        if (!relaciones || relaciones.length === 0) return;
+
+        const ids = relaciones.map(r => r.id_producto);
+        const { error } = await supabase
+            .from('producto')
+            .update({ activo: true })
+            .in('id_producto', ids);
+            
+        if (error) throw error;
+    }
+
+    // Desactiva los productos de una campaña
+    static async desactivarProductosDeCampania(id_campania) {
+        const { data: relaciones, error: errRel } = await supabase
+            .from('producto_campania')
+            .select('id_producto')
+            .eq('id_campania', id_campania);
+        
+        if (errRel) throw errRel;
+        if (!relaciones || relaciones.length === 0) return;
+
+        const ids = relaciones.map(r => r.id_producto);
+        const { error } = await supabase
+            .from('producto')
+            .update({ activo: false })
+            .in('id_producto', ids);
+            
+        if (error) throw error;
     }
 };

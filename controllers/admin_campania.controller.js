@@ -187,6 +187,13 @@ exports.postCambiarEstado = async (req, res) => {
         }
 
         await Configuracion.actualizarCampania(parseInt(id_campania), { activo: quiereActiva });
+        
+        if (quiereActiva) {
+            await Configuracion.activarProductosDeCampania(parseInt(id_campania));
+        } else {
+            await Configuracion.desactivarProductosDeCampania(parseInt(id_campania));
+        }
+        
         log('ADMIN', 'CAMPANIA', `id: ${req.session.usuario} — estado campaña ${id_campania}: ${quiereActiva}`);
         res.redirect('/admin/configurar_campania?mensaje=estado_ok');
     } catch (err) {
@@ -205,6 +212,7 @@ exports.postActivarCampania = async (req, res) => {
             return res.redirect('/admin/configurar_campania?error=ya_activa');
         }
         await Configuracion.actualizarCampania(parseInt(id_campania), { activo: true });
+        await Configuracion.activarProductosDeCampania(parseInt(id_campania));
         log('ADMIN', 'CAMPANIA', `id: ${req.session.usuario} — campaña ${id_campania} activada`);
         res.redirect('/admin/configurar_campania?mensaje=campania_activada');
     } catch (err) {
