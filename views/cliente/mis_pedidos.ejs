@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/img/PPG_Logo2.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/style_cliente_pedidos.css">
@@ -42,12 +43,15 @@ window.perfilUsuario = {
                         <p class="mb-0 font-bold">Fecha: <span id="modal-fecha" class="font-normal text-gray-700"></span></p>
                     </div>
                     <div class="md:w-5/12">
-                        <p class="mb-1 font-bold">Sucursal: <span class="font-normal text-gray-700">Jurica</span></p>
+                        <p class="mb-1 font-bold">Sucursal: <span id="modal-sucursal" class="font-normal text-gray-700"></span></p>
                         <p class="mb-0 font-bold">Total de productos: <span id="modal-total-productos" class="font-normal text-gray-700"></span></p>
                     </div>
                     <div class="md:w-2/4 md:text-right">
                         <p class="mb-1 font-bold flex items-center md:justify-end gap-2">
                             Estado de la orden: <span id="modal-estado" class="status-pill inline-block px-2 py-1 text-[11px] rounded-full"></span>
+                        </p>
+                        <p class="mb-0 font-bold flex items-center md:justify-end gap-2">
+                            Peso Total:  <span id="modal-peso" class="font-normal text-gray-500"></span>
                         </p>
                         <p class="mb-0 font-bold flex items-center md:justify-end gap-2">
                             Subtotal: <span id="modal-subtotal" class="font-normal text-gray-500"></span>
@@ -65,7 +69,6 @@ window.perfilUsuario = {
             <div class="flex justify-between items-center mb-4">
                 <h5 class="font-bold text-lg mb-0 text-gray-800">Desglose de orden:</h5>
                 <div class="flex gap-2">
-                    <button class="btn btn-exportar-small shadow-sm border rounded px-3 py-1 bg-white hover:bg-gray-50 text-sm font-semibold text-gray-800">Exportar</button>
                     <a id="btn-descargar-pdf"
                        href="#"
                        target="_blank"
@@ -122,7 +125,7 @@ window.perfilUsuario = {
 
 <!-- Contenido principal -->
 <div class="pedidos-container flex-1">
-    <h1 class="pedidos-titulo">Ordenes</h1>
+    <h1 class="pedidos-titulo">Mis Órdenes</h1>
 
     <!-- Barra de herramientas -->
     <div class="pedidos-toolbar">
@@ -162,11 +165,11 @@ window.perfilUsuario = {
             <span class="stat-value"><%= ordenesDe_hoy %></span>
         </div>
         <div class="stat-item">
-            <span class="stat-label">Ordenes Totales</span>
+            <span class="stat-label">Órdenes Totales</span>
             <span class="stat-value"><%= pedidos.length %></span>
         </div>
         <div class="stat-item">
-            <span class="stat-label">Ordenes confirmadas</span>
+            <span class="stat-label">Órdenes confirmadas</span>
             <span class="stat-value"><%= ordenesConfirmadas %></span>
         </div>
     </div>
@@ -176,25 +179,23 @@ window.perfilUsuario = {
         <div class="pedidos-table-head">
             <span>Orden</span>
             <span>Fecha</span>
-            <span>Cliente</span>
+            <span>Sucursal</span>
             <span>Total</span>
             <span class="text-center">Estatus de pedido</span>
         </div>
 
         <div class="pedidos-table-body">
-            <% if (pedidos.length === 0) { %>
-                <div class="py-16 text-center text-gray-500 font-medium">
-                    No tienes órdenes registradas aún.
-                </div>
-            <% } %>
+            <div id="no-orders-msg" class="py-16 text-center text-gray-500 font-medium<%= pedidos.length === 0 ? '' : ' hidden' %>">
+                No tienes órdenes registradas aún.
+            </div>
             <% pedidos.forEach((pedido) => { %>
                 <% const fecha = pedido.fecha_realizada ? new Date(pedido.fecha_realizada).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Sin fecha'; %>
                 <% const estado = pedido.estado.charAt(0).toUpperCase() + pedido.estado.slice(1); %>
-                <% const total = pedido.subtotal * 1.16; %> 
-                <div class="pedidos-row" data-id="<%= pedido.id_orden %>" data-fecha="<%= pedido.fecha_realizada || '' %>" style="cursor:pointer;">
-                    <span><%= String(pedido.id_orden).padStart(4, '0') %></span>
+                <% const total = pedido.subtotal * 1.16; %>
+                <div class="pedidos-row" data-id="<%= pedido.id_orden %>" data-fecha="<%= pedido.fecha_realizada || '' %>" data-sucursal="<%= pedido.sucursal ? pedido.sucursal.nombre_sucursal : 'Sin sucursal' %>" style="cursor:pointer;">
+                    <span><%= pedido.folio%></span>
                     <span><%= fecha %></span>
-                    <span>Concesionario Jurica</span>
+                    <span><%= pedido.sucursal ? pedido.sucursal.nombre_sucursal : 'Sin sucursal' %></span>
                     <span>$<%= total ? total.toLocaleString('es-MX', { minimumFractionDigits: 2 }) : '0.00' %></span>
                     <span class="status-cell">
                         <span class="status-pill <%= estado === 'Pendiente' ? 'status-pending' : estado === 'Cancelada' ? 'status-cancelled' : 'status-confirmed' %>">
@@ -204,6 +205,13 @@ window.perfilUsuario = {
                 </div>
             <% }); %>
         </div>
+    </div>
+
+    <!-- Paginación -->
+    <div id="paginacion" class="pedidos-paginacion">
+        <button id="btn-prev">&#8592; Anterior</button>
+        <span id="info-pagina">Página 1 de 1</span>
+        <button id="btn-next">Siguiente &#8594;</button>
     </div>
 </div>
 
@@ -224,112 +232,70 @@ document.getElementById('btnConfirmarCancelacion').addEventListener('click', () 
     if (form) form.submit();
 });
 
-// Búsqueda en historial
-document.querySelector('.pedidos-search input').addEventListener('input', function () {
-    const query = this.value.trim().toLowerCase();
-    document.querySelectorAll('.pedidos-row').forEach(row => {
-        const texto = row.innerText.toLowerCase();
-        row.style.display = texto.includes(query) ? '' : 'none';
-    });
-});
+// ─── Paginación ──────────────────────────────────────────────────────────────
 
-// Filtro por periodo de tiempo
-document.querySelector('.select-filter').addEventListener('change', function () {
-    const valor = this.value;
-    const ahora = new Date();
+const PAGE_SIZE = 20;
+let currentPage  = 1;
+let visibleRows  = [];
+
+function calcularVisibles() {
+    const query = document.querySelector('.pedidos-search input').value.trim().toLowerCase();
+    const valor  = document.querySelector('.select-filter').value;
+    const ahora  = new Date();
     let diasAtras = null;
-
-    if (valor === '7 días')       diasAtras = 7;
-    else if (valor === '30 días') diasAtras = 30;
-    else if (valor === '90 días') diasAtras = 90;
+    if (valor === '7 días')        diasAtras = 7;
+    else if (valor === '30 días')  diasAtras = 30;
+    else if (valor === '90 días')  diasAtras = 90;
     else if (valor === 'Último año') diasAtras = 365;
 
-    document.querySelectorAll('.pedidos-row').forEach(row => {
-        const fechaISO = row.dataset.fecha;
-        if (!diasAtras || !fechaISO) {
-            row.style.display = '';
-            return;
+    return Array.from(document.querySelectorAll('.pedidos-row')).filter(row => {
+        if (query && !row.textContent.toLowerCase().includes(query)) return false;
+        if (diasAtras) {
+            const fechaISO = row.dataset.fecha;
+            if (fechaISO) {
+                const limite = new Date(ahora);
+                limite.setDate(ahora.getDate() - diasAtras);
+                if (new Date(fechaISO) < limite) return false;
+            }
         }
-        const fechaPedido = new Date(fechaISO);
-        const limite = new Date(ahora);
-        limite.setDate(ahora.getDate() - diasAtras);
-        row.style.display = fechaPedido >= limite ? '' : 'none';
+        return true;
     });
-});
+}
 
-document.querySelector('.btn-exportar').addEventListener('click', async function() {
-    const btn = this;
-    const originalText = btn.innerText;
-    btn.innerText = 'Generando ZIP...';
-    btn.disabled = true;
+function renderPagina(pagina) {
+    currentPage = pagina;
+    const todosRows = document.querySelectorAll('.pedidos-row');
+    todosRows.forEach(r => r.style.display = 'none');
 
-    try {
-        const zip = new JSZip();
-        const fechaExport = new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const inicio = (pagina - 1) * PAGE_SIZE;
+    visibleRows.slice(inicio, inicio + PAGE_SIZE).forEach(r => r.style.display = '');
 
-        // Generar CSV general
-        const rows = document.querySelectorAll('.pedidos-row');
-        let csvMain = '"HISTORIAL DE PEDIDOS - PPG Industries"\n';
-        csvMain += `"Exportado el:","${fechaExport}"\n`;
-        csvMain += `"Total de órdenes:","${rows.length}"\n\n`;
-        csvMain += '"Orden","Fecha","Cliente","Total","Estatus"\n';
-        rows.forEach(row => {
-            const data = Array.from(row.querySelectorAll('span')).map(s => s.innerText.trim());
-            csvMain += `"${data[0]}","${data[1]}","${data[2]}","${data[3]}","${data[4]}"\n`;
-        });
-        zip.file("historial_pedidos.csv", "\uFEFF" + csvMain);
+    const totalPaginas = Math.max(1, Math.ceil(visibleRows.length / PAGE_SIZE));
+    document.getElementById('info-pagina').textContent = `Página ${pagina} de ${totalPaginas}`;
+    document.getElementById('btn-prev').disabled = pagina === 1;
+    document.getElementById('btn-next').disabled = pagina >= totalPaginas;
 
-        const detallesFolder = zip.folder("Detalles_Ordenes");
+    const noMsg = document.getElementById('no-orders-msg');
+    noMsg.style.display = visibleRows.length === 0 ? '' : 'none';
 
-        // Fetch detalles de cada orden concurrentemente
-        const fetchPromises = Array.from(rows).map(async (row) => {
-            const idOrden = row.dataset.id;
-            const res = await fetch(`/orden/detalle/${idOrden}`);
-            if (!res.ok) throw new Error('Error al fetchear detalle');
-            const { orden, detalles } = await res.json();
+    // Ocultar controles si todo cabe en una página
+    document.getElementById('paginacion').style.display =
+        visibleRows.length > PAGE_SIZE ? 'flex' : 'none';
+}
 
-            const folio = 'A' + String(orden.id_orden).padStart(4, '0');
-            const fechaOrden = orden.fecha_realizada
-                ? new Date(orden.fecha_realizada).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })
-                : 'Sin fecha';
-            const subtotalOrden = orden.subtotal
-                ? parseFloat(orden.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2 })
-                : '0.00';
+function aplicarFiltros() {
+    visibleRows = calcularVisibles();
+    renderPagina(1);
+}
 
-            let csvDetail = `"DETALLE DE ORDEN - PPG Industries"\n`;
-            csvDetail += `"Folio:","${folio}"\n`;
-            csvDetail += `"Fecha:","${fechaOrden}"\n`;
-            csvDetail += `"Subtotal:","$${subtotalOrden}"\n`;
-            csvDetail += `"Exportado el:","${fechaExport}"\n\n`;
-            csvDetail += '"Producto","SKU","Unidades","Precio Unitario","Subtotal"\n';
-            detalles.forEach(d => {
-                const nombre = (d.producto && d.producto.nombre) ? d.producto.nombre.replace(/"/g, '""') : 'Producto Desconocido';
-                const sku = (d.producto && d.producto.clave) ? d.producto.clave : 'N/A';
-                const precio = d.producto ? parseFloat(d.producto.precio_unitario || 0) : 0;
-                const total = precio * d.cantidad;
-                csvDetail += `"${nombre}","${sku}","${d.cantidad}","$${precio.toFixed(2)}","$${total.toFixed(2)}"\n`;
-            });
+document.getElementById('btn-prev').addEventListener('click', () => renderPagina(currentPage - 1));
+document.getElementById('btn-next').addEventListener('click', () => renderPagina(currentPage + 1));
 
-            detallesFolder.file(`detalle_${folio}.csv`, "\uFEFF" + csvDetail);
-        });
+// Búsqueda en historial
+document.querySelector('.pedidos-search input').addEventListener('input', aplicarFiltros);
 
-        await Promise.all(fetchPromises);
-
-        // Generar el archivo ZIP
-        const blob = await zip.generateAsync({ type: 'blob' });
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = 'historial_y_detalles.zip';
-        link.click();
-
-    } catch (err) {
-        console.error("Error generando ZIP:", err);
-        alert("Ocurrió un error al descargar el historial completo.");
-    } finally {
-        btn.innerText = originalText;
-        btn.disabled = false;
-    }
-});
+// Filtro por periodo de tiempo
+document.querySelector('.select-filter').addEventListener('change', aplicarFiltros);
 
 // Modal logic
 const modal = document.getElementById('modalDetalleOrden');
@@ -349,17 +315,26 @@ modal.addEventListener('click', (e) => {
     if (e.target === modal) cerrarModalDetalle();
 });
 
-document.querySelectorAll('.pedidos-row').forEach(row => {
-    row.addEventListener('click', async () => {
+document.querySelector('.pedidos-table-body').addEventListener('click', async (e) => {
+    const row = e.target.closest('.pedidos-row');
+    if (!row) return;
+    {
         const idOrden = row.dataset.id;
         try {
+            showLoader();
             const res = await fetch(`/orden/detalle/${idOrden}`);
             const { orden, detalles } = await res.json();
+            console.log(detalles);
+
+            const res2 = await fetch(`/orden/detalle/${idOrden}`);
+            const { producto } = await res2.json();
+            console.log(detalles);
 
             // Fill summary
             document.getElementById('modal-folio').textContent = 'A' + String(orden.id_orden).padStart(4, '0');
             const fecha = orden.fecha_realizada ? new Date(orden.fecha_realizada).toLocaleDateString('es-MX') : 'N/A';
             document.getElementById('modal-fecha').textContent = fecha;
+            document.getElementById('modal-sucursal').textContent = row.dataset.sucursal || 'Sin sucursal';
             
             const totalProductos = detalles.reduce((sum, d) => sum + d.cantidad, 0);
             document.getElementById('modal-total-productos').textContent = totalProductos;
@@ -370,13 +345,16 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
             estadoEl.className = 'status-pill inline-block px-2 py-1 text-[11px] rounded-full ' +
                 (estado === 'Cancelada' ? 'status-cancelled' : 'status-confirmed');
 
-            document.getElementById('modal-subtotal').textContent = orden.subtotal ? 
-                Number(orden.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2 }) : '0.00';
+            document.getElementById('modal-subtotal').textContent = orden.subtotal ?
+                Number(orden.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00';
+
+            // Peso
+            document.getElementById('modal-peso').textContent = orden.peso_total + ' Kg';
 
             const total = orden.subtotal * 1.16;
 
-            document.getElementById('modal-total').textContent = total ? 
-                Number(total).toLocaleString('es-MX', { minimumFractionDigits: 2 }) : '0.00';
+            document.getElementById('modal-total').textContent = total ?
+                Number(total).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00';
 
             const btnContainer = document.getElementById('btn-cancelar');
             btnContainer.innerHTML = '';
@@ -441,8 +419,14 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
             container.innerHTML = '';
             detalles.forEach(d => {
                 const precio = d.producto.precio_unitario;
+                const peso = d.producto.peso * d.cantidad;
                 const total = precio * d.cantidad;
-                const img = d.producto.url_imagen || '/img/botePintura.png';
+                let img = '/img/botePintura.png';
+                if (d.producto.url_imagen) {
+                    img = d.producto.url_imagen.startsWith('/uploads/') 
+                        ? d.producto.url_imagen 
+                        : '/uploads/' + d.producto.url_imagen.replace(/^\//, '');
+                }
                 container.innerHTML += `
                     <div class="producto-item flex flex-col sm:flex-row items-center gap-4 border-b border-gray-100 pb-4">
                         <div class="img-box w-16 h-16 shrink-0 bg-gray-50 border border-gray-200 rounded p-1">
@@ -452,6 +436,9 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
                             <h6 class="font-medium text-gray-700 mb-2 text-sm sm:max-w-[90%] pointer-events-auto h-auto">
                                 <a href="/product/${d.id_producto}" class="hover:underline">${d.producto.nombre}</a>
                             </h6>
+                            <h6 class="font-medium text-gray-700 mb-2 text-sm sm:max-w-[90%] pointer-events-auto h-auto">
+                                SKU: ${d.producto.clave}
+                            </h6>
                             <div class="flex items-center justify-center sm:justify-start gap-2">
                                 <div class="cantidad-box text-sm text-gray-500 font-medium bg-gray-100 px-2 py-1 rounded">
                                     Unidades: ${d.cantidad}
@@ -459,8 +446,9 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
                             </div>
                         </div>
                         <div class="producto-precio text-center sm:text-right shrink-0 mt-2 sm:mt-0">
-                            <div class="font-bold text-lg text-gray-800">$ ${total.toLocaleString('es-MX')}</div>
-                            <div class="text-gray-500 text-[11px]">($ ${Number(precio).toLocaleString('es-MX')} / unidad)</div>
+                            <div class="font-bold text-lg text-gray-800">$ ${total.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                            <div class="text-gray-500 text-[11px]">($ ${Number(precio).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / unidad)</div>
+                            <div class="text-gray-500 text-[11px]">( ${Number(peso)} Kg)</div>
                         </div>
                     </div>
                 `;
@@ -469,38 +457,14 @@ document.querySelectorAll('.pedidos-row').forEach(row => {
             // Enlace de descarga PDF
             document.getElementById('btn-descargar-pdf').href = `/orden/pdf/${idOrden}`;
 
-            // Exportar detalle de esta orden como CSV
-            modal.querySelector('.btn-exportar-small').onclick = () => {
-                const folioModal = document.getElementById('modal-folio').textContent;
-                const fechaModal = document.getElementById('modal-fecha').textContent;
-                const totalModal = document.getElementById('modal-total').textContent;
-                const subtotalModal = document.getElementById('modal-subtotal').textContent;
-                let csv = `"DETALLE DE ORDEN - PPG Industries"\n`;
-                csv += `"Folio:","${folioModal}"\n`;
-                csv += `"Fecha:","${fechaModal}"\n`;
-                csv += `"Subtotal:","$${subtotalModal}"\n`;
-                csv += `"Total (IVA incluido):","$${totalModal}"\n\n`;
-                csv += '"Producto","SKU","Unidades","Precio Unitario","Subtotal"\n';
-                detalles.forEach(d => {
-                    const nombre = (d.producto && d.producto.nombre) ? d.producto.nombre.replace(/"/g, '""') : 'Producto Desconocido';
-                    const sku = (d.producto && d.producto.clave) ? d.producto.clave : 'N/A';
-                    const precio = d.producto ? parseFloat(d.producto.precio_unitario || 0) : 0;
-                    const totalProd = precio * d.cantidad;
-                    csv += `"${nombre}","${sku}","${d.cantidad}","$${precio.toFixed(2)}","$${totalProd.toFixed(2)}"\n`;
-                });
-                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `detalle_${folioModal}.csv`;
-                link.click();
-            };
-
             modal.classList.remove('hidden');
             modal.style.display = 'flex';
         } catch (err) {
             console.error('Error cargando detalle:', err);
+        } finally {
+            hideLoader();
         }
-    });
+    }
 });
 
 // Error
@@ -512,8 +476,8 @@ function mostrarError(mensaje) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Aplicar filtro por defecto al cargar
-    document.querySelector('.select-filter').dispatchEvent(new Event('change'));
+    // Inicializar paginación con el filtro de tiempo por defecto
+    aplicarFiltros();
 
     const params = new URLSearchParams(window.location.search);
     if (params.get('error')) {
@@ -532,6 +496,11 @@ document.addEventListener('DOMContentLoaded', () => {
             modalSuccess.classList.add('hidden');
         });
     }
+});
+
+document.querySelector('.btn-exportar').addEventListener('click', () => {
+    const params = new URLSearchParams(window.location.search);
+    window.location.href = `/orden/exportar-historial`;
 });
 
 </script>

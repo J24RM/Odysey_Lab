@@ -4,53 +4,95 @@ function actualizarSubtotal() {
   const filas = document.getElementsByClassName('product-row');
   let subtotal = 0;
   let totalQty = 0;
+  let totalPeso = 0;
 
   for (let i = 0; i < filas.length; i++) {
     const precio = parseFloat(filas[i].dataset.precio);
     const input = document.getElementById('qty-' + filas[i].dataset.id);
     const qty = parseInt(input.value) || 0;
+    const peso = parseFloat(input.dataset.peso) || 0;
 
     subtotal += precio * qty;
     totalQty += qty;
+    totalPeso += peso;
   }
 
-
   document.getElementById('subtotal-display').textContent =
-    '$ ' + subtotal.toLocaleString('es-MX');
+    '$ ' + subtotal.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   let total = subtotal * 1.16;
 
   document.getElementById('total-display').textContent =
-    '$ ' + total.toLocaleString('es-MX');
-
+    '$ ' + total.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   document.getElementById('qty-display').textContent =
     'Cantidad de productos: ' + totalQty;
+
+  document.getElementById('peso-display').textContent =
+    'Peso Total: ' + totalPeso.toFixed(2) + " Kg";
 }
 
-// Boton
+
+const _actualizando = new Set();
+
+// Botón
 async function cambiarCantidad(idProducto, delta) {
-  const input = document.getElementById('qty-' + idProducto);
-  let cantidadActual = parseInt(input.value) || 1;
+    if (_actualizando.has(idProducto)) return;
 
-  const nuevaCantidad = cantidadActual + delta;
-  if (nuevaCantidad < 1) return;
+    const input    = document.getElementById('qty-' + idProducto);
+    const btnMenos = input.previousElementSibling;
+    const btnMas   = input.nextElementSibling;
 
-  await enviarCantidad(idProducto, nuevaCantidad);
+    let cantidadActual = parseInt(input.value) || 1;
+    const nuevaCantidad = cantidadActual + delta;
+    if (nuevaCantidad < 1) return;
+
+    _actualizando.add(idProducto);
+    btnMenos.disabled = btnMas.disabled = input.disabled = true;
+    btnMenos.classList.add('opacity-30', 'cursor-not-allowed');
+    btnMas.classList.add('opacity-30', 'cursor-not-allowed');
+
+    try {
+        await enviarCantidad(idProducto, nuevaCantidad);
+    } finally {
+        btnMenos.disabled = btnMas.disabled = input.disabled = false;
+        btnMenos.classList.remove('opacity-30', 'cursor-not-allowed');
+        btnMas.classList.remove('opacity-30', 'cursor-not-allowed');
+        _actualizando.delete(idProducto);
+    }
 }
 
-// Texto
+// Input texto
 async function inputCantidad(idProducto) {
-  const input = document.getElementById('qty-' + idProducto);
-  let cantidad = parseInt(input.value);
+    if (_actualizando.has(idProducto)) return;
 
-  if (!cantidad || cantidad < 1) cantidad = 1;
+    const input = document.getElementById('qty-' + idProducto);
+    let cantidad = parseInt(input.value);
+    if (!cantidad || cantidad < 1) cantidad = 1;
+    input.value = cantidad;
 
-  await enviarCantidad(idProducto, cantidad);
+    _actualizando.add(idProducto);
+    try {
+        await enviarCantidad(idProducto, cantidad);
+    } finally {
+        _actualizando.delete(idProducto);
+    }
 }
 
 async function enviarCantidad(idProducto, cantidad) {
   const input = document.getElementById('qty-' + idProducto);
+
+  // Mostrar spinner y ocultar input
+  input.classList.add('hidden');
+  const spinner = document.createElement('div');
+  spinner.id = 'spinner-' + idProducto;
+  spinner.className = 'w-10 h-5 flex items-center justify-center';
+  spinner.innerHTML = `
+    <svg class="animate-spin h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+    </svg>`;
+  input.insertAdjacentElement('afterend', spinner);
 
   const res = await fetch('/cart/items/' + idProducto, {
     method: 'POST',
@@ -63,7 +105,16 @@ async function enviarCantidad(idProducto, cantidad) {
 
   const data = await res.json();
 
+  // Quitar spinner y mostrar input de nuevo
+  const spinnerEl = document.getElementById('spinner-' + idProducto);
+  if (spinnerEl) spinnerEl.remove();
+  input.classList.remove('hidden');
+
   if (data.csrfToken) csrfToken = data.csrfToken;
+
+  if (data.cartCount !== undefined) {
+    actualizarCartBadge(data.cartCount);
+  }
 
   if (!res.ok) {
     mostrarError('No se pudo actualizar el producto');
@@ -80,7 +131,7 @@ async function enviarCantidad(idProducto, cantidad) {
     input.value = data.nuevaCantidad;
 
     document.getElementById('price-' + idProducto).textContent =
-      '$ ' + (precio * data.nuevaCantidad).toLocaleString('es-MX');
+      '$ ' + (precio * data.nuevaCantidad).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
   actualizarSubtotal();
@@ -101,16 +152,21 @@ async function eliminarProducto(idProducto) {
   if (data.csrfToken) csrfToken = data.csrfToken;
 
   if (!res.ok) {
-            mostrarError('No se pudo eliminar el producto');
-            return;
+    mostrarError('No se pudo eliminar el producto');
+    return;
   }
 
   if (data.eliminado) {
-  const nombre = document.getElementById('nombre-' + idProducto).textContent;
-  mostrarEliminado(nombre, idProducto);
-  actualizarSubtotal();
+    const nombre = document.getElementById('nombre-' + idProducto).textContent;
+    mostrarEliminado(nombre, idProducto);
+    actualizarSubtotal();
+
+    if (data.cartCount !== undefined) {
+        actualizarCartBadge(data.cartCount);
+    }
+  }
 }
-}
+
 
 function mostrarEliminado(nombre, idProducto) {
   const aviso = document.createElement('div');
@@ -138,3 +194,70 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// ── Selección masiva ──────────────────────────────────────────
+
+function actualizarBulkActions() {
+  const checkboxes = document.querySelectorAll('.product-checkbox');
+  const seleccionados = document.querySelectorAll('.product-checkbox:checked');
+  const bulkActions = document.getElementById('bulk-actions');
+  const selectedCount = document.getElementById('selected-count');
+
+  if (seleccionados.length > 0) {
+    bulkActions.classList.remove('hidden');
+    bulkActions.classList.add('flex');
+    selectedCount.textContent = seleccionados.length + ' seleccionado' + (seleccionados.length > 1 ? 's' : '');
+  } else {
+    bulkActions.classList.add('hidden');
+    bulkActions.classList.remove('flex');
+  }
+}
+
+async function eliminarSeleccionados() {
+  const seleccionados = document.querySelectorAll('.product-checkbox:checked');
+  if (seleccionados.length === 0) return;
+
+  const ids = Array.from(seleccionados).map(cb => cb.dataset.id);
+
+  // Deshabilitar botón mientras se procesa
+  const btn = document.querySelector('#bulk-actions button');
+  btn.disabled = true;
+  btn.textContent = 'Eliminando...';
+
+  // Eliminar en paralelo
+  const promesas = ids.map(idProducto =>
+    fetch('/cart/items/' + idProducto, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'csrf-token': csrfToken
+      },
+      body: JSON.stringify({ cantidad_ingresada: 0 }),
+    }).then(res => res.json().then(data => ({ res, data, idProducto })))
+  );
+
+  const resultados = await Promise.all(promesas);
+
+  resultados.forEach(({ res, data, idProducto }) => {
+    if (data.csrfToken) csrfToken = data.csrfToken;
+
+    if (!res.ok) {
+      mostrarError('No se pudo eliminar el producto ' + idProducto);
+      return;
+    }
+
+    if (data.eliminado) {
+      const nombreEl = document.getElementById('nombre-' + idProducto);
+      const nombre = nombreEl ? nombreEl.textContent : 'Producto';
+      mostrarEliminado(nombre, idProducto);
+    }
+  });
+
+  actualizarSubtotal();
+  actualizarBulkActions();
+
+  // Actualizar badge del carrito con el último valor recibido
+  const ultimo = resultados[resultados.length - 1];
+  if (ultimo?.data?.cartCount !== undefined) {
+    actualizarCartBadge(ultimo.data.cartCount);
+  }
+}

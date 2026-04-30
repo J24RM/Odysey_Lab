@@ -3,6 +3,7 @@
 
 <head>
 <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/img/PPG_Logo2.svg">
 <title>Estadísticas por Sucursal</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,7 +20,6 @@
 
 <%- include('partials/sidebar.ejs') %>
 
-<!-- MAIN CONTENT -->
 <main class="ml-48 pt-2 px-10 pb-9 flex-1 min-h-[calc(100vh-70px)]">
 
     <!-- Tabs -->
@@ -29,11 +29,277 @@
         <a href="/admin/stats/productos" class="tab-link px-5 py-2.5 text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors border-b-2 border-transparent -mb-[2px]" data-tab="/admin/stats/productos">Productos</a>
     </div>
 
-    <!-- Placeholder -->
-    <div class="flex flex-col items-center justify-center py-24 text-center">
-        <div class="text-6xl mb-4">🏗️</div>
-        <h2 class="text-2xl font-bold text-gray-700 mb-2">Próximamente</h2>
-        <p class="text-gray-400 text-sm">Las estadísticas por sucursal estarán disponibles pronto.</p>
+    <% if (!dbConnected) { %>
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
+        <p class="font-bold">Aviso</p>
+        <p>No se ha conectado Supabase. Mostrando datos vacíos. Configura tu `.env` para ver datos reales.</p>
+    </div>
+    <% } %>
+
+    <!-- Volumen total por sucursal -->
+    <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+        <div class="flex items-start justify-between mb-1">
+            <p class="text-[13px] font-bold text-gray-400 tracking-wide uppercase">Volumen total de pedidos por sucursal</p>
+            <div class="flex items-center gap-2">
+                <!-- Picker de período -->
+                <div class="relative" id="filtro-wrapper-vol">
+                    <button type="button" onclick="toggleDropdownVol(event)"
+                        class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 bg-gray-50 flex items-center gap-1.5 hover:bg-white cursor-pointer">
+                        <span><%= (desdeVol && hastaVol) ? desdeVol.split('-').reverse().join('/') + ' → ' + hastaVol.split('-').reverse().join('/') : diasVol ? 'Últimos ' + diasVol + ' días' : 'Todo el tiempo' %></span>
+                        <span class="text-gray-400">▾</span>
+                    </button>
+                    <div id="dropdown-vol" class="hidden absolute right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 w-64 overflow-hidden">
+                        <div id="opciones-rapidas-vol">
+                            <button type="button" onclick="seleccionarDiasVol(0)"
+                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 border-b border-gray-100 <%= (!desdeVol && !diasVol) ? 'text-blue-600 font-semibold' : '' %>">
+                                Todo el tiempo
+                            </button>
+                            <% [7, 15, 30, 60, 90].forEach(d => { %>
+                                <button type="button" onclick="seleccionarDiasVol(<%= d %>)"
+                                    class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 border-b border-gray-100 <%= (!desdeVol && diasVol === d) ? 'text-blue-600 font-semibold' : '' %>">
+                                    Últimos <%= d %> días
+                                </button>
+                            <% }); %>
+                            <button type="button" onclick="mostrarCalendarioVol()"
+                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 <%= (desdeVol && hastaVol) ? 'text-blue-600 font-semibold' : '' %>">
+                                Fecha personalizada →
+                            </button>
+                        </div>
+                        <div id="panel-calendario-vol" class="hidden p-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <button type="button" onclick="volverOpcionesVol()" class="text-xs text-gray-500 hover:text-gray-800">← Volver</button>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" onclick="cambiarMesVol(-1)" class="text-gray-500 hover:text-gray-800 px-1">‹</button>
+                                    <span id="cal-titulo-vol" class="text-sm font-semibold w-28 text-center"></span>
+                                    <button type="button" onclick="cambiarMesVol(1)" class="text-gray-500 hover:text-gray-800 px-1">›</button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-7 text-center mb-1">
+                                <% ['Lu','Ma','Mi','Ju','Vi','Sá','Do'].forEach(d => { %>
+                                    <div class="text-[10px] font-semibold text-gray-400 py-1"><%= d %></div>
+                                <% }) %>
+                            </div>
+                            <div id="cal-dias-vol" class="grid grid-cols-7 text-center gap-y-1"></div>
+                            <div class="mt-3 text-xs text-gray-500 text-center" id="cal-seleccion-vol">Selecciona inicio</div>
+                            <button type="button" id="btn-aplicar-vol" onclick="aplicarPersonalizadoVol()"
+                                class="hidden mt-3 w-full bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700">
+                                Aplicar →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Filtro estado -->
+                <div class="relative" id="filtro-edo-vol-wrapper">
+                    <button type="button" onclick="toggleEdoDropdownVol(event)"
+                        class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 bg-gray-50 flex items-center gap-1.5 hover:bg-white cursor-pointer">
+                        <span><%= (typeof edoFiltro !== 'undefined' && edoFiltro) ? edoFiltro : 'Top 10' %></span>
+                        <span class="text-gray-400">▾</span>
+                    </button>
+                    <div id="dropdown-edo-vol" class="hidden absolute right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 w-48 overflow-hidden max-h-64 overflow-y-auto">
+                        <button type="button" onclick="submitVolFormWithEdo('')"
+                            class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 border-b border-gray-100 <%= (!edoFiltro) ? 'text-blue-600 font-semibold' : '' %>">
+                            Top 10
+                        </button>
+                        <% (typeof estados !== 'undefined' ? estados : []).forEach(edo => { %>
+                            <button type="button" onclick="submitVolFormWithEdo('<%= edo %>')"
+                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 border-b border-gray-100 <%= (typeof edoFiltro !== 'undefined' && edoFiltro === edo) ? 'text-blue-600 font-semibold' : '' %>">
+                                <%= edo %>
+                            </button>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form oculto volumen -->
+        <form id="form-vol" method="GET" action="/admin/stats/sucursales" class="hidden">
+            <input type="hidden" id="vol-edo"      name="edo"      value="<%= edoFiltro || '' %>">
+            <input type="hidden" id="vol-diasVol"  name="diasVol"  value="<%= (!desdeVol && !hastaVol && diasVol) ? diasVol : '' %>">
+            <input type="hidden" id="vol-desdeVol" name="desdeVol" value="<%= desdeVol || '' %>">
+            <input type="hidden" id="vol-hastaVol" name="hastaVol" value="<%= hastaVol || '' %>">
+            <% if (typeof edoFiltroFre !== 'undefined' && edoFiltroFre) { %>
+                <input type="hidden" name="edoFre" value="<%= edoFiltroFre %>">
+            <% } %>
+            <% if (desdeFre && hastaFre) { %>
+                <input type="hidden" name="desdeFre" value="<%= desdeFre %>">
+                <input type="hidden" name="hastaFre" value="<%= hastaFre %>">
+            <% } else if (diasFre !== 30) { %>
+                <input type="hidden" name="diasFre" value="<%= diasFre %>">
+            <% } %>
+        </form>
+
+        <p class="text-sm text-gray-400 mb-6">
+            <% if (desdeVol && hastaVol) { %>
+                Del <span class="font-semibold text-gray-700"><%= desdeVol.split('-').reverse().join('/') %></span>
+                al <span class="font-semibold text-gray-700"><%= hastaVol.split('-').reverse().join('/') %></span>
+                &nbsp;·&nbsp;
+            <% } else if (diasVol) { %>
+                Últimos <span class="font-semibold text-gray-700"><%= diasVol %> días</span> &nbsp;·&nbsp;
+            <% } %>
+            Total: <span class="font-semibold text-gray-700"><%= total %> pedidos</span>
+            <% if (edoFiltro) { %> &nbsp;·&nbsp; Estado: <span class="font-semibold text-blue-600"><%= edoFiltro %></span><% } %>
+        </p>
+
+        <% if (sucursales && sucursales.length > 0) { %>
+            <% const maxTotal = sucursales[0].total; %>
+            <div class="flex flex-col gap-4">
+                <% sucursales.forEach((suc, index) => { %>
+                    <% const porcentaje = total > 0 ? Math.round((suc.total / total) * 100) : 0; %>
+                    <% const anchoBar = maxTotal > 0 ? Math.round((suc.total / maxTotal) * 100) : 0; %>
+                    <div class="cursor-pointer group rounded-xl px-3 py-2 -mx-3 hover:bg-blue-50 transition-colors duration-150" onclick="window.location.href='/admin/stats/sucursales/<%= suc.id_sucursal %>'">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm font-semibold text-gray-700 group-hover:text-blue-600 transition-colors"><%= suc.nombre %></span>
+                            <span class="text-sm text-gray-500 flex items-center gap-2"><%= suc.total %> pedidos &nbsp;·&nbsp; <span class="font-semibold text-blue-600"><%= porcentaje %>%</span>
+                                <span class="text-xs font-semibold text-gray-400 border border-gray-200 px-2 py-0.5 rounded-md group-hover:text-blue-600 group-hover:border-blue-300 group-hover:bg-blue-100 transition-all duration-150">Ver detalle →</span>
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-3">
+                            <div class="h-3 rounded-full <%= index === 0 ? 'bg-blue-600' : 'bg-violet-500' %>"
+                                 style="width: <%= anchoBar %>%">
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <p class="text-sm text-gray-400 py-8 text-center">No hay pedidos en el período seleccionado.</p>
+        <% } %>
+    </div>
+
+    <!-- Frecuencia de pedidos por sucursal -->
+    <div id="seccion-frecuencia" class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)] mt-6">
+        <div class="flex items-start justify-between mb-1">
+            <p class="text-[13px] font-bold text-gray-400 tracking-wide uppercase">Frecuencia de pedidos por sucursal</p>
+            <div class="flex items-center gap-2">
+                <!-- Picker de período -->
+                <div class="relative" id="filtro-wrapper-fre">
+                    <button type="button" id="btn-periodo-fre" onclick="toggleDropdownFre(event)"
+                        class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 bg-gray-50 flex items-center gap-1.5 hover:bg-white cursor-pointer">
+                        <span id="label-periodo-fre"><%= (desdeFre && hastaFre) ? desdeFre.split('-').reverse().join('/') + ' → ' + hastaFre.split('-').reverse().join('/') : (diasFre || 30) + ' días' %></span>
+                        <span class="text-gray-400">▾</span>
+                    </button>
+
+                    <div id="dropdown-fre" class="hidden absolute right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 w-64 overflow-hidden">
+                        <!-- Opciones rápidas -->
+                        <div id="opciones-rapidas-fre">
+                            <% [7, 15, 30, 60, 90].forEach(d => { %>
+                                <button type="button" onclick="seleccionarDiasFre(<%= d %>)"
+                                    class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 border-b border-gray-100 <%= (!desdeFre && diasFre === d) ? 'text-blue-600 font-semibold' : '' %>">
+                                    Últimos <%= d %> días
+                                </button>
+                            <% }); %>
+                            <button type="button" onclick="mostrarCalendarioFre()"
+                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 <%= (desdeFre && hastaFre) ? 'text-blue-600 font-semibold' : '' %>">
+                                Fecha personalizada →
+                            </button>
+                        </div>
+                        <!-- Calendario -->
+                        <div id="panel-calendario-fre" class="hidden p-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <button type="button" onclick="volverOpcionesFre()" class="text-xs text-gray-500 hover:text-gray-800">← Volver</button>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" onclick="cambiarMesFre(-1)" class="text-gray-500 hover:text-gray-800 px-1">‹</button>
+                                    <span id="cal-titulo-fre" class="text-sm font-semibold w-28 text-center"></span>
+                                    <button type="button" onclick="cambiarMesFre(1)" class="text-gray-500 hover:text-gray-800 px-1">›</button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-7 text-center mb-1">
+                                <% ['Lu','Ma','Mi','Ju','Vi','Sá','Do'].forEach(d => { %>
+                                    <div class="text-[10px] font-semibold text-gray-400 py-1"><%= d %></div>
+                                <% }) %>
+                            </div>
+                            <div id="cal-dias-fre" class="grid grid-cols-7 text-center gap-y-1"></div>
+                            <div class="mt-3 text-xs text-gray-500 text-center" id="cal-seleccion-fre">Selecciona inicio</div>
+                            <button type="button" id="btn-aplicar-fre" onclick="aplicarPersonalizadoFre()"
+                                class="hidden mt-3 w-full bg-blue-600 text-white text-sm py-2 rounded-lg hover:bg-blue-700">
+                                Aplicar →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtro estado -->
+                <div class="relative" id="filtro-edo-fre-wrapper">
+                    <button type="button" onclick="toggleEdoDropdownFre(event)"
+                        class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-600 bg-gray-50 flex items-center gap-1.5 hover:bg-white cursor-pointer">
+                        <span><%= (typeof edoFiltroFre !== 'undefined' && edoFiltroFre) ? edoFiltroFre : 'Top 10' %></span>
+                        <span class="text-gray-400">▾</span>
+                    </button>
+                    <div id="dropdown-edo-fre" class="hidden absolute right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 w-48 overflow-hidden max-h-64 overflow-y-auto">
+                        <button type="button" onclick="submitFreFormWithEdo('')"
+                            class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 border-b border-gray-100 <%= (!edoFiltroFre) ? 'text-blue-600 font-semibold' : '' %>">
+                            Top 10
+                        </button>
+                        <% (typeof estadosFre !== 'undefined' ? estadosFre : []).forEach(edo => { %>
+                            <button type="button" onclick="submitFreFormWithEdo('<%= edo %>')"
+                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 border-b border-gray-100 <%= (typeof edoFiltroFre !== 'undefined' && edoFiltroFre === edo) ? 'text-blue-600 font-semibold' : '' %>">
+                                <%= edo %>
+                            </button>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form oculto frecuencia -->
+        <form id="form-fre" method="GET" action="/admin/stats/sucursales" class="hidden">
+            <% if (typeof edoFiltro !== 'undefined' && edoFiltro) { %>
+                <input type="hidden" name="edo" value="<%= edoFiltro %>">
+            <% } %>
+            <% if (desdeVol && hastaVol) { %>
+                <input type="hidden" name="desdeVol" value="<%= desdeVol %>">
+                <input type="hidden" name="hastaVol" value="<%= hastaVol %>">
+            <% } else if (diasVol) { %>
+                <input type="hidden" name="diasVol" value="<%= diasVol %>">
+            <% } %>
+            <input type="hidden" id="fre-edoFre"   name="edoFre"   value="<%= edoFiltroFre || '' %>">
+            <input type="hidden" id="fre-diasFre"   name="diasFre"  value="<%= (!desdeFre && !hastaFre) ? (diasFre || 30) : '' %>">
+            <input type="hidden" id="fre-desdeFre"  name="desdeFre" value="<%= desdeFre || '' %>">
+            <input type="hidden" id="fre-hastaFre"  name="hastaFre" value="<%= hastaFre || '' %>">
+        </form>
+
+        <p class="text-sm text-gray-400 mb-6">
+            <% if (desdeFre && hastaFre) { %>
+                Del <span class="font-semibold text-gray-700"><%= desdeFre.split('-').reverse().join('/') %></span>
+                al <span class="font-semibold text-gray-700"><%= hastaFre.split('-').reverse().join('/') %></span>
+                &nbsp;·&nbsp; <span class="font-semibold text-gray-700"><%= diasPeriodo %> días</span>
+            <% } else { %>
+                Basado en los últimos <span class="font-semibold text-gray-700"><%= diasFre || 30 %> días</span>
+            <% } %>
+            <% if (edoFiltroFre) { %> &nbsp;·&nbsp; Estado: <span class="font-semibold text-blue-600"><%= edoFiltroFre %></span><% } %>
+        </p>
+
+        <% if (frecuencias && frecuencias.length > 0) { %>
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="border-b-2 border-gray-100">
+                        <th class="text-left text-[11px] font-bold text-gray-400 tracking-wide uppercase pb-3">Sucursal</th>
+                        <th class="text-center text-[11px] font-bold text-gray-400 tracking-wide uppercase pb-3">
+                            Pedidos en <%= (desdeFre && hastaFre) ? 'el período' : ((diasPeriodo || diasFre || 30) + ' días') %>
+                        </th>
+                        <th class="text-right text-[11px] font-bold text-gray-400 tracking-wide uppercase pb-3">Frecuencia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% frecuencias.forEach((fre, index) => { %>
+                        <tr class="border-b border-gray-50 cursor-pointer group hover:bg-blue-50 transition-colors duration-150" onclick="window.location.href='/admin/stats/sucursales/<%= fre.id_sucursal %>'">
+                            <td class="py-3 text-sm font-semibold text-gray-700 group-hover:text-blue-600 transition-colors"><%= fre.nombre %></td>
+                            <td class="py-3 text-sm text-gray-500 text-center"><%= fre.totalMes %> pedidos</td>
+                            <td class="py-3 text-right">
+                                <span class="inline-flex items-center gap-2">
+                                    <span class="text-xs font-semibold py-1 px-3 rounded-full <%= index === 0 ? 'bg-blue-100 text-blue-700' : 'bg-violet-100 text-violet-700' %>">
+                                        <%= fre.pedidosPorSemana %> / semana
+                                    </span>
+                                    <span class="text-xs font-semibold text-gray-400 border border-gray-200 px-2 py-0.5 rounded-md group-hover:text-blue-600 group-hover:border-blue-300 group-hover:bg-blue-100 transition-all duration-150">Ver detalle →</span>
+                                </span>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        <% } else { %>
+            <p class="text-sm text-gray-400 py-8 text-center">No hay pedidos en el período seleccionado.</p>
+        <% } %>
     </div>
 
 </main>
@@ -47,6 +313,250 @@
             tab.classList.add('border-blue-600', 'text-blue-600');
             tab.classList.remove('text-gray-500');
         }
+    });
+
+    if (sessionStorage.getItem('scrollToFre')) {
+        sessionStorage.removeItem('scrollToFre');
+        const el = document.getElementById('seccion-frecuencia');
+        if (el) el.scrollIntoView({ block: 'start' });
+    }
+
+    // ── Volumen — período picker ───────────────────────────────────────────────
+    let calYearVol  = new Date().getFullYear();
+    let calMonthVol = new Date().getMonth();
+    let selInicioVol = null, selFinVol = null;
+    const hoyVol = new Date(); hoyVol.setHours(0,0,0,0);
+    const MESES_VOL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+    function toggleDropdownVol(e) {
+        e.stopPropagation();
+        document.getElementById('dropdown-vol').classList.toggle('hidden');
+    }
+    document.addEventListener('click', e => {
+        const w = document.getElementById('filtro-wrapper-vol');
+        if (w && !w.contains(e.target)) document.getElementById('dropdown-vol').classList.add('hidden');
+    });
+    document.getElementById('dropdown-vol').addEventListener('click', e => e.stopPropagation());
+
+    function seleccionarDiasVol(d) {
+        document.getElementById('vol-diasVol').value  = d > 0 ? d : '';
+        document.getElementById('vol-desdeVol').value = '';
+        document.getElementById('vol-hastaVol').value = '';
+        document.getElementById('form-vol').submit();
+    }
+    function mostrarCalendarioVol() {
+        document.getElementById('opciones-rapidas-vol').classList.add('hidden');
+        document.getElementById('panel-calendario-vol').classList.remove('hidden');
+        renderCalVol();
+    }
+    function volverOpcionesVol() {
+        document.getElementById('panel-calendario-vol').classList.add('hidden');
+        document.getElementById('opciones-rapidas-vol').classList.remove('hidden');
+        selInicioVol = null; selFinVol = null;
+    }
+    function cambiarMesVol(delta) {
+        calMonthVol += delta;
+        if (calMonthVol > 11) { calMonthVol = 0; calYearVol++; }
+        if (calMonthVol < 0)  { calMonthVol = 11; calYearVol--; }
+        renderCalVol();
+    }
+    function toISOVol(f) {
+        return `${f.getFullYear()}-${String(f.getMonth()+1).padStart(2,'0')}-${String(f.getDate()).padStart(2,'0')}`;
+    }
+    function formatoFechaVol(iso) {
+        const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`;
+    }
+    function renderCalVol() {
+        document.getElementById('cal-titulo-vol').textContent = `${MESES_VOL[calMonthVol]} ${calYearVol}`;
+        const c = document.getElementById('cal-dias-vol');
+        c.innerHTML = '';
+        const offset    = (new Date(calYearVol, calMonthVol, 1).getDay() + 6) % 7;
+        const diasEnMes = new Date(calYearVol, calMonthVol + 1, 0).getDate();
+        for (let i = 0; i < offset; i++) c.appendChild(document.createElement('div'));
+        for (let d = 1; d <= diasEnMes; d++) {
+            const fecha = new Date(calYearVol, calMonthVol, d);
+            const iso   = toISOVol(fecha);
+            const div   = document.createElement('div');
+            div.textContent = d;
+            div.className = 'w-7 h-7 flex items-center justify-center text-xs rounded-full mx-auto';
+            if (fecha > hoyVol) {
+                div.classList.add('text-gray-300', 'cursor-not-allowed');
+            } else {
+                div.classList.add('cursor-pointer');
+                div.dataset.iso = iso;
+                if (selInicioVol && selFinVol) {
+                    const t = fecha.getTime();
+                    if (t === selInicioVol.getTime() || t === selFinVol.getTime())
+                        div.classList.add('bg-blue-600','text-white','font-bold');
+                    else if (t > selInicioVol.getTime() && t < selFinVol.getTime())
+                        div.classList.add('bg-blue-100','text-blue-800','!rounded-none');
+                    else div.classList.add('hover:bg-gray-100');
+                } else if (selInicioVol && fecha.getTime() === selInicioVol.getTime()) {
+                    div.classList.add('bg-blue-600','text-white','font-bold');
+                } else {
+                    div.classList.add('hover:bg-gray-100');
+                }
+            }
+            c.appendChild(div);
+        }
+    }
+    document.getElementById('cal-dias-vol').addEventListener('click', e => {
+        const dia = e.target.closest('[data-iso]');
+        if (!dia) return;
+        const fecha = new Date(dia.dataset.iso + 'T00:00:00');
+        if (!selInicioVol || (selInicioVol && selFinVol)) {
+            selInicioVol = fecha; selFinVol = null;
+            document.getElementById('btn-aplicar-vol').classList.add('hidden');
+            document.getElementById('cal-seleccion-vol').textContent = `Desde: ${formatoFechaVol(dia.dataset.iso)} — Selecciona fin`;
+        } else {
+            if (fecha < selInicioVol) { selFinVol = selInicioVol; selInicioVol = fecha; }
+            else selFinVol = fecha;
+            document.getElementById('cal-seleccion-vol').textContent =
+                `${formatoFechaVol(toISOVol(selInicioVol))} → ${formatoFechaVol(toISOVol(selFinVol))}`;
+            document.getElementById('btn-aplicar-vol').classList.remove('hidden');
+        }
+        renderCalVol();
+    });
+    function aplicarPersonalizadoVol() {
+        if (!selInicioVol || !selFinVol) return;
+        document.getElementById('vol-diasVol').value  = '';
+        document.getElementById('vol-desdeVol').value = toISOVol(selInicioVol);
+        document.getElementById('vol-hastaVol').value = toISOVol(selFinVol);
+        document.getElementById('form-vol').submit();
+    }
+    function submitVolFormWithEdo(edoValue) {
+        document.getElementById('vol-edo').value = edoValue;
+        document.getElementById('form-vol').submit();
+    }
+
+    // ── Frecuencia — período picker ────────────────────────────────────────────
+    let calYearFre  = new Date().getFullYear();
+    let calMonthFre = new Date().getMonth();
+    let selInicioFre = null, selFinFre = null;
+    const hoyFre = new Date(); hoyFre.setHours(0,0,0,0);
+    const MESES_FRE = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+    function toggleDropdownFre(e) {
+        e.stopPropagation();
+        document.getElementById('dropdown-fre').classList.toggle('hidden');
+    }
+    document.addEventListener('click', e => {
+        const w = document.getElementById('filtro-wrapper-fre');
+        if (w && !w.contains(e.target)) document.getElementById('dropdown-fre').classList.add('hidden');
+    });
+    document.getElementById('dropdown-fre').addEventListener('click', e => e.stopPropagation());
+
+    function seleccionarDiasFre(d) {
+        document.getElementById('fre-diasFre').value  = d;
+        document.getElementById('fre-desdeFre').value = '';
+        document.getElementById('fre-hastaFre').value = '';
+        submitFreForm();
+    }
+    function mostrarCalendarioFre() {
+        document.getElementById('opciones-rapidas-fre').classList.add('hidden');
+        document.getElementById('panel-calendario-fre').classList.remove('hidden');
+        renderCalFre();
+    }
+    function volverOpcionesFre() {
+        document.getElementById('panel-calendario-fre').classList.add('hidden');
+        document.getElementById('opciones-rapidas-fre').classList.remove('hidden');
+        selInicioFre = null; selFinFre = null;
+    }
+    function cambiarMesFre(delta) {
+        calMonthFre += delta;
+        if (calMonthFre > 11) { calMonthFre = 0; calYearFre++; }
+        if (calMonthFre < 0)  { calMonthFre = 11; calYearFre--; }
+        renderCalFre();
+    }
+    function toISOFre(f) {
+        return `${f.getFullYear()}-${String(f.getMonth()+1).padStart(2,'0')}-${String(f.getDate()).padStart(2,'0')}`;
+    }
+    function formatoFechaFre(iso) {
+        const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`;
+    }
+    function renderCalFre() {
+        document.getElementById('cal-titulo-fre').textContent = `${MESES_FRE[calMonthFre]} ${calYearFre}`;
+        const c = document.getElementById('cal-dias-fre');
+        c.innerHTML = '';
+        const offset    = (new Date(calYearFre, calMonthFre, 1).getDay() + 6) % 7;
+        const diasEnMes = new Date(calYearFre, calMonthFre + 1, 0).getDate();
+        for (let i = 0; i < offset; i++) c.appendChild(document.createElement('div'));
+        for (let d = 1; d <= diasEnMes; d++) {
+            const fecha = new Date(calYearFre, calMonthFre, d);
+            const iso   = toISOFre(fecha);
+            const div   = document.createElement('div');
+            div.textContent = d;
+            div.className = 'w-7 h-7 flex items-center justify-center text-xs rounded-full mx-auto';
+            if (fecha > hoyFre) {
+                div.classList.add('text-gray-300', 'cursor-not-allowed');
+            } else {
+                div.classList.add('cursor-pointer');
+                div.dataset.iso = iso;
+                if (selInicioFre && selFinFre) {
+                    const t = fecha.getTime();
+                    if (t === selInicioFre.getTime() || t === selFinFre.getTime())
+                        div.classList.add('bg-blue-600','text-white','font-bold');
+                    else if (t > selInicioFre.getTime() && t < selFinFre.getTime())
+                        div.classList.add('bg-blue-100','text-blue-800','!rounded-none');
+                    else div.classList.add('hover:bg-gray-100');
+                } else if (selInicioFre && fecha.getTime() === selInicioFre.getTime()) {
+                    div.classList.add('bg-blue-600','text-white','font-bold');
+                } else {
+                    div.classList.add('hover:bg-gray-100');
+                }
+            }
+            c.appendChild(div);
+        }
+    }
+    document.getElementById('cal-dias-fre').addEventListener('click', e => {
+        const dia = e.target.closest('[data-iso]');
+        if (!dia) return;
+        const fecha = new Date(dia.dataset.iso + 'T00:00:00');
+        if (!selInicioFre || (selInicioFre && selFinFre)) {
+            selInicioFre = fecha; selFinFre = null;
+            document.getElementById('btn-aplicar-fre').classList.add('hidden');
+            document.getElementById('cal-seleccion-fre').textContent = `Desde: ${formatoFechaFre(dia.dataset.iso)} — Selecciona fin`;
+        } else {
+            if (fecha < selInicioFre) { selFinFre = selInicioFre; selInicioFre = fecha; }
+            else selFinFre = fecha;
+            document.getElementById('cal-seleccion-fre').textContent =
+                `${formatoFechaFre(toISOFre(selInicioFre))} → ${formatoFechaFre(toISOFre(selFinFre))}`;
+            document.getElementById('btn-aplicar-fre').classList.remove('hidden');
+        }
+        renderCalFre();
+    });
+    function aplicarPersonalizadoFre() {
+        if (!selInicioFre || !selFinFre) return;
+        document.getElementById('fre-diasFre').value  = '';
+        document.getElementById('fre-desdeFre').value = toISOFre(selInicioFre);
+        document.getElementById('fre-hastaFre').value = toISOFre(selFinFre);
+        submitFreForm();
+    }
+    function submitFreForm() {
+        sessionStorage.setItem('scrollToFre', '1');
+        document.getElementById('form-fre').submit();
+    }
+    function submitFreFormWithEdo(edoValue) {
+        document.getElementById('fre-edoFre').value = edoValue;
+        submitFreForm();
+    }
+
+    // ── Dropdowns custom de estado (cross-browser) ────────────────────────────
+    function toggleEdoDropdownVol(e) {
+        e.stopPropagation();
+        document.getElementById('dropdown-edo-vol').classList.toggle('hidden');
+        document.getElementById('dropdown-edo-fre').classList.add('hidden');
+    }
+    function toggleEdoDropdownFre(e) {
+        e.stopPropagation();
+        document.getElementById('dropdown-edo-fre').classList.toggle('hidden');
+        document.getElementById('dropdown-edo-vol').classList.add('hidden');
+    }
+    document.addEventListener('click', e => {
+        if (!document.getElementById('filtro-edo-vol-wrapper').contains(e.target))
+            document.getElementById('dropdown-edo-vol').classList.add('hidden');
+        if (!document.getElementById('filtro-edo-fre-wrapper').contains(e.target))
+            document.getElementById('dropdown-edo-fre').classList.add('hidden');
     });
 </script>
 

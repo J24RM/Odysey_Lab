@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/img/PPG_Logo2.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Detalle de Producto</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -26,6 +27,14 @@
   </script>
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
+<svg width="0" height="0" style="position:absolute;overflow:hidden">
+  <defs>
+    <linearGradient id="star-half">
+      <stop offset="50%" stop-color="#FBBF24"/>
+      <stop offset="50%" stop-color="#E5E7EB"/>
+    </linearGradient>
+  </defs>
+</svg>
 
   <%- include('../includes/_navbar') %>
 
@@ -56,6 +65,9 @@
         <h1 class="text-2xl font-bold text-gray-900 leading-snug mb-3">
           <%= producto.nombre %>
         </h1>
+        <h1 class="text-xl font-semibold text-gray-700 leading-snug mb-3">
+          SKU: <%= producto.clave %>
+        </h1>
 
         <!-- Estrellas -->
         <%
@@ -64,9 +76,15 @@
             ? Math.round(resenas.reduce((s, r) => s + r.rating, 0) / resenas.length * 10) / 10
             : 0;
         %>
-        <div class="flex items-center gap-1 mb-1">
-          <% for (let i = 1; i <= 5; i++) { %>
-            <img src="/img/estrellita.png" alt="estrella" class="w-6 h-6 <%= i <= Math.round(promedioDetalle) ? 'opacity-100' : 'opacity-20' %>"/>
+        <div class="flex items-center gap-0.5 mb-1">
+          <% for (let i = 1; i <= 5; i++) {
+            const starFill = promedioDetalle >= i ? '#FBBF24' : (promedioDetalle >= i - 0.5 ? 'url(#star-half)' : '#E5E7EB');
+            const starStroke = promedioDetalle >= i ? '#F59E0B' : (promedioDetalle >= i - 0.5 ? '#F59E0B' : '#D1D5DB');
+          %>
+            <svg width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"
+                fill="<%= starFill %>" stroke="<%= starStroke %>" stroke-width="1" stroke-linejoin="round"/>
+            </svg>
           <% } %>
           <% if (resenas.length > 0) { %>
             <span class="text-sm text-gray-500 ml-1"><%= promedioDetalle %> (<%= resenas.length %> <%= resenas.length === 1 ? 'reseña' : 'reseñas' %>)</span>
@@ -78,11 +96,11 @@
         <hr class="border-gray-200 mb-4"/>
 
         <!-- Precio -->
-        <p class="text-3xl font-bold text-gray-900 mb-4">$ <%= producto.precio %></p>
+        <p class="text-3xl font-bold text-gray-900 mb-4">$ <%= Number(producto.precio).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
 
         <!-- Especificaciones -->
         <div class="text-sm text-gray-700 space-y-1 mb-4">
-          <p>-Peso: <%= producto.peso %></p>
+          <p>-Peso: <%= producto.peso %> Kg</p>
           <p>-Unidad de Venta: <%= producto.unidadVenta %></p>
           <p>-Unidad de Medida: <%= producto.unidadMedida %></p>
         </div>
@@ -105,26 +123,34 @@
         style="box-shadow: 0 4px 24px rgba(0,0,0,0.12);"
       >
         <!-- Precio -->
-        <p class="text-4xl font-extrabold text-gray-900">$ <%= producto.precio %></p>
-
-        <!-- Sucursal -->
-        <p class="text-sm font-semibold" style="color: #0078A9;">Sucursal: Galerias</p>
+        <p class="text-4xl font-extrabold text-gray-900">$ <%= Number(producto.precio).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
 
         <!-- Cantidad -->
-      <div class="flex items-center border border-gray-400 rounded-md px-4 py-2 bg-white gap-2">
-        <label class="text-sm font-semibold text-gray-800">Cantidad:</label>
-        <input
-          id="cantidad-visible"
-          type="text"
-          value="1"
-          inputmode="numeric"
-          pattern="[0-9]*"
-          maxlength="3"
-          oninput="this.value = this.value.replace(/[^0-9]/g, ''); document.getElementById('cantidad-input').value = this.value || 1;"
-          onblur="if(!this.value) this.value = 1; document.getElementById('cantidad-input').value = this.value;"
-          class="w-16 text-sm font-semibold text-gray-800 outline-none text-right"
-        />
+      <div class="flex items-center gap-2">
+        <label class="text-sm font-semibold text-gray-700">Cantidad:</label>
+        <div class="flex items-center border border-gray-400 rounded bg-white overflow-hidden">
+          <button type="button"
+            onclick="cambiarCantidad(-1)"
+            class="px-3 py-2 text-gray-600 hover:bg-gray-100 text-sm leading-none select-none"
+          >&#8722;</button>
+          <input
+            id="cantidad-visible"
+            type="text"
+            value="1"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="3"
+            oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value === '' || parseInt(this.value) < 1) this.value = 1; document.getElementById('cantidad-input').value = this.value;"
+            onblur="if(!this.value || parseInt(this.value) < 1) this.value = 1; document.getElementById('cantidad-input').value = this.value;"
+            class="w-10 text-sm font-semibold text-gray-700 outline-none text-center border-x border-gray-400 py-2"
+          />
+          <button type="button"
+            onclick="cambiarCantidad(1)"
+            class="px-3 py-2 text-gray-600 hover:bg-gray-100 text-sm leading-none select-none"
+          >&#43;</button>
+        </div>
       </div>
+      
 
       <!-- Botón agregar al carrito -->
       <form action="/cart/items" method="POST">
@@ -159,7 +185,12 @@
           <p class="text-sm text-gray-500 mb-4">Esta fue tu calificación:</p>
           <div class="flex items-center gap-1">
             <% for (let i = 1; i <= 5; i++) { %>
-              <img src="/img/estrellita.png" alt="estrella" class="w-8 h-8 <%= i <= calificacion.rating ? 'opacity-100' : 'opacity-25' %>"/>
+              <svg width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"
+                  fill="<%= i <= calificacion.rating ? '#FBBF24' : '#E5E7EB' %>"
+                  stroke="<%= i <= calificacion.rating ? '#F59E0B' : '#D1D5DB' %>"
+                  stroke-width="1" stroke-linejoin="round"/>
+              </svg>
             <% } %>
             <span class="text-sm font-semibold text-gray-700 ml-2"><%= calificacion.rating %> de 5</span>
           </div>
@@ -187,11 +218,12 @@
           <div class="flex items-center gap-2">
             <span class="text-sm font-semibold text-gray-700 mr-1">Tu calificación:</span>
             <div class="flex gap-1" id="estrellas">
-              <img src="/img/estrellita.png" data-valor="1" alt="1 estrella" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
-              <img src="/img/estrellita.png" data-valor="2" alt="2 estrellas" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
-              <img src="/img/estrellita.png" data-valor="3" alt="3 estrellas" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
-              <img src="/img/estrellita.png" data-valor="4" alt="4 estrellas" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
-              <img src="/img/estrellita.png" data-valor="5" alt="5 estrellas" class="estrella w-8 h-8 cursor-pointer opacity-30 transition"/>
+              <% for (let i = 1; i <= 5; i++) { %>
+              <svg data-valor="<%= i %>" class="estrella cursor-pointer transition-transform hover:scale-110" width="32" height="32" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#E5E7EB">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"
+                  stroke="#D1D5DB" stroke-width="1" stroke-linejoin="round"/>
+              </svg>
+              <% } %>
             </div>
             <span class="text-sm text-gray-400 ml-1" id="label-estrellas">Selecciona una calificación</span>
           </div>
@@ -247,7 +279,12 @@
             <!-- Estrellas -->
             <div class="flex gap-0.5">
               <% for (let i = 1; i <= 5; i++) { %>
-                <img src="/img/estrellita.png" alt="estrella" class="w-5 h-5 <%= i <= r.rating ? 'opacity-100' : 'opacity-20' %>"/>
+                <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"
+                    fill="<%= i <= r.rating ? '#FBBF24' : '#E5E7EB' %>"
+                    stroke="<%= i <= r.rating ? '#F59E0B' : '#D1D5DB' %>"
+                    stroke-width="1" stroke-linejoin="round"/>
+                </svg>
               <% } %>
             </div>
             <!-- Comentario -->
@@ -262,19 +299,25 @@
     <% } %>
   </section>
 
-  <!-- SECCIÓN PRODUCTOS SIMILARES -->
+  <!-- SECCIÓN PRODUCTOS DESTACADOS -->
+  <% if (productosDestacados && productosDestacados.length > 0) { %>
   <section class="max-w-6xl mx-auto px-6 pb-10 mt-8">
-    <h2 class="text-xl font-bold text-gray-900 mb-4">Productos similares</h2>
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <% for (let i = 0; i < 4; i++) { %>
-      <div class="border border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:shadow-md transition cursor-pointer">
-        <img src="/img/botePintura.png" alt="Producto similar" class="w-24 h-24 object-contain"/>
-      </div>
+    <h2 class="text-xl font-bold text-gray-900 mb-4">Productos destacados</h2>
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <% for (const dest of productosDestacados) { %>
+      <a href="/cliente/product/<%= dest.id_producto %>"
+         class="border border-gray-200 rounded-xl p-4 flex flex-col items-center gap-2 hover:shadow-md transition">
+        <img src="/uploads/<%= dest.url_imagen || '/img/botePintura.png' %>"
+             alt="<%= dest.nombre %>"
+             onerror="this.src='/img/botePintura.png'"
+             class="w-24 h-24 object-contain"/>
+        <p class="text-xs font-semibold text-gray-800 text-center line-clamp-2"><%= dest.nombre %></p>
+        <p class="text-xs text-gray-500">$<%= Number(dest.precio_unitario).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
+      </a>
       <% } %>
-
-
     </div>
   </section>
+  <% } %>
 
   <!-- MODAL CALIFICACIÓN ENVIADA -->
   <div id="modal-calificacion" class="fixed inset-0 flex items-center justify-center z-50 hidden">
@@ -301,6 +344,15 @@
   </div>
 
   <script>
+    function cambiarCantidad(delta) {
+      const input = document.getElementById('cantidad-visible');
+      const hidden = document.getElementById('cantidad-input');
+      let val = parseInt(input.value) || 1;
+      val = Math.max(1, val + delta);
+      input.value = val;
+      hidden.value = val;
+    }
+
     const estrellas = document.querySelectorAll('.estrella');
     const labelEstrellas = document.getElementById('label-estrellas');
     const btnEnviar = document.getElementById('btn-enviar-calificacion');
@@ -312,8 +364,9 @@
 
     function pintarEstrellas(cantidad) {
       estrellas.forEach((e, i) => {
-        e.classList.toggle('opacity-100', i < cantidad);
-        e.classList.toggle('opacity-30', i >= cantidad);
+        const filled = i < cantidad;
+        e.setAttribute('fill', filled ? '#FBBF24' : '#E5E7EB');
+        e.querySelector('path').setAttribute('stroke', filled ? '#F59E0B' : '#D1D5DB');
       });
     }
 

@@ -8,18 +8,23 @@ const productoController = require('../controllers/producto.controller');
 const cuentaController = require('../controllers/cuenta.controller');
 const clienteController = require('../controllers/cliente.controllers');
 const calificacionController = require('../controllers/calificacion.controller');
+const cartCount = require("../utils/cartcount")
+
 
 //Ruta get para pagina principal
-router.get('/home', authController.getClienteHome);
+router.get('/home',cartCount ,authController.getClienteHome);
+
+//API búsqueda de productos en tiempo real
+router.get('/api/productos', productoController.searchProductos);
 
 //Ruta get para detalle de producto
-router.get('/product/:id', productoController.getProductoCliente);
+router.get('/product/:id',cartCount, productoController.getProductoCliente);
 
 //Ruta get para ver mis pedidos
-router.get('/mis-pedidos', clienteController.getMisPedidos);
+router.get('/mis-pedidos', cartCount,clienteController.getMisPedidos);
 
 //Ruta get para ver el perfil
-router.get('/profile', cuentaController.getProfile);
+router.get('/profile', cartCount,cuentaController.getProfile);
 
 //Ruta get para datos del perfil (AJAX)
 router.get('/perfil-datos', cuentaController.getProfileData);

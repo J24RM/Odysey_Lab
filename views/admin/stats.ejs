@@ -3,24 +3,21 @@
 
 <head>
 <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/img/PPG_Logo2.svg">
 <title>Estadísticas Generales</title>
-<!-- Tailwind CSS CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-    * {
-        font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    }
+    * { font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
 </style>
 </head>
 
 <body class="bg-gray-50">
 
 <%- include('partials/header.ejs') %>
-
 <%- include('partials/sidebar.ejs') %>
 
-<!-- MAIN CONTENT -->
 <main class="ml-48 pt-2 px-10 pb-9 flex-1 min-h-[calc(100vh-70px)]">
 
     <!-- Tabs -->
@@ -30,145 +27,156 @@
         <a href="/admin/stats/productos" class="tab-link px-5 py-2.5 text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors border-b-2 border-transparent -mb-[2px]" data-tab="/admin/stats/productos">Productos</a>
     </div>
 
-    <% if (!dbConnected) { %>
-    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
-        <p class="font-bold">Aviso</p>
-        <p>No se ha conectado Supabase. Mostrando datos de prueba. Configura tu `.env` para ver datos reales.</p>
-    </div>
-    <% } %>
+    <!-- Section title -->
+    <p class="text-[13px] font-bold text-gray-400 tracking-wide mb-5 uppercase">Estadísticas Generales del Mes (Resumen)</p>
 
-        <!-- TOP ROW: Best seller + Donut -->
-        <div class="grid grid-cols-2 gap-6 mb-6 max-[900px]:grid-cols-1">
+    <!-- Top 3-column cards -->
+    <div class="grid grid-cols-3 gap-5 mb-6">
 
-        <!-- Best seller card -->
-        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
-            <p class="text-[13px] font-bold text-text-muted tracking-wide mb-4 uppercase">PRODUCTO MÁS VENDIDO
-            SEMANALMENTE</p>
-            <div class="flex items-center gap-5">
-            <div
-                class="w-[120px] h-[120px] shrink-0 flex items-center justify-center bg-[#f8f6fc] rounded-xl overflow-hidden p-2">
-                <% if (productoMasVendido && productoMasVendido.img) { %>
-                <img src="<%= productoMasVendido.img %>" alt="Producto" onerror="this.style.display='none'"
-                    class="max-w-full max-h-full object-contain" />
-                <% } else { %>
-                    <div class="text-5xl">📦</div>
+        <!-- Card 1: Producto más vendido -->
+        <div class="bg-white rounded-[14px] p-5 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+            <p class="text-[11px] font-bold text-gray-400 tracking-wide uppercase mb-4">Producto más vendido semanalmente</p>
+            <% if (productoMasVendido) { %>
+            <div class="flex items-center gap-4">
+                <div class="w-24 h-24 flex-shrink-0 bg-gray-50 rounded-xl overflow-hidden flex items-center justify-center border border-gray-100">
+                    <% if (productoMasVendido.img) { %>
+                        <img src="/uploads/<%= productoMasVendido.img %>" alt="Producto" class="max-w-full max-h-full object-contain"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <span class="text-3xl hidden items-center justify-center">📦</span>
+                    <% } else { %>
+                        <span class="text-3xl">📦</span>
                     <% } %>
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-gray-800 leading-snug"><%= productoMasVendido.nombre %></p>
+                    <% if (productoMasVendido.desc) { %>
+                    <p class="text-xs text-gray-400 mt-1"><%= productoMasVendido.desc %></p>
+                    <% } %>
+                </div>
             </div>
-            <div>
-                <h3 class="text-lg m-0 mb-1.5 text-text-dark">
-                    <%= productoMasVendido ? productoMasVendido.nombre : 'Aún no hay ventas' %>
-                </h3>
-                <p class="text-[13px] text-text-muted my-0.5">
-                    <%= productoMasVendido ? productoMasVendido.desc : 'Sin pedidos recientes' %>
-                </p>
+            <% } else { %>
+            <div class="flex flex-col items-center justify-center py-8 text-center">
+                <span class="text-4xl mb-2">📦</span>
+                <p class="text-xs text-gray-400">Sin datos esta semana</p>
             </div>
+            <% } %>
+        </div>
+
+        <!-- Card 2: Total ventas del mes -->
+        <div class="bg-white rounded-[14px] p-5 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+            <p class="text-[11px] font-bold text-gray-400 tracking-wide uppercase mb-4">Total de ventas en el mes</p>
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-gray-600 mb-1">Ventas Mensuales</p>
+                    <p class="text-5xl font-extrabold text-gray-800 leading-none"><%= totalMensual %></p>
+                    <p class="text-xs text-gray-400 mt-2">Realizados en total</p>
+                </div>
             </div>
         </div>
 
-        <!-- Donut chart card -->
-        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)] flex flex-col items-center">
-            <p class="text-[13px] font-bold text-text-muted tracking-wide mb-4 uppercase">CANTIDAD REFERENTE A VENTAS DE
-                LA SEMANA</p>
-            <div class="relative w-[200px] h-[200px] flex items-center justify-center">
-            <svg viewBox="0 0 100 100" class="donut-svg w-full h-full">
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#e8e4f0" stroke-width="12" />
-                <!-- stroke-dasharray formula: (percent/100) * 239, 239 -->
-                <% const dash1=Math.round((porcentajeProducto/100) * 239); %>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#7c5cbf" stroke-width="12"
-                    stroke-dasharray="<%= dash1 %> 239" stroke-dashoffset="0" stroke-linecap="round" />
-            </svg>
-            <div class="absolute text-center">
-                <span class="block text-[32px] font-extrabold text-[#7c5cbf]">
-                    <%= porcentajeProducto %>%
-                </span>
-                <span class="block text-[11px] text-text-muted leading-tight mt-0.5">de productos<br />de la
-                    semana</span>
-            </div>
+        <!-- Card 3: Total ventas semanales -->
+        <div class="bg-white rounded-[14px] p-5 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+            <p class="text-[11px] font-bold text-gray-400 tracking-wide uppercase mb-4">Total de ventas semanales</p>
+            <p class="text-sm font-semibold text-gray-600 mb-3">Ventas Semanales</p>
+            <div class="flex gap-6">
+                <div>
+                    <p class="text-4xl font-extrabold text-gray-800 leading-none"><%= totalSemanal %></p>
+                    <p class="text-xs text-gray-400 mt-1">Pedidos</p>
+                </div>
+                <div class="w-px bg-gray-200 self-stretch mx-1"></div>
+                <div>
+                    <p class="text-4xl font-extrabold text-gray-800 leading-none"><%= productosSemanal %></p>
+                    <p class="text-xs text-gray-400 mt-1">Productos</p>
+                </div>
             </div>
         </div>
-        </div>
 
-        <!-- MIDDLE ROW: Monthly + Weekly -->
-        <div class="grid grid-cols-2 gap-6 mb-6 max-[900px]:grid-cols-1">
+    </div>
 
-        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
-            <p class="text-[13px] font-bold text-text-muted tracking-wide mb-4 uppercase">TOTAL DE VENTAS EN EL MES</p>
-            <p class="text-sm text-text-muted my-1.5">Se realizaron un total de:</p>
-            <p class="text-base font-bold text-ppg-blue my-1 mb-3">
-                <%= totalMensual %> Pedidos entre todas las sucursales
-            </p>
+    <!-- Line chart card: Total de ventas en el mes -->
+    <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)] mb-6">
+        <p class="text-[13px] font-bold text-gray-400 tracking-wide mb-6 uppercase">COMPARACIÓN: TOTAL DE VENTAS EN EL MES</p>
+
+        <canvas id="chart"></canvas>
+    </div>
+
+    <!-- Weekly branches table -->
+    <div class="bg-white rounded-[14px] shadow-[0_4px_16px_rgba(0,0,0,0.07)] overflow-hidden">
+        <div class="px-6 pt-5 pb-4 border-b border-gray-100 flex items-center justify-between gap-4 flex-wrap">
+            <p class="text-[13px] font-bold text-gray-400 tracking-wide uppercase">Top 10 sucursales con más pedidos</p>
+            <div class="flex gap-1">
+                <a href="/admin/stats?semana=0"
+                   class="px-3 py-1.5 text-xs font-semibold rounded transition-colors <%= semanaFiltro === 0 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                   Semana actual
+                </a>
+                <a href="/admin/stats?semana=1"
+                   class="px-3 py-1.5 text-xs font-semibold rounded transition-colors <%= semanaFiltro === 1 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                   Semana pasada
+                </a>
+                <a href="/admin/stats?semana=2"
+                   class="px-3 py-1.5 text-xs font-semibold rounded transition-colors <%= semanaFiltro === 2 ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' %>">
+                   Hace 2 semanas
+                </a>
             </div>
-
-        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
-            <p class="text-[13px] font-bold text-text-muted tracking-wide mb-4 uppercase">TOTAL DE VENTAS SEMANALES</p>
-            <p class="text-sm text-text-muted my-1.5">Se realizaron un total de:</p>
-            <p class="text-base font-bold text-ppg-blue my-1 mb-3">
-                <%= totalSemanal %> Pedidos entre todas las sucursales
-            </p>
-            <p class="text-sm text-text-muted my-1.5">Se ordenaron:</p>
-            <p class="text-base font-bold text-ppg-blue my-1 mb-3">
-                <%= productosSemanal %> Productos entre todas las sucursales
-            </p>
         </div>
+        <% if (!topSucursalesChart || topSucursalesChart.length === 0) { %>
+        <div class="flex flex-col items-center justify-center py-14 text-center">
+            <span class="text-4xl mb-3">🏪</span>
+            <p class="text-gray-400 text-sm">Sin pedidos confirmados en este período.</p>
         </div>
-
-        <!-- BOTTOM ROW: Branches + Donut -->
-        <div class="grid grid-cols-[2fr_1fr] gap-6 mb-6 max-[900px]:grid-cols-1">
-
-        <!-- Branches table -->
-        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
-            <p class="text-[13px] font-bold text-text-muted tracking-wide mb-4 uppercase">SUCURSALES CON MÁS PEDIDOS EN
-                LA SEMANA</p>
-            <table class="w-full border-collapse">
-            <tbody>
-                <% if (topSucursales && topSucursales.length> 0) { %>
-                <% topSucursales.forEach((sucursal, index)=> { %>
-                    <tr class="border-b border-[#f0f0f0]">
-                    <td class="py-3 px-2 align-middle text-sm font-semibold text-text-dark">
-                        <%= sucursal.nombre %>
-                    </td>
-                    <td class="py-3 px-2 align-middle">
-                        <span
-                        class="inline-block text-xs font-semibold py-1.5 px-3 rounded-full <%= index === 0 ? 'bg-ppg-blue/[0.12] text-ppg-blue' : 'bg-[#7c5cbf]/[0.12] text-[#7c5cbf]' %>">
-                        <%= sucursal.cantidad %> Pedidos en la última semana
+        <% } else { %>
+        <table class="w-full">
+            <thead>
+                <tr class="text-left">
+                    <th class="px-6 py-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Sucursal</th>
+                    <th class="px-6 py-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Gerente</th>
+                    <th class="px-6 py-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Pedidos</th>
+                    <th class="px-6 py-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Ingresos</th>
+                    <th class="px-6 py-3 text-[11px] font-bold text-gray-400 uppercase tracking-wider">% de ingresos</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                <% topSucursalesChart.forEach(s => { %>
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 text-sm font-semibold text-gray-800"><%= s.nombre_sucursal %></td>
+                    <td class="px-6 py-4 text-sm text-gray-500"><%= s.nombre_cuenta %></td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center justify-center min-w-[2rem] px-2.5 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700">
+                            <%= s.total_ordenes %>
                         </span>
                     </td>
-                    </tr>
-                    <% }); %>
-                        <% } else { %>
-                        <tr>
-                            <td class="py-3 px-2 text-sm text-text-muted">Aún no hay pedidos registrados esta semana.</td>
-                        </tr>
-                        <% } %>
-                </tbody>
-            </table>
-        </div>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-emerald-50 text-emerald-700">
+                            <%
+                                const v = s.total_ventas;
+                                let fmt;
+                                if (v >= 1000000) fmt = '$' + (v/1000000).toFixed(1) + 'M';
+                                else if (v >= 1000) fmt = '$' + Math.round(v/1000) + 'K';
+                                else fmt = '$' + Math.round(v);
+                            %>
+                            <%= fmt %>
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-1 bg-gray-100 rounded-full h-1.5 min-w-[60px]">
+                                <div class="bg-blue-500 h-1.5 rounded-full" style="width:<%= s.porcentaje %>%"></div>
+                            </div>
+                            <span class="text-xs font-bold text-gray-700 w-9 text-right"><%= s.porcentaje %>%</span>
+                        </div>
+                    </td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+        <% } %>
+    </div>
 
-        <!-- Mini donut -->
-        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)] flex flex-col items-center">
-            <div class="relative w-[160px] h-[160px] flex items-center justify-center">
-                <svg viewBox="0 0 100 100" class="donut-svg w-[160px] h-[160px]">
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#e8e4f0" stroke-width="12" />
-                <!-- stroke-dasharray formula: (percent/100) * 239, 239 -->
-                <% const dash2=Math.round((porcentajeSucursales/100) * 239); %>
-                <circle cx="50" cy="50" r="38" fill="none" stroke="#7c5cbf" stroke-width="12"
-                    stroke-dasharray="<%= dash2 %> 239" stroke-dashoffset="0" stroke-linecap="round" />
-            </svg>
-            <div class="absolute text-center">
-                <span class="block text-[26px] font-extrabold text-[#7c5cbf]">
-                <%= porcentajeSucursales %>%
-                </span>
-                <span class="block text-[10px] text-text-muted leading-tight mt-0.5">Representado por las<br />top
-                sucursales<br />en la semana</span>
-            </div>
-            </div>
-        </div>
-
-        </div>
 </main>
 
 <%- include('partials/footer.ejs') %>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const currentPath = window.location.pathname;
     document.querySelectorAll('.tab-link').forEach(tab => {
@@ -177,8 +185,50 @@
             tab.classList.remove('text-gray-500');
         }
     });
+
+    const vd = <%- JSON.stringify(typeof ventasDiarias !== 'undefined' ? ventasDiarias : { actual: [], anterior: [], diasEnMes: 30 }) %>;
+    const diasMes = vd.diasEnMes || 30;
+    const dataActual = vd.actual || [];
+    const dataAnterior = vd.anterior || [];
+
+    // Create labels based on number of days (e.g., 1, 2, 3...)
+    const labels = Array.from({length: diasMes}, (_, i) => (i + 1).toString());
+
+    const ctx = document.getElementById('chart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Periodo Actual',
+                        data: dataActual,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Periodo Anterior',
+                        data: dataAnterior,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
 </script>
 
 </body>
-
 </html>

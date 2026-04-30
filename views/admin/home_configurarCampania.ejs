@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/img/PPG_Logo2.svg">
+    <title>Configurar Campaña</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        .banner-radio { display: none; }
+        .banner-card {
+            cursor: pointer;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .banner-radio:checked + .banner-card {
+            border-color: #1d4ed8;
+            box-shadow: 0 0 0 3px #bfdbfe;
+        }
+        .banner-card img { width: 100%; height: 80px; object-fit: cover; display: block; }
+    </style>
+</head>
+<body class="bg-blue-50">
+    <%- include('partials/header.ejs') %>
+
+    <div class="flex min-h-screen flex-col">
+        <%- include('partials/sidebar.ejs') %>
+
+        <main class="ml-48 pt-6 px-10 pb-12 flex-1">
+            <div class="max-w-4xl mx-auto">
+
+            <h1 class="text-2xl font-extrabold text-gray-900 mb-1">Configurar Campaña</h1>
+            <p class="text-sm text-gray-500 mb-6">Gestiona banners, estado y parámetros de la campaña activa.</p>
+
+            <% if (mensaje) { %>
+            <div class="mb-5 px-4 py-3 bg-green-50 border border-green-300 text-green-800 rounded text-sm font-semibold">
+                <%= mensaje %>
+            </div>
+            <% } %>
+            <% if (error) { %>
+            <div class="mb-5 px-4 py-3 bg-red-50 border border-red-300 text-red-800 rounded text-sm font-semibold">
+                <%= error %>
+            </div>
+            <% } %>
+
+            <!-- Información de campaña activa -->
+            <% if (campania) { %>
+            <div class="bg-white border border-gray-200 rounded p-5 mb-8 flex flex-wrap items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+                    <span class="text-sm font-bold text-gray-900">Campaña Activa</span>
+                </div>
+                <span class="text-gray-300">|</span>
+                <span class="text-sm font-semibold text-gray-700"><%= campania.nombre %></span>
+                <span class="text-gray-300">|</span>
+                <span class="text-xs text-gray-500">
+                    <%= new Date(campania.fecha_de_inicio).toLocaleString('es-MX') %> &rarr;
+                    <%= new Date(campania.fecha_de_fin).toLocaleString('es-MX') %>
+                </span>
+                <span class="text-gray-300">|</span>
+                <span class="text-xs text-gray-500"><%= campania.tiempo_de_cancelacion %> min cancelación</span>
+            </div>
+            <% } else { %>
+            <div class="bg-yellow-50 border border-yellow-200 rounded p-5 mb-8">
+                <p class="text-yellow-700 font-bold text-sm mb-4">No hay ninguna campaña activa en este momento.</p>
+                <% if (todasCampanias.length > 0) { %>
+                <form action="/admin/configurar_campania/activar" method="POST" class="flex items-end gap-3">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div class="flex-1 max-w-xs">
+                        <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">Activar una campaña</label>
+                        <select name="id_campania" required
+                            class="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:border-blue-600 focus:outline-none bg-white">
+                            <option value="">Selecciona una campaña...</option>
+                            <% todasCampanias.forEach(c => { %>
+                            <option value="<%= c.id_campania %>"><%= c.nombre %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <button type="submit"
+                        class="px-5 py-2.5 bg-blue-700 text-white font-bold text-sm rounded hover:bg-blue-800 transition-colors">
+                        Activar
+                    </button>
+                </form>
+                <% } else { %>
+                <a href="/admin/agregar_campania" class="text-xs font-bold text-blue-700 hover:underline">
+                    Agregar campaña &rarr;
+                </a>
+                <% } %>
+            </div>
+            <% } %>
+
+            <% if (campania) { %>
+            <div class="space-y-8">
+
+                <!-- ─── 1. ESTADO ─── -->
+                <section class="bg-white border border-gray-200 rounded p-6">
+                    <h2 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-700 text-white text-xs flex items-center justify-center font-bold">1</span>
+                        Estado de la Campaña
+                    </h2>
+                    <form action="/admin/configurar_campania/estado" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="hidden" name="id_campania" value="<%= campania.id_campania %>">
+                        <div class="flex items-center gap-8 mb-3">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="radio" name="activo" value="true"
+                                    <%= campania.activo ? 'checked' : '' %>
+                                    class="w-4 h-4 accent-blue-700">
+                                <span class="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+                                    Activa
+                                </span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="radio" name="activo" value="false"
+                                    <%= !campania.activo ? 'checked' : '' %>
+                                    class="w-4 h-4 accent-blue-700">
+                                <span class="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-red-400 inline-block"></span>
+                                    Inactiva
+                                </span>
+                            </label>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-4">No pueden coexistir dos campañas activas. Cuando está inactiva, los banners no se muestran a los clientes.</p>
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                class="px-6 py-2 bg-blue-700 text-white font-bold text-sm rounded hover:bg-blue-800 transition-colors">
+                                Actualizar estado
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- ─── 2. BANNER DE LOGIN ─── -->
+                <section class="bg-white border border-gray-200 rounded p-6">
+                    <h2 class="text-base font-bold text-gray-900 mb-2 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-700 text-white text-xs flex items-center justify-center font-bold">2</span>
+                        Banner de Login
+                    </h2>
+                    <p class="text-xs text-gray-400 mb-5">Selecciona el banner que aparece en la pantalla de inicio de sesión.</p>
+                    <% if (banners.length === 0) { %>
+                        <p class="text-sm text-gray-400 italic">No hay banners asignados a esta campaña. Agrega uno en la sección de abajo.</p>
+                    <% } else { %>
+                    <form action="/admin/configurar_campania/banner_login" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="hidden" name="id_campania" value="<%= campania.id_campania %>">
+                        <div class="grid grid-cols-4 gap-3 mb-5">
+                            <% banners.forEach(b => { %>
+                            <label>
+                                <input type="radio" name="id_configuraciones"
+                                    value="<%= b.id_configuraciones %>"
+                                    class="banner-radio"
+                                    <%= (campania.banner_login === b.id_configuraciones) ? 'checked' : '' %>>
+                                <div class="banner-card">
+                                    <img src="/img/<%= b.banner %>" alt="Banner"
+                                        onerror="this.src='/img/botePintura.png'">
+                                    <div class="px-2 py-1.5 bg-gray-50">
+                                        <% if (campania.banner_login === b.id_configuraciones) { %>
+                                        <span class="text-xs font-bold text-blue-700">&#10003; Activo</span>
+                                        <% } else { %>
+                                        <span class="text-xs text-gray-400">#<%= b.id_configuraciones %></span>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </label>
+                            <% }) %>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                class="px-6 py-2 bg-blue-700 text-white font-bold text-sm rounded hover:bg-blue-800 transition-colors">
+                                Actualizar banner de login
+                            </button>
+                        </div>
+                    </form>
+                    <% } %>
+                </section>
+
+                <!-- ─── 3. BANNER GENERAL ─── -->
+                <section class="bg-white border border-gray-200 rounded p-6">
+                    <h2 class="text-base font-bold text-gray-900 mb-2 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-700 text-white text-xs flex items-center justify-center font-bold">3</span>
+                        Banner General
+                    </h2>
+                    <p class="text-xs text-gray-400 mb-5">Selecciona el banner de acompañamiento general de la campaña.</p>
+                    <% if (banners.length === 0) { %>
+                        <p class="text-sm text-gray-400 italic">No hay banners asignados a esta campaña. Agrega uno en la sección de abajo.</p>
+                    <% } else { %>
+                    <form action="/admin/configurar_campania/banner_general" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="hidden" name="id_campania" value="<%= campania.id_campania %>">
+                        <div class="grid grid-cols-4 gap-3 mb-5">
+                            <% banners.forEach(b => { %>
+                            <label>
+                                <input type="radio" name="id_configuraciones"
+                                    value="<%= b.id_configuraciones %>"
+                                    class="banner-radio"
+                                    <%= (campania.banner_general === b.id_configuraciones) ? 'checked' : '' %>>
+                                <div class="banner-card">
+                                    <img src="/img/<%= b.banner %>" alt="Banner"
+                                        onerror="this.src='/img/botePintura.png'">
+                                    <div class="px-2 py-1.5 bg-gray-50">
+                                        <% if (campania.banner_general === b.id_configuraciones) { %>
+                                        <span class="text-xs font-bold text-blue-700">&#10003; Activo</span>
+                                        <% } else { %>
+                                        <span class="text-xs text-gray-400">#<%= b.id_configuraciones %></span>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </label>
+                            <% }) %>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                class="px-6 py-2 bg-blue-700 text-white font-bold text-sm rounded hover:bg-blue-800 transition-colors">
+                                Actualizar banner general
+                            </button>
+                        </div>
+                    </form>
+                    <% } %>
+                </section>
+
+                <!-- ─── 4. AGREGAR BANNER ─── -->
+                <section class="bg-white border border-gray-200 rounded p-6">
+                    <h2 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-700 text-white text-xs flex items-center justify-center font-bold">4</span>
+                        Agregar Banner
+                    </h2>
+                    <form action="/admin/configurar_campania/agregar_banner" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="hidden" name="id_camp" value="<%= campania.id_campania %>">
+                        <div class="max-w-sm mb-4">
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">
+                                Imagen <span class="text-red-500">*</span>
+                            </label>
+                            <input type="file" name="banner" accept="image/png,image/jpeg,image/jpg" required
+                                class="w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:border file:border-gray-300 file:rounded file:text-xs file:font-semibold file:bg-gray-50 hover:file:bg-gray-100 cursor-pointer">
+                            <p class="text-xs text-gray-400 mt-1">Se agregará a la campaña activa: <span class="font-semibold"><%= campania.nombre %></span></p>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                class="px-6 py-2 bg-blue-700 text-white font-bold text-sm rounded hover:bg-blue-800 transition-colors">
+                                Guardar banner
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- ─── 5. TIEMPO DE CANCELACIÓN ─── -->
+                <section class="bg-white border border-gray-200 rounded p-6">
+                    <h2 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-700 text-white text-xs flex items-center justify-center font-bold">5</span>
+                        Tiempo de Cancelación
+                    </h2>
+                    <form action="/admin/configurar_campania/cancelacion" method="POST">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="hidden" name="id_campania" value="<%= campania.id_campania %>">
+                        <div class="flex items-center gap-3 max-w-xs mb-2">
+                            <input type="number" name="tiempo_de_cancelacion" min="1" required
+                                value="<%= campania.tiempo_de_cancelacion || '' %>"
+                                class="flex-1 px-3 py-2.5 border border-gray-300 rounded text-sm focus:border-blue-600 focus:outline-none">
+                            <span class="text-sm text-gray-600 font-semibold">minutos</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-4">Plazo máximo para que un cliente cancele su orden después de realizarla.</p>
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                class="px-6 py-2 bg-blue-700 text-white font-bold text-sm rounded hover:bg-blue-800 transition-colors">
+                                Actualizar tiempo
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+            </div>
+            <% } %> <!-- fin if campania -->
+            </div>
+        </main>
+    </div>
+
+    <%- include('partials/footer.ejs') %>
+</body>
+</html>

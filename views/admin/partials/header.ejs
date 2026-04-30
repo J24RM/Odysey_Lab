@@ -16,24 +16,23 @@
 })();
 </script>
 
+<!-- Loader de navegación -->
+<div id="page-loader" class="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-200" style="background-color: rgba(0,39,54,0.35);">
+  <div class="bg-white rounded-2xl shadow-xl px-10 py-8 flex flex-col items-center gap-4">
+    <div class="w-10 h-10 rounded-full border-4 border-gray-200 border-t-[#0078A9] animate-spin"></div>
+    <span class="text-sm font-semibold text-gray-700">Cargando...</span>
+  </div>
+</div>
+
 <!-- Header -->
 <header class="sticky top-0 z-50 bg-blue-50 border-b border-blue-100 shadow-sm">
     <div class="flex items-center justify-between px-7 h-[60px]">
         <div class="flex-shrink-0">
             <img src="/img/ppg-logo.svg" alt="Logo PPG" class="h-11">
         </div>
-        <!-- Stats que remplazan barra de busqueda -->
-        <div class="flex-1 flex items-center justify-center gap-8 mx-8">
-            <div class="flex items-center gap-2">
-                <span class="text-xs font-semibold text-gray-600">Pedidos confirmados hoy:</span>
-                <span class="text-lg font-extrabold text-gray-900">12</span>
-            </div>
-            <div class="w-px h-6 bg-gray-300"></div>
-            <div class="flex items-center gap-2">
-                <span class="text-xs font-semibold text-gray-600">Producto más popular:</span>
-                <span class="text-lg font-extrabold text-gray-900">SELLADOR-001</span>
-            </div>
-        </div>
+        <!-- Welcome Banner -->
+        <h2 class="text-3xl font-extrabold text-blue-700 m-0">Bienvenido, Administrador</h2>
+        
         <div class="flex items-center gap-3">
             <a href="/logout" class="inline-flex items-center justify-center px-3.5 py-2 rounded-full border border-gray-300 bg-white text-blue-600 font-bold text-sm hover:bg-blue-600 hover:text-white transition-all">
                 Cerrar sesión

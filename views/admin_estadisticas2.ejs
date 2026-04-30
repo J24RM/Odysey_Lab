@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/img/PPG_Logo2.svg">
   <title>Estadísticas de Pedidos</title>
   <link rel="stylesheet" href="/style_admin_estadisticas2.css" />
 </head>
@@ -159,7 +160,7 @@
                 </div>
                 <div class="product-price">
                   <p class="price-main">
-                    <%= producto.precio ? '$ ' + producto.precio : 'N/A' %>
+                    <%= producto.precio ? '$ ' + Number(producto.precio).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'N/A' %>
                   </p>
                 </div>
               </div>

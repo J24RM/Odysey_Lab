@@ -18,40 +18,52 @@
 
 <meta name="csrf-token" content="<%= csrfToken %>">
 
-<nav class="w-full flex items-center justify-between px-6 py-3 border-b border-gray-200" style="background-color: rgba(0, 120, 169, 0.1);">
-    <!-- Logo -->
+<nav class="w-full flex items-center justify-between px-6 py-3 border-b border-gray-200 sticky top-0 z-50 sticky z-50 bg-blue-50 border-b border-blue-100 shadow-sm">
+        <!-- Logo -->
     <a href="/cliente/home" class="flex-shrink-0">
         <img src="/img/ppg-logo.svg" class="w-[60px]" alt="PPG">
     </a>
 
-    <!-- Sucursal activa (solo display, no es botón) -->
+    <!-- Sucursal activa (abre modal de perfil) -->
     <div class="ml-6 flex-shrink-0">
-        <div id="sucursal-display" class="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm shadow-sm">
+        <button onclick="window.abrirModalPerfil()" id="sucursal-display" class="bg-white border border-gray-300 rounded-md px-4 py-2 text-sm shadow-sm hover:border-[#0078A9] hover:shadow-md transition-all cursor-pointer">
             <% if (locals.sucursal_activa) { %>
                 <span class="font-semibold text-gray-800"><%= sucursal_activa.nombre_sucursal %></span>
             <% } else { %>
                 <span class="text-gray-400 italic">Sin sucursal</span>
             <% } %>
-        </div>
+        </button>
     </div>
 
     <!-- Buscador centrado -->
     <form action="/cliente/home" method="GET" class="mx-auto w-[45%]">
         <div class="relative">
-            <input type="search" name="search" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" class="w-full text-center border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0078A9] text-gray-800" placeholder="Buscar Producto" aria-label="Buscar Producto">
+            <input id="clienteSearchInput" type="search" name="search" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" class="w-full text-center border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0078A9] text-gray-800" placeholder="Buscar Producto" aria-label="Buscar Producto">
         </div>
     </form>
 
     <!-- Menu derecho -->
     <div class="flex items-center space-x-6 shrink-0">
-        <a href="/cliente/mis-pedidos" class="bg-white border text-gray-800 border-gray-300 rounded-md px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">Mis Pedidos</a>
-        <a href="/cart" class="hover:opacity-80 transition-opacity">
+        <a href="/cliente/mis-pedidos" class="bg-white border text-gray-800 border-gray-300 rounded-md px-4 py-2 text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">Mis órdenes</a>
+       <a href="/cart" class="hover:opacity-80 transition-opacity relative inline-block">
             <img src="https://cdn-icons-png.flaticon.com/512/3144/3144456.png" class="w-[35px]" alt="Carrito">
+            <% if (locals.cartCount && locals.cartCount > 0) { %>
+                <span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none">
+                <%= locals.cartCount > 99 ? '+99' : locals.cartCount %>
+                </span>
+            <% } %>
         </a>
         <button id="btnPerfil" data-bs-toggle="modal" data-bs-target="#modalSelector" class="block hover:opacity-80 transition-opacity">
             <img src="/img/iconoPerfil.png" class="w-[40px] h-[40px] rounded-full object-cover shadow-sm border" alt="Perfil">
         </button>
     </div>
+    <!-- Carga -->
+<div id="page-loader" class="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-200" style="background-color: rgba(0,39,54,0.35);">
+  <div class="bg-white rounded-2xl shadow-xl px-10 py-8 flex flex-col items-center gap-4">
+    <div class="w-10 h-10 rounded-full border-4 border-gray-200 border-t-[#0078A9] animate-spin"></div>
+    <span class="text-sm font-semibold text-gray-700">Cargando...</span>
+  </div>
+</div>
 </nav>
 
 <%- include('_modal_info') %>

@@ -21,6 +21,8 @@ const adminProductoRoutes = require('./routes/admin/producto.routes');
 const adminOrdenesRoutes = require('./routes/admin/ordenes.routes');
 const adminClientesRoutes = require('./routes/admin/clientes.routes');
 const adminEstadisticasRoutes = require('./routes/admin/estadisticas.routes');
+const adminBitacoraRoutes = require('./routes/admin/bitacora.routes');
+const adminCampaniaRoutes = require('./routes/admin/campania.routes');
 const clienteRoutes = require('./routes/cliente.routes')
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -56,7 +58,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Configuración de multer para subida de imágenes
 const fileStorage = multer.diskStorage({
     destination: (request, file, callback) => {
-        callback(null, path.join(__dirname, 'uploads'));
+        const bannerFields = ['banner', 'banner_login', 'banner_general'];
+        if (bannerFields.includes(file.fieldname)) {
+            callback(null, path.join(__dirname, 'public', 'img'));
+        } else {
+            callback(null, path.join(__dirname, 'uploads'));
+        }
     },
     filename: (request, file, callback) => {
         // Generar nombre único sin caracteres problemáticos
@@ -86,7 +93,10 @@ const fileFilter = (request, file, callback) => {
 app.use(multer({ storage: fileStorage, fileFilter }).fields([
     { name: 'imagen', maxCount: 1 },
     { name: 'imagenes', maxCount: 50 },
-    { name: 'archivoCSV', maxCount: 1 }
+    { name: 'archivoCSV', maxCount: 1 },
+    { name: 'banner_login', maxCount: 1 },
+    { name: 'banner_general', maxCount: 1 },
+    { name: 'banner', maxCount: 1 }
 ]));
 
 app.use(csrfProtection);
@@ -148,7 +158,9 @@ app.use((request, response, next) => {
 //Middleware de autorizacion para rutas admin
 const requireAdmin = (request, response, next) => {
     if (request.session.id_rol !== 2) {
-        return response.status(404).send('La ruta no existe');
+        return response.status(404).render('error', {
+
+        });
     }
     next();
 };
@@ -161,12 +173,25 @@ const requireCliente = (request, response, next) => {
     next();
 };
 
+// Middleware: inyecta configuración de campaña en todas las vistas protegidas
+const Configuracion = require('./models/configuracion.model');
+app.use(async (_req, res, next) => {
+    try {
+        res.locals.config = await Configuracion.ObtenerConfig();
+    } catch {
+        res.locals.config = null;
+    }
+    next();
+});
+
 // Rutas para admin (protegidas)
 app.use('/admin', requireAdmin, adminHomeRoutes);
 app.use('/admin', requireAdmin, adminProductoRoutes);
 app.use('/admin', requireAdmin, adminOrdenesRoutes);
 app.use('/admin', requireAdmin, adminClientesRoutes);
 app.use('/admin', requireAdmin, adminEstadisticasRoutes);
+app.use('/admin', requireAdmin, adminBitacoraRoutes);
+app.use('/admin', requireAdmin, adminCampaniaRoutes);
 
 
 // Rutas del Cliente
@@ -184,15 +209,31 @@ app.use("/cart",requireCliente,carrito);
 const ordenRoutes = require('./routes/orden.routes');
 app.use("/orden", requireCliente, ordenRoutes);
 
-app.use((request, response, next) => {
-    response.status(404).send("La ruta no existe");
+// 404 — ruta no encontrada
+app.use((req, res) => {
+    res.status(404).render('error', {
+        codigo: 404,
+        mensaje: 'Página no encontrada.',
+        detalle: 'La ruta que buscas no existe o fue movida.'
+    });
 });
 
+// 500 — error interno
 app.use((err, req, res, next) => {
     if (err.code === 'EBADCSRFTOKEN') {
-        return res.status(403).send('Token CSRF inválido');
+        return res.status(403).render('error', {
+            codigo: 403,
+            mensaje: 'Token de seguridad inválido o expirado.',
+            detalle: 'Recarga la página e intenta de nuevo.'
+        });
     }
-    next(err);
+
+    console.error(err);
+    res.status(500).render('error', {
+        codigo: 500,
+        mensaje: 'Error interno del servidor.',
+        detalle: 'Algo salió mal. Por favor intenta más tarde.'
+    });
 });
 
 app.listen(PORT, () => {

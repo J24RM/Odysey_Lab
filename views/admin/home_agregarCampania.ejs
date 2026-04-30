@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/img/PPG_Logo2.svg">
+    <title>Agregar Campaña</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>* { font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }</style>
+</head>
+<body class="bg-blue-50">
+    <%- include('partials/header.ejs') %>
+
+    <div class="flex min-h-screen flex-col">
+        <%- include('partials/sidebar.ejs') %>
+
+        <main class="ml-48 pt-6 px-10 pb-12 flex-1">
+            <div class="max-w-3xl mx-auto">
+
+            <h1 class="text-2xl font-extrabold text-gray-900 mb-1">Agregar Campaña</h1>
+            <p class="text-sm text-gray-500 mb-8">Crea una nueva campaña con sus datos y banners iniciales.</p>
+
+            <% if (hayActiva) { %>
+            <div class="mb-6 px-4 py-3 bg-yellow-50 border border-yellow-300 text-yellow-800 rounded text-sm font-semibold flex items-start gap-2">
+                <span class="mt-0.5">⚠</span>
+                <span>Ya existe una campaña activa. Si deseas que esta sea activa, primero desactiva la actual desde
+                    <a href="/admin/configurar_campania" class="underline">Configurar Campaña</a>.
+                </span>
+            </div>
+            <% } %>
+
+            <% if (mensaje) { %>
+            <div class="mb-6 px-4 py-3 bg-green-50 border border-green-300 text-green-800 rounded text-sm font-semibold">
+                <%= mensaje %>
+            </div>
+            <% } %>
+            <% if (error) { %>
+            <div class="mb-6 px-4 py-3 bg-red-50 border border-red-300 text-red-800 rounded text-sm font-semibold">
+                <%= error %>
+            </div>
+            <% } %>
+
+            <form action="/admin/agregar_campania" method="POST" enctype="multipart/form-data" class="space-y-8">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                <!-- ─── 1. DATOS ─── -->
+                <section class="bg-white border border-gray-200 rounded p-6">
+                    <h2 class="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-700 text-white text-xs flex items-center justify-center font-bold">1</span>
+                        Datos de la Campaña
+                    </h2>
+                    <div class="grid grid-cols-2 gap-5">
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">
+                                Nombre <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="nombre" required placeholder="Ej. Día de Muertos 2026"
+                                class="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:border-blue-600 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">
+                                Fecha y hora de inicio <span class="text-red-500">*</span>
+                            </label>
+                            <input type="datetime-local" name="fecha_de_inicio" required
+                                class="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:border-blue-600 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">
+                                Fecha y hora de fin <span class="text-red-500">*</span>
+                            </label>
+                            <input type="datetime-local" name="fecha_de_fin" required
+                                class="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:border-blue-600 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-1">
+                                Tiempo de cancelación <span class="text-red-500">*</span>
+                            </label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" name="tiempo_de_cancelacion" required min="1" placeholder="15"
+                                    class="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:border-blue-600 focus:outline-none">
+                                <span class="text-sm text-gray-500 whitespace-nowrap">minutos</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-1">Plazo para que un cliente cancele su orden.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-3">Estado inicial</label>
+                            <div class="flex items-center gap-6">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="activo" value="true" <%= hayActiva ? 'disabled' : '' %>
+                                        class="w-4 h-4 accent-blue-700">
+                                    <span class="flex items-center gap-1.5 text-sm font-semibold <%= hayActiva ? 'text-gray-400' : 'text-gray-800' %>">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
+                                        Activa
+                                    </span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="activo" value="false" checked
+                                        class="w-4 h-4 accent-blue-700">
+                                    <span class="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-red-400 inline-block"></span>
+                                        Inactiva
+                                    </span>
+                                </label>
+                            </div>
+                            <% if (!hayActiva) { %>
+                            <p class="text-xs text-gray-400 mt-1">Solo puede haber una campaña activa a la vez.</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ─── 2. BANNER LOGIN ─── -->
+                <section class="bg-white border border-gray-200 rounded p-6">
+                    <h2 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-700 text-white text-xs flex items-center justify-center font-bold">2</span>
+                        Banner de Login <span class="text-red-500 text-sm font-normal ml-1">*</span>
+                    </h2>
+                    <div id="preview-login" class="hidden mb-3">
+                        <img id="img-preview-login" src="" alt="Preview"
+                            class="max-h-36 object-contain border border-gray-200 rounded">
+                    </div>
+                    <input type="file" name="banner_login" accept="image/png,image/jpeg,image/jpg" required
+                        onchange="previewImg(this,'img-preview-login','preview-login')"
+                        class="w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:border file:border-gray-300 file:rounded file:text-xs file:font-semibold file:bg-gray-50 hover:file:bg-gray-100 cursor-pointer">
+                    <p class="text-xs text-gray-400 mt-2">Imagen de fondo en la pantalla de inicio de sesión.</p>
+                </section>
+
+                <!-- ─── 3. BANNER GENERAL ─── -->
+                <section class="bg-white border border-gray-200 rounded p-6">
+                    <h2 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-blue-700 text-white text-xs flex items-center justify-center font-bold">3</span>
+                        Banner General <span class="text-red-500 text-sm font-normal ml-1">*</span>
+                    </h2>
+                    <div id="preview-general" class="hidden mb-3">
+                        <img id="img-preview-general" src="" alt="Preview"
+                            class="max-h-36 object-contain border border-gray-200 rounded">
+                    </div>
+                    <input type="file" name="banner_general" accept="image/png,image/jpeg,image/jpg" required
+                        onchange="previewImg(this,'img-preview-general','preview-general')"
+                        class="w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:border file:border-gray-300 file:rounded file:text-xs file:font-semibold file:bg-gray-50 hover:file:bg-gray-100 cursor-pointer">
+                    <p class="text-xs text-gray-400 mt-2">Imagen de acompañamiento general de la campaña.</p>
+                </section>
+
+                <div class="flex justify-end">
+                    <button type="submit"
+                        class="px-8 py-3 bg-blue-700 text-white font-bold text-sm rounded hover:bg-blue-800 transition-colors">
+                        Crear campaña
+                    </button>
+                </div>
+            </form>
+
+            </div>
+        </main>
+    </div>
+
+    <%- include('partials/footer.ejs') %>
+
+    <script>
+        function previewImg(input, imgId, containerId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    document.getElementById(imgId).src = e.target.result;
+                    document.getElementById(containerId).classList.remove('hidden');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+</body>
+</html>

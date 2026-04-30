@@ -2,8 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/img/PPG_Logo2.svg">
     <title>Login</title>
     <link rel="stylesheet" href="/style_login.css">
+    <% if (config && config.banner_login_url) { %>
+    <style>:root { --banner-login-url: url('/img/<%= config.banner_login_url %>'); }</style>
+    <% } %>
     <style>
         .modal-overlay {
             display: none;

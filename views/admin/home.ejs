@@ -3,81 +3,102 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/img/PPG_Logo2.svg">
     <title>Admin Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
+        * { font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
     </style>
 </head>
 
-<body class="bg-gray-50">
+<body class="bg-blue-50">
     <%- include('partials/header.ejs') %>
 
     <div class="flex min-h-screen flex-col">
         <%- include('partials/sidebar.ejs') %>
 
-        <!-- Main Content -->
-        <main class="ml-48 pt-2 px-10 pb-9 flex-1">
-            <!-- Welcome Section -->
-            <div class="bg-gradient-to-r from-white to-blue-50 border-l-4 border-l-blue-600 border border-blue-200 rounded-2xl px-5 py-4 mb-7 shadow-sm">
-                <h2 class="text-3xl font-extrabold text-blue-600 m-0">Bienvenido administrador</h2>
-            </div>
+        <main class="ml-48 pt-4 px-10 pb-9 flex-1">
 
-            <!-- Banner Section -->
-            <section class="bg-white rounded-2xl p-7 shadow-md mb-7 overflow-hidden relative">
-                <!-- Decorative background circle -->
-                <div class="absolute -top-10 -right-10 w-56 h-56 rounded-full bg-blue-100 opacity-40"></div>
-
-                <div class="flex items-center justify-between gap-6 relative z-10">
-                    <div>
-                        <h2 class="text-4xl font-extrabold text-blue-600 underline decoration-orange-500 decoration-2 underline-offset-4 max-w-sm leading-tight">
-                            Preventa Activa: Productos Exclusivos Mundial 2026
+            <!-- Banner de campaña -->
+            <% const timerImgSrc = (config && config.banner_general_url) ? '/img/' + config.banner_general_url : '/img/niñoMundial.png'; %>
+            <% const nombreCamp = (config && config.nombre) ? config.nombre : 'Mundial 2026'; %>
+            <% const fechaFin = (config && config.fecha_de_fin) ? config.fecha_de_fin : '2026-06-11T00:00:00'; %>
+            <section class="mb-6 overflow-hidden" style="background:#002736; padding:28px 40px;">
+                <div class="flex items-center justify-between gap-6">
+                    <!-- Left -->
+                    <div class="flex-1">
+                        <p class="text-xs font-bold uppercase tracking-widest mb-2" style="color:#8FBADE;">Preventa activa</p>
+                        <h2 class="text-3xl font-extrabold text-white leading-tight mb-2">
+                            Productos Exclusivos<br>
+                            <span style="color:#f97316;"><%= nombreCamp %></span>
                         </h2>
+                        <p class="text-sm" style="color:#8FBADE;">Fin: <%= new Date(fechaFin).toLocaleDateString('es-MX', {day:'numeric', month:'long', year:'numeric'}) %></p>
                     </div>
-                    <div class="flex-shrink-0">
-                        <img src="/img/niñoMundial.png" alt="Mundial 2026" class="h-32 w-auto object-contain">
+                    <!-- Temporizador e imagen -->
+                    <div class="flex items-center gap-4">
+                        <div class="flex gap-3">
+                            <div class="flex flex-col items-center px-4 py-3 rounded" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);">
+                                <span id="cd-dias" class="text-2xl font-extrabold text-white">--</span>
+                                <span class="text-xs uppercase" style="color:#8FBADE;">Días</span>
+                            </div>
+                            <div class="flex flex-col items-center px-4 py-3 rounded" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);">
+                                <span id="cd-hrs" class="text-2xl font-extrabold text-white">--</span>
+                                <span class="text-xs uppercase" style="color:#8FBADE;">Hrs</span>
+                            </div>
+                            <div class="flex flex-col items-center px-4 py-3 rounded" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);">
+                                <span id="cd-min" class="text-2xl font-extrabold text-white">--</span>
+                                <span class="text-xs uppercase" style="color:#8FBADE;">Min</span>
+                            </div>
+                            <div class="flex flex-col items-center px-4 py-3 rounded" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);">
+                                <span id="cd-seg" class="text-2xl font-extrabold text-white">--</span>
+                                <span class="text-xs uppercase" style="color:#8FBADE;">Seg</span>
+                            </div>
+                        </div>
+                        <img src="<%= timerImgSrc %>" alt="<%= nombreCamp %>" class="h-40 w-auto object-contain" onerror="this.src='/img/botePintura.png'">
                     </div>
                 </div>
             </section>
 
-            <!-- Action Buttons -->
-            <section class="bg-white rounded-2xl p-7 shadow-md mb-7 flex gap-6">
-                <a href="/admin/agregar_producto" class="flex-1 py-5 px-5 bg-green-400 text-green-900 font-extrabold text-lg rounded-xl transition-all hover:shadow-lg hover:-translate-y-0.5">
-                    Agregar Producto
+            <!-- Botones de Agregar y Editar producto -->
+            <section class="bg-white border border-gray-200 p-5 mb-6 flex gap-4">
+                <a href="/admin/agregar_producto"
+                    class="flex-1 py-4 px-5 bg-green-700 text-white font-bold text-sm text-center rounded transition-colors hover:bg-green-800">
+                    Agregar Producto al Catálogo
                 </a>
-                <a href="/admin/editar_producto" class="flex-1 py-5 px-5 bg-blue-400 text-blue-900 font-extrabold text-lg rounded-xl transition-all hover:shadow-lg hover:-translate-y-0.5">
-                    Editar Producto
+                <a href="/admin/editar_producto"
+                    class="flex-1 py-4 px-5 bg-blue-700 text-white font-bold text-sm text-center rounded transition-colors hover:bg-blue-800">
+                    Editar Producto del Catálogo
                 </a>
             </section>
 
-            <!-- Catalog Section -->
-            <section class="bg-white rounded-2xl p-7 shadow-md">
-                <!-- Header -->
-                <div class="flex items-center justify-between mb-6 gap-4">
+            <!-- Seccion del catálogo -->
+            <section class="bg-white border border-blue-100 p-7">
+                <div class="flex flex-col items-center mb-6 gap-4">
                     <h3 class="text-2xl font-extrabold text-gray-900 m-0">Catálogo de Productos</h3>
-                    <input id="searchInput" type="text" placeholder="Buscar Productos" class="px-4 py-2.5 border-2 border-gray-300 rounded-full text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors w-64" />
+                    <input id="searchInput" type="text" placeholder="Buscar Producto"
+                        class="px-4 py-2.5 border-2 border-gray-300 rounded text-sm font-medium focus:border-blue-600 focus:outline-none transition-colors w-full max-w-2xl" />
                 </div>
 
-                <!-- Product Grid -->
-                <div id="productGrid" class="grid grid-cols-4 gap-5">
+                <!-- Grid de productos -->
+                <div id="productGrid" class="grid grid-cols-4 gap-4">
                     <% if (productos && productos.length > 0) { %>
                         <% productos.forEach(p => { %>
-                            <a href="/admin/product/<%= p.id_producto %>" class="border-2 border-blue-100 rounded-xl p-4 text-center transition-all hover:shadow-lg hover:border-blue-600 hover:-translate-y-1">
-                                <div class="h-32 flex items-center justify-center mb-3">
-                                    <img src="<%= p.url_imagen ? '/uploads/' + p.url_imagen : '/img/botePintura.png' %>" alt="<%= p.nombre %>" class="max-h-28 max-w-full object-contain" onerror="this.src='/img/botePintura.png'">
+                            <a href="/admin/product/<%= p.id_producto %>"
+                                class="border border-gray-200 rounded p-4 text-center transition-all hover:border-blue-600 hover:shadow-md">
+                                <div class="h-32 flex items-center justify-center bg-gray-50 mb-3">
+                                    <img src="<%= p.url_imagen ? '/uploads/' + p.url_imagen : '/img/botePintura.png' %>"
+                                        alt="<%= p.nombre %>" class="max-h-28 max-w-full object-contain"
+                                        onerror="this.src='/img/botePintura.png'">
                                 </div>
-                                <p class="text-sm font-bold text-gray-900 text-left leading-snug mb-2">
-                                    <%= p.nombre %>
-                                </p>
-                                <div class="flex items-center gap-2 justify-center flex-wrap mb-2">
-                                    <span class="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-xs font-bold rounded-full">
-                                        $ <%= p.precio_unitario %>
+                                <p class="text-sm font-bold text-gray-900 text-left leading-snug mb-2"><%= p.nombre %></p>
+                                <p class="text-sm font-bold text-gray-600 text-left leading-snug mb-2">SKU: <%= p.clave %></p>
+                                <div class="flex items-center gap-2 justify-center flex-wrap">
+                                    <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200 rounded">
+                                        $<%= Number(p.precio_unitario).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
                                     </span>
                                     <% if (!p.activo) { %>
-                                        <span class="inline-block px-3 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-full">
+                                        <span class="px-2 py-0.5 bg-red-50 text-red-700 text-xs font-bold border border-red-200 rounded">
                                             Inactivo
                                         </span>
                                     <% } %>
@@ -91,25 +112,26 @@
                     <% } %>
                 </div>
 
-                <!-- Pagination -->
+                <!-- Paginacion -->
                 <% if (totalPages > 1) { %>
-                <div class="flex items-center justify-center gap-2 mt-8 pt-6 border-t border-gray-200">
+                <div class="flex items-center justify-center gap-1 mt-8 pt-6 border-t border-gray-200">
                     <% if (page > 1) { %>
-                        <a href="/admin/home?page=<%= page - 1 %>" class="px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-700 font-bold hover:border-blue-600 hover:bg-blue-50 transition">← Anterior</a>
+                        <a href="/admin/home?page=<%= page - 1 %>"
+                            class="px-4 py-2 border border-gray-300 rounded text-gray-700 font-semibold text-sm hover:border-blue-600 hover:bg-blue-50 transition">← Anterior</a>
                     <% } %>
-
                     <% for (let i = 1; i <= totalPages; i++) { %>
                         <% if (i === page) { %>
-                            <span class="px-3 py-2 bg-blue-600 text-white font-bold rounded-lg"><%= i %></span>
+                            <span class="px-3 py-2 bg-blue-700 text-white font-bold text-sm rounded"><%= i %></span>
                         <% } else if (i <= 3 || i > totalPages - 3 || (i > page - 2 && i < page + 2)) { %>
-                            <a href="/admin/home?page=<%= i %>" class="px-3 py-2 border-2 border-gray-300 rounded-lg text-gray-700 font-bold hover:border-blue-600 hover:bg-blue-50 transition"><%= i %></a>
+                            <a href="/admin/home?page=<%= i %>"
+                                class="px-3 py-2 border border-gray-300 rounded text-gray-700 font-semibold text-sm hover:border-blue-600 hover:bg-blue-50 transition"><%= i %></a>
                         <% } else if (i === 4 || i === totalPages - 3) { %>
-                            <span class="px-3 py-2 text-gray-400">...</span>
+                            <span class="px-3 py-2 text-gray-400 text-sm">...</span>
                         <% } %>
                     <% } %>
-
                     <% if (page < totalPages) { %>
-                        <a href="/admin/home?page=<%= page + 1 %>" class="px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-700 font-bold hover:border-blue-600 hover:bg-blue-50 transition">Siguiente →</a>
+                        <a href="/admin/home?page=<%= page + 1 %>"
+                            class="px-4 py-2 border border-gray-300 rounded text-gray-700 font-semibold text-sm hover:border-blue-600 hover:bg-blue-50 transition">Siguiente →</a>
                     <% } %>
                 </div>
                 <% } %>
@@ -120,56 +142,61 @@
     <%- include('partials/footer.ejs') %>
 
     <script>
+        // Temporizador de preventa
+        const target = new Date('<%= (config && config.fecha_de_fin) ? config.fecha_de_fin : "2026-06-11T00:00:00" %>');
+        function updateCountdown() {
+            const diff = target - new Date();
+            if (diff <= 0) {
+                ['cd-dias', 'cd-hrs', 'cd-min', 'cd-seg'].forEach(id => document.getElementById(id).textContent = '00');
+                return;
+            }
+            const pad = n => String(n).padStart(2, '0');
+            document.getElementById('cd-dias').textContent = pad(Math.floor(diff / 86400000));
+            document.getElementById('cd-hrs').textContent  = pad(Math.floor((diff % 86400000) / 3600000));
+            document.getElementById('cd-min').textContent  = pad(Math.floor((diff % 3600000) / 60000));
+            document.getElementById('cd-seg').textContent  = pad(Math.floor((diff % 60000) / 1000));
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // Busqueda de producto en tiempo real
         const searchInput = document.getElementById('searchInput');
         const productGrid = document.getElementById('productGrid');
 
-        // Búsqueda en tiempo real
         searchInput.addEventListener('input', async (e) => {
             const query = e.target.value.trim();
-
             if (!query) {
-                // Si está vacío, recargar la página para mostrar todos los productos
                 window.location.href = '/admin/home';
                 return;
             }
-
             try {
-                const url = `/admin/api/productos?q=${encodeURIComponent(query)}`;
-                const response = await fetch(url);
+                const response = await fetch(`/admin/api/productos?q=${encodeURIComponent(query)}`);
                 const productos = await response.json();
-
                 productGrid.innerHTML = '';
-
                 if (productos.length === 0) {
                     productGrid.innerHTML = '<div class="col-span-4 py-10 text-center text-gray-500">No se encontraron productos</div>';
                     return;
                 }
-
                 productos.forEach(p => {
-                    const imageSrc = p.url_imagen ? `/uploads/${p.url_imagen}` : '/img/botePintura.png';
-                    const inactiveStyle = !p.activo ? '<span class="inline-block px-3 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-full">Inactivo</span>' : '';
-
-                    const article = document.createElement('a');
-                    article.href = `/admin/product/${p.id_producto}`;
-                    article.className = 'border-2 border-blue-100 rounded-xl p-4 text-center transition-all hover:shadow-lg hover:border-blue-600 hover:-translate-y-1';
-                    article.innerHTML = `
-                        <div class="h-32 flex items-center justify-center mb-3">
-                            <img src="${imageSrc}" alt="${p.nombre}" class="max-h-28 max-w-full object-contain" onerror="this.src='/img/botePintura.png'">
+                    const src = p.url_imagen ? `/uploads/${p.url_imagen}` : '/img/botePintura.png';
+                    const inactive = !p.activo
+                        ? '<span class="px-2 py-0.5 bg-red-50 text-red-700 text-xs font-bold border border-red-200 rounded">Inactivo</span>'
+                        : '';
+                    const el = document.createElement('a');
+                    el.href = `/admin/product/${p.id_producto}`;
+                    el.className = 'border border-gray-200 rounded p-4 text-center transition-all hover:border-blue-600 hover:shadow-md';
+                    el.innerHTML = `
+                        <div class="h-32 flex items-center justify-center bg-gray-50 mb-3">
+                            <img src="${src}" alt="${p.nombre}" class="max-h-28 max-w-full object-contain" onerror="this.src='/img/botePintura.png'">
                         </div>
-                        <p class="text-sm font-bold text-gray-900 text-left leading-snug mb-2">
-                            ${p.nombre}
-                        </p>
-                        <div class="flex items-center gap-2 justify-center flex-wrap mb-2">
-                            <span class="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-xs font-bold rounded-full">
-                                $ ${p.precio_unitario}
-                            </span>
-                            ${inactiveStyle}
-                        </div>
-                    `;
-                    productGrid.appendChild(article);
+                        <p class="text-sm font-bold text-gray-900 text-left leading-snug mb-2">${p.nombre}</p>
+                        <div class="flex items-center gap-2 justify-center flex-wrap">
+                            <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200 rounded">$${Number(p.precio_unitario).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            ${inactive}
+                        </div>`;
+                    productGrid.appendChild(el);
                 });
-            } catch (error) {
-                console.error('Error searching products:', error);
+            } catch {
                 productGrid.innerHTML = '<div class="col-span-4 py-10 text-center text-red-500">Error al buscar productos</div>';
             }
         });

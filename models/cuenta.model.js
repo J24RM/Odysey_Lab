@@ -15,7 +15,7 @@ module.exports = class Cuenta {
     static async obtenerSucursalesPorCuenta(id_cuenta) {
         const { data, error } = await supabase
             .from('sucursal_cuenta')
-            .select('sucursal(id_sucursal, nombre_sucursal, edo, deleg_municipio, num_colonia)')
+            .select('sucursal(id_sucursal, nombre_sucursal, edo, deleg_municipio, num_colonia, calle_1, calle_2)')
             .eq('id_cuenta', id_cuenta);
 
         if (error) throw error;

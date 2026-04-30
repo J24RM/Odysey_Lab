@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/img/PPG_Logo2.svg">
+<title>Detalle Sucursal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>* { font-family: 'Public Sans', -apple-system, sans-serif; }</style>
+</head>
+
+<body class="bg-gray-50">
+
+<%- include('partials/header.ejs') %>
+<%- include('partials/sidebar.ejs') %>
+
+<main class="ml-48 pt-2 px-10 pb-9 flex-1 min-h-[calc(100vh-70px)]">
+
+    <!-- Header con back + título + selector de período -->
+    <div class="flex items-center justify-between mb-6 pt-2">
+        <div class="flex items-center gap-3">
+            <a href="/admin/stats/sucursales" class="text-gray-400 hover:text-gray-700 text-xl transition-colors">←</a>
+            <h1 class="text-xl font-extrabold text-gray-800"><%= nombre %></h1>
+            <% if (edo) { %>
+                <span class="text-xs font-semibold bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full"><%= edo %></span>
+            <% } %>
+        </div>
+
+        <!-- Selector de período + botón calendario -->
+        <div class="flex items-center gap-2 relative">
+            <form method="GET" action="/admin/stats/sucursales/<%= id_sucursal %>" id="form-periodo">
+                <select name="periodo" id="select-periodo"
+                    class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer <%= periodo === 'personalizado' ? 'text-gray-300' : 'text-gray-600' %>">
+                    <option value="semana"   <%= periodo === 'semana'   ? 'selected' : '' %>>Esta Semana</option>
+                    <option value="quincena" <%= periodo === 'quincena' ? 'selected' : '' %>>15 Días</option>
+                    <option value="mes"      <%= periodo === 'mes'      ? 'selected' : '' %>>Este Mes</option>
+                </select>
+            </form>
+
+            <!-- Botón calendario -->
+            <button id="btn-calendario" type="button"
+                class="flex items-center gap-1.5 text-sm border rounded-lg px-3 py-1.5 bg-white transition-colors cursor-pointer <%= periodo === 'personalizado' ? 'border-blue-400 text-blue-600' : 'border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-400' %>">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Personalizar
+            </button>
+
+            <!-- Panel de fechas personalizadas -->
+            <div id="panel-calendario"
+                class="hidden absolute right-0 top-10 z-50 bg-white border border-gray-200 rounded-2xl shadow-xl p-5 w-80">
+
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Rango personalizado</p>
+
+                <form method="GET" action="/admin/stats/sucursales/<%= id_sucursal %>" id="form-personalizado">
+                    <input type="hidden" name="periodo" value="personalizado">
+
+                    <!-- Período actual -->
+                    <div class="mb-4">
+                        <p class="text-xs font-semibold text-gray-700 mb-1.5">Período actual</p>
+                        <div class="flex gap-2">
+                            <div class="flex-1">
+                                <label class="text-[10px] text-gray-400 mb-0.5 block">Desde</label>
+                                <input type="date" name="desde"
+                                    class="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    value="<%= typeof desde !== 'undefined' ? desde : '' %>">
+                            </div>
+                            <div class="flex-1">
+                                <label class="text-[10px] text-gray-400 mb-0.5 block">Hasta</label>
+                                <input type="date" name="hasta"
+                                    class="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    value="<%= typeof hasta !== 'undefined' ? hasta : '' %>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Período de comparación (opcional) -->
+                    <div class="mb-5">
+                        <p class="text-xs font-semibold text-gray-700 mb-1.5">
+                            Período de comparación
+                            <span class="font-normal text-gray-400">(opcional)</span>
+                        </p>
+                        <div class="flex gap-2">
+                            <div class="flex-1">
+                                <label class="text-[10px] text-gray-400 mb-0.5 block">Desde</label>
+                                <input type="date" name="comp_desde"
+                                    class="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    value="<%= typeof comp_desde !== 'undefined' ? comp_desde : '' %>">
+                            </div>
+                            <div class="flex-1">
+                                <label class="text-[10px] text-gray-400 mb-0.5 block">Hasta</label>
+                                <input type="date" name="comp_hasta"
+                                    class="w-full text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                    value="<%= typeof comp_hasta !== 'undefined' ? comp_hasta : '' %>">
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-gray-400 mt-1.5">Si no se define, se usa el período anterior automáticamente.</p>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold rounded-lg py-2 transition-colors">
+                        Aplicar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-2 gap-5 mb-5">
+
+        <!-- Cantidad Ordenada -->
+        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+            <p class="text-[12px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Cantidad Ordenada</p>
+            <div class="flex items-end gap-3">
+                <span class="text-4xl font-extrabold text-gray-800"><%= cantActual %></span>
+                <span class="mb-1 text-sm font-bold <%= cambioCantidad >= 0 ? 'text-green-500' : 'text-red-500' %>">
+                    <%= cambioCantidad >= 0 ? '▲' : '▼' %> <%= Math.abs(cambioCantidad) %>%
+                </span>
+            </div>
+            <p class="text-xs text-gray-400 mt-2">vs período anterior</p>
+        </div>
+
+        <!-- Ventas -->
+        <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+            <p class="text-[12px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Ventas</p>
+            <div class="flex items-end gap-3">
+                <span class="text-4xl font-extrabold text-gray-800">$<%= Number(subtotalActual).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
+                <span class="mb-1 text-sm font-bold <%= cambioSubtotal >= 0 ? 'text-green-500' : 'text-red-500' %>">
+                    <%= cambioSubtotal >= 0 ? '▲' : '▼' %> <%= Math.abs(cambioSubtotal) %>%
+                </span>
+            </div>
+            <p class="text-xs text-gray-400 mt-2">vs período anterior</p>
+        </div>
+    </div>
+
+    <!-- Gráfica de comparación -->
+    <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
+        <p class="text-[13px] font-bold text-gray-800 mb-5">Comparación</p>
+        <div class="relative h-64">
+            <canvas id="chart-comparacion"></canvas>
+        </div>
+        <!-- Leyenda -->
+        <div class="flex items-center gap-6 mt-4 justify-center">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-3 rounded bg-blue-400 opacity-70"></div>
+                <span class="text-xs text-gray-500"><%= labelActual %></span>
+            </div>
+            <% if (periodo !== 'mes') { %>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-3 rounded bg-red-300 opacity-70"></div>
+                <span class="text-xs text-gray-500"><%= labelAnterior %></span>
+            </div>
+            <% } %>
+        </div>
+    </div>
+
+</main>
+
+<%- include('partials/footer.ejs') %>
+
+<script>
+    const labels       = <%- JSON.stringify(labels) %>;
+    const datosActual  = <%- JSON.stringify(datosActual) %>;
+    const datosAnterior = <%- JSON.stringify(datosAnterior) %>;
+
+    const datasets = [
+        {
+            label: 'Período Actual',
+            data: datosActual,
+            borderColor: 'rgba(96,165,250,0.9)',
+            backgroundColor: 'rgba(96,165,250,0.12)',
+            borderWidth: 2.5,
+            pointRadius: 4,
+            pointBackgroundColor: 'rgba(96,165,250,1)',
+            fill: true,
+            tension: 0.4
+        }
+    ];
+
+    <% if (periodo !== 'mes') { %>
+    datasets.push({
+        label: 'Período Anterior',
+        data: datosAnterior,
+        borderColor: 'rgba(252,165,165,0.9)',
+        backgroundColor: 'rgba(252,165,165,0.08)',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: 'rgba(252,165,165,1)',
+        borderDash: [5, 4],
+        fill: false,
+        tension: 0.4
+    });
+    <% } %>
+
+    new Chart(document.getElementById('chart-comparacion'), {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 },
+                    grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    const btnCal      = document.getElementById('btn-calendario');
+    const panelCal    = document.getElementById('panel-calendario');
+    const selectPeriodo = document.getElementById('select-periodo');
+    const formPeriodo = document.getElementById('form-periodo');
+
+    // Dropdown: cualquier opción hace submit directamente
+    selectPeriodo.addEventListener('change', () => {
+        panelCal.classList.add('hidden');
+        formPeriodo.submit();
+    });
+
+    // Botón calendario abre/cierra el panel
+    btnCal.addEventListener('click', (e) => {
+        e.stopPropagation();
+        panelCal.classList.toggle('hidden');
+    });
+
+    // Cerrar panel al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        if (!panelCal.contains(e.target) && !btnCal.contains(e.target)) {
+            panelCal.classList.add('hidden');
+        }
+    });
+
+    // Si la página cargó en modo personalizado, abrir el panel automáticamente
+    if ('<%= periodo %>' === 'personalizado') {
+        panelCal.classList.remove('hidden');
+    }
+</script>
+
+</body>
+</html>

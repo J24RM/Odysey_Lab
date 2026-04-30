@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/img/PPG_Logo2.svg">
     <title>Detalle de orden</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -72,13 +73,14 @@
                         </div>
                         <div>
                             <span class="text-sm font-semibold text-gray-600">Subtotal:</span>
-                            <p class="font-bold text-gray-900"><%= orden.subtotal %></p>
+                            <p class="font-bold text-gray-900">$ <%= Number(orden.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
                         </div>
                         <button type="button" class="w-full py-2.5 bg-blue-600 text-white font-bold text-sm rounded-lg hover:bg-blue-700 transition-all">
                             Exportar
                         </button>
                     </div>
                 </div>
+
 
                 <!-- Products Section -->
                 <div>
@@ -102,8 +104,8 @@
 
                                         <!-- Price -->
                                         <div class="text-right">
-                                            <p class="text-lg font-bold text-gray-900">$<%= producto.total %></p>
-                                            <p class="text-sm text-gray-600">($<%= producto.precioUnitario %>/unidad)</p>
+                                            <p class="text-lg font-bold text-gray-900">$<%= Number(producto.total).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
+                                            <p class="text-sm text-gray-600">($<%= Number(producto.precioUnitario).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>/unidad)</p>
                                         </div>
                                     </div>
                                 </article>

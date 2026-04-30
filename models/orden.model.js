@@ -1,5 +1,10 @@
 const supabase = require('../utils/supabase');
 
+function dec(s) {
+    if (!s || (!s.includes('Ã') && !s.includes('Â'))) return s;
+    try { return Buffer.from(s, 'latin1').toString('utf8'); } catch (_) { return s; }
+}
+
 module.exports = class Orden {
 
     static async obtenerOrdenEnEstadoCarrito(id_usuario) {
@@ -49,7 +54,7 @@ module.exports = class Orden {
     static async obtenerOrdenesPorUsuario(id_usuario) {
         const { data: ordenes, error } = await supabase
             .from('orden')
-            .select('*')
+            .select('*, sucursal(nombre_sucursal)')
             .eq('id_usuario', id_usuario)
             .neq('estado', 'carrito')
             .order('fecha_realizada', { ascending: false });
@@ -58,15 +63,30 @@ module.exports = class Orden {
         return ordenes || [];
     }
 
-    static async CancelarOrden(id_orden) {
-        const { data: orden, error } = await supabase
+    static async obtenerOrdenesPorUsuarioPaginado(id_usuario, page = 1, perPage = 20) {
+        const from = (page - 1) * perPage;
+        const to = from + perPage - 1;
+
+        const { data: ordenes, error, count } = await supabase
             .from('orden')
-            .update({ estado: 'cancelada' })
-            .eq('id_orden', id_orden)
-            .single();
+            .select('*, sucursal(nombre_sucursal)', { count: 'exact' })
+            .eq('id_usuario', id_usuario)
+            .neq('estado', 'carrito')
+            .order('fecha_realizada', { ascending: false, nullsFirst: false })
+            .range(from, to);
 
         if (error) throw error;
-        return orden;
+        return { ordenes: ordenes || [], total: count || 0 };
+    }
+
+    static async CancelarOrden(id_orden) {
+        const { data, error } = await supabase
+            .rpc('cancelar_orden', {
+                p_id_orden: parseInt(id_orden)
+            });
+            if (error) throw error;
+
+            return data;
     }
 
     static async ObtenerOrdenPorId(id_orden){
@@ -83,11 +103,22 @@ module.exports = class Orden {
     static async obtenerDetalleOrden(id_orden) {
         const { data: detalles, error } = await supabase
             .from('detalle_orden')
-            .select('cantidad, id_producto, producto(nombre, precio_unitario, url_imagen, clave)')
+            .select('cantidad, id_producto, producto(nombre, precio_unitario, url_imagen, clave, peso)')
             .eq('id_orden', id_orden);
 
         if (error) throw error;
-        return detalles || [];
+        return (detalles || []).map(d => ({
+            ...d,
+            producto: d.producto ? { ...d.producto, nombre: dec(d.producto.nombre) } : d.producto
+        }));
+    }
+
+    static async actualizarSucursalYCuentaPorFolio(folio, id_sucursal, id_cuenta) {
+        const { error } = await supabase
+            .from('orden')
+            .update({ id_sucursal , id_cuenta})
+            .eq('folio', folio);
+        if (error) throw error;
     }
 
     static async obtenerTodasLasOrdenes(page = 1, perPage = 20) {

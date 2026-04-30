@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/img/PPG_Logo2.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Carrito PPG</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,6 +12,7 @@
     .nav-bg { background-color: rgba(0, 120, 169, 0.1); }
     .nav-border { border-color: rgba(0, 120, 169, 0.2); }
   </style>
+  
   <script>
     tailwind.config = {
       theme: {
@@ -28,16 +30,24 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
 
+  
 <%- include('../includes/_navbar') %>
 
 <div class="max-w-7xl mx-auto px-6 py-10 flex gap-6 items-start">
 
   <!-- Columna izquierda -->
-  <div class="flex-1 rounded-2xl p-8" style="background-color: rgba(0, 120, 169, 0.102);">
+  <div class="flex-1 rounded-2xl p-8 shadow-sm p-7 bg-white">
 
+    <!-- Por este: -->
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-4xl font-black text-gray-900">Carrito</h1>
-      <span class="text-xl font-bold" style="color: #1FB5DF;">Sucursal: <%= sucursal_activa.nombre_sucursal %></span>
+      <div id="bulk-actions" class="hidden flex items-center gap-3">
+        <span id="selected-count" class="text-sm text-gray-500 font-medium">0 seleccionados</span>
+        <button onclick="eliminarSeleccionados()"
+          class="text-sm font-semibold text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded-full transition-all active:scale-95">
+          Eliminar seleccionados
+        </button>
+      </div>
     </div>
 
     <hr class="border-gray-300 mb-0" />
@@ -62,10 +72,17 @@
     <% const producto = detalleProductos[index] && detalleProductos[index][0] %>
     <% if (producto) { %>
 
+    <!-- Por: -->
     <div id="row-<%= item.id_producto%>"
-          class="product-row flex items-center gap-5 py-6 border-b border-gray-300"
+      class="product-row flex items-center gap-5 py-6 border-b border-gray-300 group"
           data-precio="<%= producto.precio_unitario %>"
           data-id="<%= item.id_producto %>">
+
+      <!-- Checkbox de selección -->
+      <input type="checkbox"
+        class="product-checkbox w-5 h-5 rounded cursor-pointer accent-ppg-blue flex-shrink-0"
+        data-id="<%= item.id_producto %>"
+        onchange="actualizarBulkActions()" />
 
       <!-- Imagen -->
       <div class="w-28 h-28 flex-shrink-0 bg-white rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
@@ -81,9 +98,18 @@
             class="text-base font-semibold text-gray-900 hover:underline leading-snug">
           <%= producto.nombre %>
         </a>
+        <div class="flex items-center gap-3 mt-1">
+          <span class="text-xs text-gray-400 font-medium tracking-wide uppercase">
+            <span class="text-gray-500 font-semibold normal-case tracking-normal"> SKU: <%= producto.clave %></span>
+          </span>
+          <span class="text-gray-300 text-xs">·</span>
+          <span class="text-xs text-gray-400 font-medium">
+            <span class="text-gray-500 font-semibold"><%= producto.peso %> kg</span> 
+          </span>
+        </div>
         
         <div class="flex items-center gap-4 mt-4">
-          <div class="flex items-center gap-2 border-2 rounded-full px-3 py-1" style="border-color: #1FB5DF;">
+          <div class="flex items-center gap-2 border-2 rounded-full px-3 py-1" style="border-color: #00000066;">
             <button onclick="cambiarCantidad(<%= item.id_producto %>, -1)"
               class="text-gray-700 font-bold text-lg w-5 h-5 flex items-center justify-center hover:opacity-70 transition">−</button>
 
@@ -91,6 +117,7 @@
               id="qty-<%= item.id_producto %>"
               type="text"
               value="<%= item.cantidad %>"
+              data-peso="<%= producto.peso %>"
               inputmode="numeric"
               class="qty text-sm font-semibold text-gray-800 w-10 text-center outline-none"
               oninput="this.value = this.value.replace(/[^0-9]/g, '')"
@@ -102,15 +129,15 @@
 
           </div>
           <button onclick="eliminarProducto(<%= item.id_producto %>)"                                                                                                                           
-            class="text-sm font-medium hover:underline" style="color: #1FB5DF;">Eliminar</button>
+            class="text-sm font-medium hover:underline" style="color: #000000;">Eliminar</button>
         </div>
       </div>
 
 
       <!-- Precio -->
       <div class="text-right flex-shrink-0">
-        <p id="price-<%= item.id_producto %>" class="text-xl font-bold text-gray-900">$ <%= (producto.precio_unitario * item.cantidad).toLocaleString('es-MX') %></p>
-        <p class="text-xs text-gray-500 mt-1">($ <%= Number(producto.precio_unitario).toLocaleString('es-MX') %> / unidad)</p>
+        <p id="price-<%= item.id_producto %>" class="text-xl font-bold text-gray-900">$ <%= (producto.precio_unitario * item.cantidad).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
+        <p class="text-xs text-gray-500 mt-1">($ <%= Number(producto.precio_unitario).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %> / unidad)</p>
       </div>
 
     </div>
@@ -130,6 +157,7 @@
       <p class="text-2xl font-bold text-gray-900 leading-tight">Total(IVA incluido):</p>
       <p class="text-3xl font-black text-gray-900 mt-1" id="total-display">$ 0</p>
       <p class="text-sm text-gray-500 mt-4 font-medium" id="qty-display">Cantidad de productos: 0</p>
+      <p class="text-sm text-gray-500 mt-4 font-medium" id="peso-display">Peso Total: 0 kg</p>
       
     </div>
 
@@ -143,11 +171,34 @@
     </form>
 
     <p class="text-xs text-gray-500 text-center leading-snug px-2">
-      <em>Revisa tu orden, solo tendrás 15 minutos para cancelarla una vez la realices</em>
+      <em>Revisa tu orden, solo tendrás <%= tiempoCancelacion %> minutos para cancelarla una vez la realices</em>
     </p>
   </div>
   
 </div>
+
+<!-- Productos sugeridos -->
+<% if (productosSugeridos && productosSugeridos.length > 0) { %>
+<div class="max-w-7xl mx-auto px-6 pb-12">
+    <h2 class="text-2xl font-black text-gray-900 mb-6">Productos similares</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-5">
+        <% productosSugeridos.forEach(function(p) { %>
+        <a href="/cliente/product/<%= p.id_producto %>"
+           class="bg-white rounded-2xl shadow-sm p-5 flex flex-col items-center hover:shadow-md transition-shadow">
+            <div class="w-full h-36 flex items-center justify-center overflow-hidden mb-3">
+                <img src="/uploads/<%= p.url_imagen || '/img/botePintura.png' %>"
+                     alt="<%= p.nombre %>"
+                     onerror="this.src='/img/botePintura.png'"
+                     class="object-contain h-full w-full">
+            </div>
+            <p class="text-sm font-semibold text-gray-800 text-center leading-snug mb-2 line-clamp-2"><%= p.nombre %></p>
+            <p class="text-sm font-semibold text-gray-800 text-center leading-snug mb-2 line-clamp-2">SKU: <%= p.clave %></p>
+            <p class="text-base font-black text-gray-900">$ <%= Number(p.precio_unitario).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
+        </a>
+        <% }); %>
+    </div>
+</div>
+<% } %>
 
 <meta name="csrf-token" content="<%= csrfToken %>">
 <script src="/JavaScript/carrito.js"></script>
@@ -159,9 +210,10 @@
   document.querySelector('form[action="/orden/registrar"]').addEventListener('submit', function(e) {
     if (!window._sucursalActivaId) {
       e.preventDefault();
+      e.stopImmediatePropagation();
       window.abrirModalPerfil({ forzado: true });
     }
-  });
+  }, true); 
 </script>
 </body>
 </html>

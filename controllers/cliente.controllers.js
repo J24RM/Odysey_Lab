@@ -9,6 +9,7 @@ exports.getMisPedidos = async (request, response) => {
             Orden.obtenerOrdenesPorUsuario(id_usuario),
             Usuario.obtenerClientePorId(id_usuario).catch(() => null)
         ]);
+
         response.render('cliente/mis_pedidos', {
             usuario: request.session.usuario,
             pedidos: pedidos,
