@@ -117,7 +117,7 @@ async function verificar() {
         console.log(`   Rango campaña: 2026-03-01 → 2026-05-24`);
     }
 
-    console.log('\n📦 IDs de órdenes:');
+    console.log('\n IDs de órdenes:');
     const ids = ordenes.map(o => o.id_orden).sort((a,b) => a-b);
     console.log(`   Min: ${ids[0]}, Max: ${ids[ids.length-1]}`);
 }
