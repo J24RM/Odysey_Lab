@@ -136,8 +136,8 @@
 
       <!-- Precio -->
       <div class="text-right flex-shrink-0">
-        <p id="price-<%= item.id_producto %>" class="text-xl font-bold text-gray-900">$ <%= (producto.precio_unitario * item.cantidad).toLocaleString('es-MX') %></p>
-        <p class="text-xs text-gray-500 mt-1">($ <%= Number(producto.precio_unitario).toLocaleString('es-MX') %> / unidad)</p>
+        <p id="price-<%= item.id_producto %>" class="text-xl font-bold text-gray-900">$ <%= (producto.precio_unitario * item.cantidad).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
+        <p class="text-xs text-gray-500 mt-1">($ <%= Number(producto.precio_unitario).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %> / unidad)</p>
       </div>
 
     </div>
@@ -193,7 +193,7 @@
             </div>
             <p class="text-sm font-semibold text-gray-800 text-center leading-snug mb-2 line-clamp-2"><%= p.nombre %></p>
             <p class="text-sm font-semibold text-gray-800 text-center leading-snug mb-2 line-clamp-2">SKU: <%= p.clave %></p>
-            <p class="text-base font-black text-gray-900">$ <%= Number(p.precio_unitario).toLocaleString('es-MX') %></p>
+            <p class="text-base font-black text-gray-900">$ <%= Number(p.precio_unitario).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></p>
         </a>
         <% }); %>
     </div>

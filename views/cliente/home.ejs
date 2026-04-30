@@ -88,7 +88,7 @@
             </div>
             
             <div class="product-price">
-                $ <%= producto.precio_unitario %>
+                $ <%= Number(producto.precio_unitario).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
             </div>
             </a>
             <hr class="border-gray-300 mb-0" />

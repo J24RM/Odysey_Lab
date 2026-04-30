@@ -345,16 +345,16 @@ document.querySelector('.pedidos-table-body').addEventListener('click', async (e
             estadoEl.className = 'status-pill inline-block px-2 py-1 text-[11px] rounded-full ' +
                 (estado === 'Cancelada' ? 'status-cancelled' : 'status-confirmed');
 
-            document.getElementById('modal-subtotal').textContent = orden.subtotal ? 
-                Number(orden.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2 }) : '0.00';
+            document.getElementById('modal-subtotal').textContent = orden.subtotal ?
+                Number(orden.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00';
 
             // Peso
             document.getElementById('modal-peso').textContent = orden.peso_total + ' Kg';
 
             const total = orden.subtotal * 1.16;
 
-            document.getElementById('modal-total').textContent = total ? 
-                Number(total).toLocaleString('es-MX', { minimumFractionDigits: 2 }) : '0.00';
+            document.getElementById('modal-total').textContent = total ?
+                Number(total).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00';
 
             const btnContainer = document.getElementById('btn-cancelar');
             btnContainer.innerHTML = '';
@@ -446,8 +446,8 @@ document.querySelector('.pedidos-table-body').addEventListener('click', async (e
                             </div>
                         </div>
                         <div class="producto-precio text-center sm:text-right shrink-0 mt-2 sm:mt-0">
-                            <div class="font-bold text-lg text-gray-800">$ ${total.toLocaleString('es-MX')}</div>
-                            <div class="text-gray-500 text-[11px]">($ ${Number(precio).toLocaleString('es-MX')} / unidad)</div>
+                            <div class="font-bold text-lg text-gray-800">$ ${total.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                            <div class="text-gray-500 text-[11px]">($ ${Number(precio).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / unidad)</div>
                             <div class="text-gray-500 text-[11px]">( ${Number(peso)} Kg)</div>
                         </div>
                     </div>

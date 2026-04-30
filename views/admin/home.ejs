@@ -95,7 +95,7 @@
                                 <p class="text-sm font-bold text-gray-600 text-left leading-snug mb-2">SKU: <%= p.clave %></p>
                                 <div class="flex items-center gap-2 justify-center flex-wrap">
                                     <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200 rounded">
-                                        $<%= p.precio_unitario %>
+                                        $<%= Number(p.precio_unitario).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
                                     </span>
                                     <% if (!p.activo) { %>
                                         <span class="px-2 py-0.5 bg-red-50 text-red-700 text-xs font-bold border border-red-200 rounded">
@@ -191,7 +191,7 @@
                         </div>
                         <p class="text-sm font-bold text-gray-900 text-left leading-snug mb-2">${p.nombre}</p>
                         <div class="flex items-center gap-2 justify-center flex-wrap">
-                            <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200 rounded">$${p.precio_unitario}</span>
+                            <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200 rounded">$${Number(p.precio_unitario).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             ${inactive}
                         </div>`;
                     productGrid.appendChild(el);

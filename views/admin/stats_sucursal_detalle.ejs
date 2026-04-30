@@ -128,7 +128,7 @@
         <div class="bg-white rounded-[14px] p-6 shadow-[0_4px_16px_rgba(0,0,0,0.07)]">
             <p class="text-[12px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Ventas</p>
             <div class="flex items-end gap-3">
-                <span class="text-4xl font-extrabold text-gray-800">$<%= Number(subtotalActual).toLocaleString('es-MX') %></span>
+                <span class="text-4xl font-extrabold text-gray-800">$<%= Number(subtotalActual).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></span>
                 <span class="mb-1 text-sm font-bold <%= cambioSubtotal >= 0 ? 'text-green-500' : 'text-red-500' %>">
                     <%= cambioSubtotal >= 0 ? '▲' : '▼' %> <%= Math.abs(cambioSubtotal) %>%
                 </span>

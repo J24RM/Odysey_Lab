@@ -18,12 +18,12 @@ function actualizarSubtotal() {
   }
 
   document.getElementById('subtotal-display').textContent =
-    '$ ' + subtotal.toLocaleString('es-MX');
+    '$ ' + subtotal.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   let total = subtotal * 1.16;
 
   document.getElementById('total-display').textContent =
-    '$ ' + total.toLocaleString('es-MX');
+    '$ ' + total.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   document.getElementById('qty-display').textContent =
     'Cantidad de productos: ' + totalQty;
@@ -131,7 +131,7 @@ async function enviarCantidad(idProducto, cantidad) {
     input.value = data.nuevaCantidad;
 
     document.getElementById('price-' + idProducto).textContent =
-      '$ ' + (precio * data.nuevaCantidad).toLocaleString('es-MX');
+      '$ ' + (precio * data.nuevaCantidad).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
   actualizarSubtotal();

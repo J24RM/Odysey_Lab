@@ -160,7 +160,7 @@
                 </div>
                 <div class="product-price">
                   <p class="price-main">
-                    <%= producto.precio ? '$ ' + producto.precio : 'N/A' %>
+                    <%= producto.precio ? '$ ' + Number(producto.precio).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'N/A' %>
                   </p>
                 </div>
               </div>
