@@ -1,0 +1,1021 @@
+=== USUARIOS CLIENTES ===
+[
+  {
+    "id_usuario": 24,
+    "email": "unacuenta",
+    "id_rol": 1
+  },
+  {
+    "id_usuario": 11,
+    "email": "laura.ext90@gmail.com",
+    "id_rol": 1
+  },
+  {
+    "id_usuario": 12,
+    "email": "mario.clt55@outlook.com",
+    "id_rol": 1
+  },
+  {
+    "id_usuario": 13,
+    "email": "patricia.hr41@yahoo.com",
+    "id_rol": 1
+  },
+  {
+    "id_usuario": 14,
+    "email": "jorge.mk82@gmail.com",
+    "id_rol": 1
+  },
+  {
+    "id_usuario": 15,
+    "email": "andrea.sales37@protonmail.com",
+    "id_rol": 1
+  },
+  {
+    "id_usuario": 16,
+    "email": "raul.ops64@hotmail.com",
+    "id_rol": 1
+  },
+  {
+    "id_usuario": 17,
+    "email": "lucia.mkt21@gmail.com",
+    "id_rol": 1
+  },
+  {
+    "id_usuario": 18,
+    "email": "oscar.tech78@outlook.com",
+    "id_rol": 1
+  },
+  {
+    "id_usuario": 19,
+    "email": "mariana.biz33@yahoo.com",
+    "id_rol": 1
+  },
+  {
+    "id_usuario": 20,
+    "email": "alberto.mx59@gmail.com",
+    "id_rol": 1
+  },
+  {
+    "id_usuario": 26,
+    "email": "jesusC",
+    "id_rol": 1
+  },
+  {
+    "id_usuario": 25,
+    "email": "cliente@cliente.com",
+    "id_rol": 1
+  }
+]
+
+=== CAMPAÑAS ACTIVAS ===
+[
+  {
+    "id_campania": 11,
+    "fecha_de_inicio": "2026-03-01T12:00:00",
+    "fecha_de_fin": "2026-05-24T12:00:00",
+    "nombre": "Mundial We Are One 2026",
+    "activo": true,
+    "tiempo_de_cancelacion": 15,
+    "banner_login": 11,
+    "banner_general": 12
+  }
+]
+
+=== USUARIO_CUENTA ===
+[
+  {
+    "id_cuenta": 1,
+    "id_usuario": 11
+  },
+  {
+    "id_cuenta": 2,
+    "id_usuario": 11
+  },
+  {
+    "id_cuenta": 3,
+    "id_usuario": 12
+  },
+  {
+    "id_cuenta": 4,
+    "id_usuario": 12
+  },
+  {
+    "id_cuenta": 5,
+    "id_usuario": 13
+  },
+  {
+    "id_cuenta": 6,
+    "id_usuario": 13
+  },
+  {
+    "id_cuenta": 7,
+    "id_usuario": 14
+  },
+  {
+    "id_cuenta": 8,
+    "id_usuario": 14
+  },
+  {
+    "id_cuenta": 9,
+    "id_usuario": 15
+  },
+  {
+    "id_cuenta": 10,
+    "id_usuario": 15
+  },
+  {
+    "id_cuenta": 11,
+    "id_usuario": 16
+  },
+  {
+    "id_cuenta": 12,
+    "id_usuario": 16
+  },
+  {
+    "id_cuenta": 13,
+    "id_usuario": 16
+  },
+  {
+    "id_cuenta": 14,
+    "id_usuario": 17
+  },
+  {
+    "id_cuenta": 15,
+    "id_usuario": 17
+  },
+  {
+    "id_cuenta": 16,
+    "id_usuario": 17
+  },
+  {
+    "id_cuenta": 17,
+    "id_usuario": 18
+  },
+  {
+    "id_cuenta": 18,
+    "id_usuario": 18
+  },
+  {
+    "id_cuenta": 19,
+    "id_usuario": 18
+  },
+  {
+    "id_cuenta": 1,
+    "id_usuario": 19
+  },
+  {
+    "id_cuenta": 5,
+    "id_usuario": 19
+  },
+  {
+    "id_cuenta": 10,
+    "id_usuario": 19
+  },
+  {
+    "id_cuenta": 20,
+    "id_usuario": 19
+  },
+  {
+    "id_cuenta": 2,
+    "id_usuario": 20
+  },
+  {
+    "id_cuenta": 6,
+    "id_usuario": 20
+  },
+  {
+    "id_cuenta": 11,
+    "id_usuario": 20
+  },
+  {
+    "id_cuenta": 20,
+    "id_usuario": 20
+  },
+  {
+    "id_cuenta": 8,
+    "id_usuario": 24
+  },
+  {
+    "id_cuenta": 4,
+    "id_usuario": 25
+  },
+  {
+    "id_cuenta": 20,
+    "id_usuario": 26
+  }
+]
+
+=== SUCURSAL_CUENTA ===
+[
+  {
+    "id_sucursal": 1,
+    "id_cuenta": 1
+  },
+  {
+    "id_sucursal": 2,
+    "id_cuenta": 2
+  },
+  {
+    "id_sucursal": 3,
+    "id_cuenta": 3
+  },
+  {
+    "id_sucursal": 4,
+    "id_cuenta": 4
+  },
+  {
+    "id_sucursal": 5,
+    "id_cuenta": 5
+  },
+  {
+    "id_sucursal": 6,
+    "id_cuenta": 6
+  },
+  {
+    "id_sucursal": 7,
+    "id_cuenta": 7
+  },
+  {
+    "id_sucursal": 8,
+    "id_cuenta": 8
+  },
+  {
+    "id_sucursal": 9,
+    "id_cuenta": 9
+  },
+  {
+    "id_sucursal": 10,
+    "id_cuenta": 10
+  },
+  {
+    "id_sucursal": 11,
+    "id_cuenta": 11
+  },
+  {
+    "id_sucursal": 12,
+    "id_cuenta": 12
+  },
+  {
+    "id_sucursal": 13,
+    "id_cuenta": 13
+  },
+  {
+    "id_sucursal": 14,
+    "id_cuenta": 14
+  },
+  {
+    "id_sucursal": 15,
+    "id_cuenta": 15
+  },
+  {
+    "id_sucursal": 16,
+    "id_cuenta": 16
+  },
+  {
+    "id_sucursal": 17,
+    "id_cuenta": 17
+  },
+  {
+    "id_sucursal": 18,
+    "id_cuenta": 18
+  },
+  {
+    "id_sucursal": 19,
+    "id_cuenta": 19
+  },
+  {
+    "id_sucursal": 20,
+    "id_cuenta": 20
+  },
+  {
+    "id_sucursal": 21,
+    "id_cuenta": 1
+  },
+  {
+    "id_sucursal": 22,
+    "id_cuenta": 2
+  },
+  {
+    "id_sucursal": 23,
+    "id_cuenta": 3
+  },
+  {
+    "id_sucursal": 24,
+    "id_cuenta": 4
+  },
+  {
+    "id_sucursal": 25,
+    "id_cuenta": 5
+  },
+  {
+    "id_sucursal": 26,
+    "id_cuenta": 6
+  },
+  {
+    "id_sucursal": 27,
+    "id_cuenta": 7
+  },
+  {
+    "id_sucursal": 28,
+    "id_cuenta": 8
+  },
+  {
+    "id_sucursal": 29,
+    "id_cuenta": 9
+  },
+  {
+    "id_sucursal": 30,
+    "id_cuenta": 10
+  },
+  {
+    "id_sucursal": 31,
+    "id_cuenta": 11
+  },
+  {
+    "id_sucursal": 32,
+    "id_cuenta": 12
+  },
+  {
+    "id_sucursal": 33,
+    "id_cuenta": 12
+  },
+  {
+    "id_sucursal": 34,
+    "id_cuenta": 13
+  },
+  {
+    "id_sucursal": 35,
+    "id_cuenta": 13
+  },
+  {
+    "id_sucursal": 36,
+    "id_cuenta": 14
+  },
+  {
+    "id_sucursal": 37,
+    "id_cuenta": 14
+  },
+  {
+    "id_sucursal": 38,
+    "id_cuenta": 15
+  },
+  {
+    "id_sucursal": 39,
+    "id_cuenta": 15
+  },
+  {
+    "id_sucursal": 40,
+    "id_cuenta": 16
+  },
+  {
+    "id_sucursal": 41,
+    "id_cuenta": 16
+  },
+  {
+    "id_sucursal": 42,
+    "id_cuenta": 16
+  },
+  {
+    "id_sucursal": 43,
+    "id_cuenta": 17
+  },
+  {
+    "id_sucursal": 44,
+    "id_cuenta": 17
+  },
+  {
+    "id_sucursal": 45,
+    "id_cuenta": 17
+  },
+  {
+    "id_sucursal": 46,
+    "id_cuenta": 18
+  },
+  {
+    "id_sucursal": 47,
+    "id_cuenta": 18
+  },
+  {
+    "id_sucursal": 48,
+    "id_cuenta": 18
+  }
+]
+
+=== SUCURSALES (total: 48) ===
+[
+  {
+    "id_sucursal": 1,
+    "nombre_sucursal": "Comex Guadalajara Centro",
+    "edo": "Jalisco"
+  },
+  {
+    "id_sucursal": 2,
+    "nombre_sucursal": "Comex Monterrey Norte",
+    "edo": "Nuevo León"
+  },
+  {
+    "id_sucursal": 3,
+    "nombre_sucursal": "Comex Queretaro Constituyentes",
+    "edo": "Querétaro"
+  },
+  {
+    "id_sucursal": 4,
+    "nombre_sucursal": "Comex Merida Altabrisa",
+    "edo": "Yucatán"
+  },
+  {
+    "id_sucursal": 5,
+    "nombre_sucursal": "Comex Tuxtla Oriente",
+    "edo": "Chiapas"
+  },
+  {
+    "id_sucursal": 6,
+    "nombre_sucursal": "Comex Puebla Reforma",
+    "edo": "Puebla"
+  },
+  {
+    "id_sucursal": 7,
+    "nombre_sucursal": "Comex CDMX Del Valle",
+    "edo": "CDMX"
+  },
+  {
+    "id_sucursal": 8,
+    "nombre_sucursal": "Comex Hermosillo Kino",
+    "edo": "Sonora"
+  },
+  {
+    "id_sucursal": 9,
+    "nombre_sucursal": "Comex Saltillo Centro",
+    "edo": "Coahuila"
+  },
+  {
+    "id_sucursal": 10,
+    "nombre_sucursal": "Comex Tampico Madero",
+    "edo": "Tamaulipas"
+  },
+  {
+    "id_sucursal": 11,
+    "nombre_sucursal": "Comex Leon Poliforum",
+    "edo": "Guanajuato"
+  },
+  {
+    "id_sucursal": 12,
+    "nombre_sucursal": "Comex Morelia Camelinas",
+    "edo": "Michoacán"
+  },
+  {
+    "id_sucursal": 13,
+    "nombre_sucursal": "Comex Pachuca Centro",
+    "edo": "Hidalgo"
+  },
+  {
+    "id_sucursal": 14,
+    "nombre_sucursal": "Comex Veracruz Malecon",
+    "edo": "Veracruz"
+  },
+  {
+    "id_sucursal": 15,
+    "nombre_sucursal": "Comex Culiacan Tres Rios",
+    "edo": "Sinaloa"
+  },
+  {
+    "id_sucursal": 16,
+    "nombre_sucursal": "Comex Villahermosa Tabasco 2000",
+    "edo": "Tabasco"
+  },
+  {
+    "id_sucursal": 17,
+    "nombre_sucursal": "Comex Durango Guadiana",
+    "edo": "Durango"
+  },
+  {
+    "id_sucursal": 19,
+    "nombre_sucursal": "Comex Zacatecas Centro Historico",
+    "edo": "Zacatecas"
+  },
+  {
+    "id_sucursal": 20,
+    "nombre_sucursal": "Comex Chihuahua Juventud",
+    "edo": "Chihuahua"
+  },
+  {
+    "id_sucursal": 18,
+    "nombre_sucursal": "Comex Oaxaca Huayapam",
+    "edo": "Oaxaca"
+  },
+  {
+    "id_sucursal": 21,
+    "nombre_sucursal": "Sucursal Complementaria 1-1",
+    "edo": "Jalisco"
+  },
+  {
+    "id_sucursal": 22,
+    "nombre_sucursal": "Sucursal Complementaria 2-1",
+    "edo": "Nuevo León"
+  },
+  {
+    "id_sucursal": 23,
+    "nombre_sucursal": "Sucursal Complementaria 3-1",
+    "edo": "Querétaro"
+  },
+  {
+    "id_sucursal": 24,
+    "nombre_sucursal": "Sucursal Complementaria 4-1",
+    "edo": "Yucatán"
+  },
+  {
+    "id_sucursal": 25,
+    "nombre_sucursal": "Sucursal Complementaria 5-1",
+    "edo": "Chiapas"
+  },
+  {
+    "id_sucursal": 26,
+    "nombre_sucursal": "Sucursal Complementaria 6-1",
+    "edo": "Puebla"
+  },
+  {
+    "id_sucursal": 27,
+    "nombre_sucursal": "Sucursal Complementaria 7-1",
+    "edo": "CDMX"
+  },
+  {
+    "id_sucursal": 28,
+    "nombre_sucursal": "Sucursal Complementaria 8-1",
+    "edo": "Sonora"
+  },
+  {
+    "id_sucursal": 29,
+    "nombre_sucursal": "Sucursal Complementaria 9-1",
+    "edo": "Coahuila"
+  },
+  {
+    "id_sucursal": 30,
+    "nombre_sucursal": "Sucursal Complementaria 10-1",
+    "edo": "Tamaulipas"
+  },
+  {
+    "id_sucursal": 31,
+    "nombre_sucursal": "Sucursal Complementaria 11-1",
+    "edo": "Guanajuato"
+  },
+  {
+    "id_sucursal": 32,
+    "nombre_sucursal": "Sucursal Complementaria 12-1",
+    "edo": "Michoacán"
+  },
+  {
+    "id_sucursal": 33,
+    "nombre_sucursal": "Sucursal Complementaria 12-2",
+    "edo": "Michoacán"
+  },
+  {
+    "id_sucursal": 34,
+    "nombre_sucursal": "Sucursal Complementaria 13-1",
+    "edo": "Hidalgo"
+  },
+  {
+    "id_sucursal": 35,
+    "nombre_sucursal": "Sucursal Complementaria 13-2",
+    "edo": "Hidalgo"
+  },
+  {
+    "id_sucursal": 36,
+    "nombre_sucursal": "Sucursal Complementaria 14-1",
+    "edo": "Veracruz"
+  },
+  {
+    "id_sucursal": 37,
+    "nombre_sucursal": "Sucursal Complementaria 14-2",
+    "edo": "Veracruz"
+  },
+  {
+    "id_sucursal": 38,
+    "nombre_sucursal": "Sucursal Complementaria 15-1",
+    "edo": "Sinaloa"
+  },
+  {
+    "id_sucursal": 39,
+    "nombre_sucursal": "Sucursal Complementaria 15-2",
+    "edo": "Sinaloa"
+  },
+  {
+    "id_sucursal": 40,
+    "nombre_sucursal": "Sucursal Complementaria 16-1",
+    "edo": "Tabasco"
+  },
+  {
+    "id_sucursal": 41,
+    "nombre_sucursal": "Sucursal Complementaria 16-2",
+    "edo": "Tabasco"
+  },
+  {
+    "id_sucursal": 42,
+    "nombre_sucursal": "Sucursal Complementaria 16-3",
+    "edo": "Tabasco"
+  },
+  {
+    "id_sucursal": 43,
+    "nombre_sucursal": "Sucursal Complementaria 17-1",
+    "edo": "Durango"
+  },
+  {
+    "id_sucursal": 44,
+    "nombre_sucursal": "Sucursal Complementaria 17-2",
+    "edo": "Durango"
+  },
+  {
+    "id_sucursal": 45,
+    "nombre_sucursal": "Sucursal Complementaria 17-3",
+    "edo": "Durango"
+  },
+  {
+    "id_sucursal": 46,
+    "nombre_sucursal": "Sucursal Complementaria 18-1",
+    "edo": "Oaxaca"
+  },
+  {
+    "id_sucursal": 47,
+    "nombre_sucursal": "Sucursal Complementaria 18-2",
+    "edo": "Oaxaca"
+  },
+  {
+    "id_sucursal": 48,
+    "nombre_sucursal": "Sucursal Complementaria 18-3",
+    "edo": "Oaxaca"
+  }
+]
+
+=== CUENTAS ===
+[
+  {
+    "id_cuenta": 1,
+    "nombre_dueno": "Carlos Perez",
+    "region": "Jalisco"
+  },
+  {
+    "id_cuenta": 2,
+    "nombre_dueno": "Ana Lopez",
+    "region": "Nuevo León"
+  },
+  {
+    "id_cuenta": 3,
+    "nombre_dueno": "Miguel Torres",
+    "region": "Querétaro"
+  },
+  {
+    "id_cuenta": 4,
+    "nombre_dueno": "Luis Ramirez",
+    "region": "Yucatán"
+  },
+  {
+    "id_cuenta": 5,
+    "nombre_dueno": "Sofia Martinez",
+    "region": "Chiapas"
+  },
+  {
+    "id_cuenta": 6,
+    "nombre_dueno": "Diego Castro",
+    "region": "Puebla"
+  },
+  {
+    "id_cuenta": 7,
+    "nombre_dueno": "Fernanda Ruiz",
+    "region": "CDMX"
+  },
+  {
+    "id_cuenta": 8,
+    "nombre_dueno": "Ricardo Diaz",
+    "region": "Sonora"
+  },
+  {
+    "id_cuenta": 9,
+    "nombre_dueno": "Daniela Cruz",
+    "region": "Coahuila"
+  },
+  {
+    "id_cuenta": 10,
+    "nombre_dueno": "Hugo Vargas",
+    "region": "Tamaulipas"
+  },
+  {
+    "id_cuenta": 11,
+    "nombre_dueno": "Laura Reyes",
+    "region": "Guanajuato"
+  },
+  {
+    "id_cuenta": 12,
+    "nombre_dueno": "Mario Flores",
+    "region": "Michoacán"
+  },
+  {
+    "id_cuenta": 13,
+    "nombre_dueno": "Patricia Morales",
+    "region": "Hidalgo"
+  },
+  {
+    "id_cuenta": 14,
+    "nombre_dueno": "Jorge Silva",
+    "region": "Veracruz"
+  },
+  {
+    "id_cuenta": 15,
+    "nombre_dueno": "Andrea Gomez",
+    "region": "Sinaloa"
+  },
+  {
+    "id_cuenta": 16,
+    "nombre_dueno": "Raul Herrera",
+    "region": "Tabasco"
+  },
+  {
+    "id_cuenta": 17,
+    "nombre_dueno": "Lucia Navarro",
+    "region": "Durango"
+  },
+  {
+    "id_cuenta": 18,
+    "nombre_dueno": "Oscar Medina",
+    "region": "Oaxaca"
+  },
+  {
+    "id_cuenta": 19,
+    "nombre_dueno": "Mariana Rojas",
+    "region": "Zacatecas"
+  },
+  {
+    "id_cuenta": 20,
+    "nombre_dueno": "Alberto Ibarra",
+    "region": "Chihuahua"
+  }
+]
+
+=== PRODUCTOS ACTIVOS (total: 43) ===
+[
+  {
+    "id_producto": 573,
+    "precio_unitario": 120,
+    "peso": 0.15
+  },
+  {
+    "id_producto": 574,
+    "precio_unitario": 85,
+    "peso": 0.1
+  },
+  {
+    "id_producto": 576,
+    "precio_unitario": 35,
+    "peso": 0.02
+  },
+  {
+    "id_producto": 577,
+    "precio_unitario": 280,
+    "peso": 0.4
+  },
+  {
+    "id_producto": 578,
+    "precio_unitario": 160,
+    "peso": 0.25
+  },
+  {
+    "id_producto": 579,
+    "precio_unitario": 65,
+    "peso": 0.05
+  },
+  {
+    "id_producto": 580,
+    "precio_unitario": 75,
+    "peso": 0.12
+  },
+  {
+    "id_producto": 581,
+    "precio_unitario": 350,
+    "peso": 0.55
+  },
+  {
+    "id_producto": 582,
+    "precio_unitario": 75,
+    "peso": 0.03
+  },
+  {
+    "id_producto": 583,
+    "precio_unitario": 185,
+    "peso": 0.3
+  },
+  {
+    "id_producto": 584,
+    "precio_unitario": 145,
+    "peso": 0.18
+  },
+  {
+    "id_producto": 585,
+    "precio_unitario": 110,
+    "peso": 0.22
+  },
+  {
+    "id_producto": 586,
+    "precio_unitario": 240,
+    "peso": 0.35
+  },
+  {
+    "id_producto": 587,
+    "precio_unitario": 95,
+    "peso": 0.2
+  },
+  {
+    "id_producto": 588,
+    "precio_unitario": 650,
+    "peso": 2.5
+  },
+  {
+    "id_producto": 589,
+    "precio_unitario": 180,
+    "peso": 0.3
+  },
+  {
+    "id_producto": 590,
+    "precio_unitario": 320,
+    "peso": 0.45
+  },
+  {
+    "id_producto": 591,
+    "precio_unitario": 45,
+    "peso": 0.02
+  },
+  {
+    "id_producto": 592,
+    "precio_unitario": 40,
+    "peso": 0.02
+  },
+  {
+    "id_producto": 593,
+    "precio_unitario": 220,
+    "peso": 0.35
+  },
+  {
+    "id_producto": 594,
+    "precio_unitario": 290,
+    "peso": 0.5
+  },
+  {
+    "id_producto": 595,
+    "precio_unitario": 480,
+    "peso": 0.35
+  },
+  {
+    "id_producto": 596,
+    "precio_unitario": 75,
+    "peso": 0.06
+  },
+  {
+    "id_producto": 597,
+    "precio_unitario": 120,
+    "peso": 0.18
+  },
+  {
+    "id_producto": 598,
+    "precio_unitario": 150,
+    "peso": 0.08
+  },
+  {
+    "id_producto": 599,
+    "precio_unitario": 160,
+    "peso": 0.3
+  },
+  {
+    "id_producto": 600,
+    "precio_unitario": 850,
+    "peso": 2
+  },
+  {
+    "id_producto": 601,
+    "precio_unitario": 420,
+    "peso": 0.55
+  },
+  {
+    "id_producto": 602,
+    "precio_unitario": 380,
+    "peso": 0.6
+  },
+  {
+    "id_producto": 603,
+    "precio_unitario": 145,
+    "peso": 0.28
+  },
+  {
+    "id_producto": 604,
+    "precio_unitario": 520,
+    "peso": 0.6
+  },
+  {
+    "id_producto": 605,
+    "precio_unitario": 350,
+    "peso": 0.55
+  },
+  {
+    "id_producto": 606,
+    "precio_unitario": 280,
+    "peso": 0.45
+  },
+  {
+    "id_producto": 607,
+    "precio_unitario": 420,
+    "peso": 0.6
+  },
+  {
+    "id_producto": 608,
+    "precio_unitario": 750,
+    "peso": 0.25
+  },
+  {
+    "id_producto": 609,
+    "precio_unitario": 380,
+    "peso": 0.45
+  },
+  {
+    "id_producto": 610,
+    "precio_unitario": 320,
+    "peso": 0.45
+  },
+  {
+    "id_producto": 611,
+    "precio_unitario": 350,
+    "peso": 0.45
+  },
+  {
+    "id_producto": 612,
+    "precio_unitario": 95,
+    "peso": 0.12
+  },
+  {
+    "id_producto": 613,
+    "precio_unitario": 45,
+    "peso": 0.02
+  },
+  {
+    "id_producto": 614,
+    "precio_unitario": 620,
+    "peso": 0.8
+  },
+  {
+    "id_producto": 615,
+    "precio_unitario": 550,
+    "peso": 1.2
+  },
+  {
+    "id_producto": 575,
+    "precio_unitario": 130,
+    "peso": 0.3
+  }
+]
+
+=== PRODUCTOS_CAMPANIA (ids) ===
+[
+  573,
+  574,
+  575,
+  576,
+  577,
+  578,
+  579,
+  580,
+  581,
+  582,
+  583,
+  584,
+  585,
+  586,
+  587,
+  588,
+  589,
+  590,
+  591,
+  592,
+  593,
+  594,
+  595,
+  596,
+  597,
+  598,
+  599,
+  600,
+  601,
+  602,
+  603,
+  604,
+  605,
+  606,
+  607,
+  608,
+  609,
+  610,
+  611,
+  612,
+  613,
+  614,
+  615
+]
+
+=== ORDENES EXISTENTES: 16 ===
+
+=== COLUMNS IN ORDEN ===
+["id_orden","folio","subtotal","fecha_realizada","estado","id_sucursal","id_usuario","id_campania","peso_total","id_cuenta"]

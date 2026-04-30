@@ -1,5 +1,11 @@
 const supabase = require('../utils/supabase');
 
+// Decodifica strings con encoding roto (bytes UTF-8 leídos como Latin-1)
+function dec(s) {
+    if (!s || (!s.includes('Ã') && !s.includes('Â'))) return s;
+    try { return Buffer.from(s, 'latin1').toString('utf8'); } catch (_) { return s; }
+}
+
 // Formatea una fecha como "YYYY-MM-DD HH:MM:SS" (mismo formato que toLocaleString guarda en BD)
 function toDbStr(d) {
     const p = n => String(n).padStart(2, '0');
@@ -120,7 +126,7 @@ module.exports = class Estadisticas {
 
                 if (prodData) {
                     result.productoMasVendido = {
-                        nombre: prodData.nombre || ("ID Producto: " + prodData.id_producto),
+                        nombre: dec(prodData.nombre) || ("ID Producto: " + prodData.id_producto),
                         desc: prodData.unidad_venta + " " + prodData.unidad_medida,
                         img: prodData.url_imagen
                     };
@@ -187,7 +193,7 @@ module.exports = class Estadisticas {
 
                 if (prodsData) {
                     result.productosSemana = prodsData.map(p => ({
-                        nombre: p.nombre || ("ID Producto: " + p.id_producto),
+                        nombre: dec(p.nombre) || ("ID Producto: " + p.id_producto),
                         desc: p.unidad_venta + " " + p.unidad_medida,
                         precio: p.precio_unitario,
                         img: p.url_imagen
@@ -611,7 +617,7 @@ static async getEstadisticasProductos(periodo = 'semana', busqueda = '', orden =
             const ventA = cantA * precio, ventP = cantP * precio;
             return {
                 id_producto: p.id_producto,
-                nombre: p.nombre,
+                nombre: dec(p.nombre),
                 url_imagen: p.url_imagen || '',
                 cantidad: cantA,
                 ventas: ventA,
@@ -729,7 +735,7 @@ static async getEstadisticasProductos(periodo = 'semana', busqueda = '', orden =
     return {
         producto: {
             id_producto: prodData.id_producto,
-            nombre:      prodData.nombre,
+            nombre:      dec(prodData.nombre),
             url_imagen:  prodData.url_imagen || '',
             cantidad:    cantA,
             ventas:      ventA,
