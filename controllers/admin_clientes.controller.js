@@ -42,9 +42,7 @@ exports.getDetalleCliente = async (request, response) => {
                 ? new Date(o.fecha_realizada).toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' })
                 : 'N/A',
             sucursal: o.sucursal?.nombre_sucursal || '—',
-            total: o.subtotal != null
-                ? `$${Number(o.subtotal).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
-                : 'N/A',
+            total: o.subtotal != null ? Number(o.subtotal) : null,
             estado: o.estado ? o.estado.charAt(0).toUpperCase() + o.estado.slice(1) : ''
         }));
 

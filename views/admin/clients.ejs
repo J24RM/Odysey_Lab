@@ -53,13 +53,13 @@
                         <% clientes.forEach((cliente) => { %>
                             <a href="/admin/clients/<%= cliente.id_usuario %>"
                                class="cliente-row grid grid-cols-4 gap-4 px-6 py-4 items-center hover:bg-blue-50 transition-colors"
-                               data-search="<%= (cliente.nombre || '') + ' ' + cliente.email %>">
+                               data-search="<%= (cliente.Nombre_usuario || '') + ' ' + cliente.email %>">
                                 <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
                                     <img src="/img/iconoPerfil.png" alt="Perfil de cliente" class="w-full h-full object-cover">
                                 </div>
-                                <span class="font-semibold text-gray-900"><%= cliente.nombre || cliente.email %></span>
+                                <span class="font-semibold text-gray-900"><%= cliente.Nombre_usuario || cliente.email %></span>
                                 <span class="text-gray-600 text-sm"><%= cliente.email %></span>
-                                <span class="text-gray-500 text-sm">N/A</span>
+                                <span class="text-gray-500 text-sm">--</span>
                             </a>
                         <% }); %>
                     </div>
