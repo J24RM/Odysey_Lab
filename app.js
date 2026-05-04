@@ -118,11 +118,6 @@ app.get('/', (request, response) => {
     response.redirect('/login');
 });
 
-//Ruta a panel de estadisticas
-// const estadisticasRoutes = require('./routes/admin_estadisticas.routes');
-// app.use(estadisticasRoutes);
-// ESAS LINEAS DAN FALLO
-
 //Middleware global de autenticacion e inactividad
 app.use((request, response, next) => {
     if (!request.session.usuario) {

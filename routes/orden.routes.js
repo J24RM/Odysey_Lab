@@ -16,8 +16,4 @@ router.get('/exportar-historial', ordenesController.exportarHistorialPedidosExce
 // Cancelar Orden
 router.post("/cancelar/:id_orden", ordenesController.postCancelarOrden);
 
-router.get("/:id_orden", cartCount, ordenesController.getOrdenes);
-
-router.get("/",cartCount ,  ordenesController.getOrdenes);
-
 module.exports = router;

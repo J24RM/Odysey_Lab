@@ -13,10 +13,6 @@ const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 
-exports.getOrdenes = async (req, res) => {
-
-};
-
 
 exports.registrarOrden = async (req, res) => {
     try {

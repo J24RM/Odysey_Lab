@@ -2,7 +2,6 @@ const ordenModel = require('../../models/orden.model')
 const detalle_ordenModel = require('../../models/detalle_orden.model');
 const productoModel = require('../../models/producto.model')
 const configuracionModel = require('../../models/configuracion.model')
-const { compile } = require('ejs');
 const { log } = require('../../utils/logger');
 const cartcount = require('../../utils/cartcount');
 

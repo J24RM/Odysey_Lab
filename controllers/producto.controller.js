@@ -8,16 +8,6 @@ const path = require('path');
 const fs = require('fs');
 const { log } = require('../utils/logger');
 
-//Obtener todos los productos (admin)
-exports.getProductos = async (request, response) => {
-    try {
-        const productos = await Producto.fetchAll();
-        // Render or send based on requirements (currently empty in file)
-    } catch (error) {
-        console.error('Error fetching products for admin:', error);
-        response.status(500).send('Error interno del servidor');
-    }
-};
 
 //Mostrar formulario de agregar producto
 exports.getAgregarProducto = async (request, response) => {
@@ -250,30 +240,6 @@ exports.getProductoCliente = async (request, response) => {
     }
 };
 
-//Mostrar formulario de editar producto
-exports.getEditarProducto = async (request, response) => {
-    try {
-        const productos = await Producto.fetchLimit(10);
-        response.render('admin/home_editarProducto', {
-            usuario: request.session.usuario,
-            productos: productos,
-            formulario: null,
-            mensaje: null,
-            error: null,
-            productoSeleccionado: null
-        });
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        response.render('admin/home_editarProducto', {
-            usuario: request.session.usuario,
-            productos: [],
-            formulario: null,
-            mensaje: null,
-            error: 'Error al cargar los productos',
-            productoSeleccionado: null
-        });
-    }
-};
 
 //Buscar producto en tiempo real (API)
 exports.searchProductos = async (request, response) => {

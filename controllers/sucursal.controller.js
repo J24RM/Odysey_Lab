@@ -1,3 +1,0 @@
-exports.getSucursalesDeMiCuenta = (request, response) => {
-
-};

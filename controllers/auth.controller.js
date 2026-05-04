@@ -174,8 +174,3 @@ exports.logout = (request, response) => {
         response.redirect('/login?motivo=logout');
     });
 };
-
-//Ruta protegida, sirve para mostrar el perfil de usuario
-exports.getMiPerfil = (request, response) => {
-    response.render('cliente/profile', { usuario: request.session.usuario });
-};

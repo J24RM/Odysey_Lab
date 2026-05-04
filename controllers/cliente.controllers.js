@@ -27,9 +27,6 @@ exports.getMisPedidos = async (request, response) => {
     }
 };
 
-exports.getPerfil = (request, response) => {
-
-};
 
 exports.setCuentaActiva = async (request, response) => {
     try {
